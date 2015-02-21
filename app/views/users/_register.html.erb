@@ -1,0 +1,44 @@
+<div class="content" id="registerpanel">
+	<p style="color:#5200A3"><i>Please fill in the required fields.</i></p>
+	<div>
+		<%= form_for :user, url: users_path, method: :post, :html => {:id => "register", :name => "register"} do |f| %>
+			<div class="inputs row">
+				<div class="col">
+					<%= f.text_field :blog_title, class:"control-text lg", placeholder: "Blog Title (Optional)" %>
+					<span class="error">
+				</div>
+				<div class="col" style="margin-left:20px">
+					<%= f.text_field :displayname, class:"control-text lg", placeholder:"Display Name (Optional)" %>
+					<span class="error"></span>	
+				</div>
+			</div>
+			<div style="margin-bottom:20px"></div>	
+			<div class="inputs">			
+					<%= f.text_field :username, class:"control-text", placeholder:"E-mail" %>
+					<span class="error"><i>(Required)</i></span>
+					<label class="control-label"><i>(This will be used as your log-in.)</i></label>
+			</div>
+
+			<div style="margin-bottom:20px"></div>
+
+			<div class="inputs row">
+				<div class="col">
+					<%= f.password_field :password, class:"control-text lg", placeholder:"Password" %>
+				</div>
+				<div class="col">
+					<%= f.password_field :password2, class:"control-text lg", placeholder:"Re-enter Password" %>
+					<span class="error"><i>(Required, must be at least 8 characters)</i></span>
+				</div>
+			</div>
+			<div style="margin-bottom:20px"></div>
+			<div class="inputs" style="margin-left:30px">
+				<button type="button" class="btn confirm" onClick="validate()">Register</button>
+				<button type="button" class="btn cancel" onClick="displayLogonPanel()">Back</button>
+			</div>
+			<div class="inputs">
+				<img src="/images/loading.gif" style="display:none" id="loading-reg">
+			</div>
+			<p id="pass-alert"></p>
+		<% end %>
+	</div>
+</div>

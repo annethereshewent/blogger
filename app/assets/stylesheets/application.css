@@ -1,0 +1,247 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any styles
+ * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
+ * file per style scope.
+ *
+ *= require font-awesome
+ *= require_tree .
+ *= require_self
+ */
+.post {
+	font-size:16px;
+}
+h2 {
+	font-family:"Calibri";
+	color:#EBD6FF;
+	font-size:30px;
+	
+}
+.error {
+	color:red;;
+	display:none;
+	font-size:10px;
+}
+.tab {
+	background:#CC3399;
+	width:200px;
+	border:1px solid #7A1F5C;
+	color:#ffffff;
+}
+a.delete {
+	text-decoration:none;
+	color: #000000;
+	margin-left:10px;
+}
+a.tlink {
+	text-decoration:none;
+	color:#ffffff;
+}
+.content {
+	font-family:"Calibri";
+	background: #F2F2FA;
+	border:1px solid #000000;
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	border-radius: 20px;
+	//margin: 30px 30px 30px 30px;
+	padding-left: 40px;
+	padding-bottom:20px;
+	padding-right:20px;
+	width: 400px;
+}
+.tab-container {
+	margin-left:20px;
+}
+.content-divider {
+	height:20px; 
+	width: 20px
+}
+.main {
+	margin-left: 440px;
+	width:400px;
+}
+body {
+	background:#7A7ACC;
+	margin: 60px 100px 60px 100px;
+}
+.control-text {
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	display:block;
+}
+.pageFooter {
+	width:450px;
+	text-align:center;
+}
+.control-text.lg {
+	width:140px;
+	margin-right:10px;
+}
+.control-text.xlg {
+	width:200px;
+	margin-right:150px;
+}
+.logo {
+	color: white;
+	font-family:"Bookman Old Style";
+	font-size:42px;
+}
+.logo-bracket {
+	color:#6B24B2;
+}
+.control-label {
+	display:block;
+}
+.row {
+	display:table-row;
+}
+.col {
+	display:table-cell;
+}
+.sidebar {
+    position:fixed;
+    height: 100%;
+    width: 300px;
+    background:#3D1466;
+    top: 0;
+    left: 0;
+    font-family: Cambria, serif;
+    color:white;
+}
+.sidebar-main {
+    margin-left:40px;
+}
+.links ul {
+    list-style:none;
+    font-size:10px;
+	margin-top:10px;
+	font-family:cambria, serif;
+}
+.links li a {
+    color:white;
+    text-decoration:none;
+}
+.links li {
+	 	margin-left:-30px;
+    border-bottom:1px solid white;
+    width:100px;
+}
+.pagination {
+    font-size:10px;
+}
+.pagi-link {
+    color:white;
+    text-decoration:none;
+}
+.links a:hover {
+    padding-left:20px;
+    color:#C285FF;
+    border-color:#C285FF;
+    -webkit-transition: all 0.6s ease-in-out;
+    -moz-transition: all 0.6s ease-in-out;
+    -o-transition: all 0.6s ease-in-out;
+    -ms-transition: all 0.6s ease-in-out;
+    transition: all 0.6s ease-in-out;
+}
+.navi a:hover {
+    color:#c285ff;
+}
+.title {
+    color: white;
+    font-size:20px;
+    padding-bottom:10px;
+    padding-top:10px;
+    margin-top:20px;
+    border-top:1px solid white;
+    border-bottom:1px solid white;
+    width:150px;
+    text-align:center;
+}
+.sidebar-image {
+    //width:120px;
+    //height:120px;
+    -webkit-border-radius: 200px;
+    -moz-border-radius: 200px;
+    border-radius: 200px;
+    margin-top:20px;
+    text-align:center;
+}
+.description {
+    font-size:10px;
+    width:100px;
+    font-family:cambria, serif;
+    margin-left:10px;
+}
+.btn.warn {
+    background:#FFCC00;
+    color:#E68A2E;
+}
+.btn.confirm {
+    background:#0099CC;
+    color:#FFFFFF;
+}
+.btn.cancel {
+    background:#993366;
+    color:#FFFFFF;
+}
+.btn {
+    width:100px;
+    height:25px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.btn.primary {
+    background:#00B88A;
+    color:#E6F8F3;
+}
+.btn.primary:disabled {
+    background:#00B88A;
+    color:#3D997A;
+}
+.btn.sm {
+    width:75px;
+}
+.btn-lg {
+    width:175px;
+}
+.tags-row {
+	margin-left:10px;
+	margin-bottom:10px;
+}
+.block-quote {
+	border-left: 2px solid grey;
+	padding-left:10px;
+}
+.block-quote, .block-quote-outer {
+	margin-left:10px;
+}
+.block-quote-outer a {
+	color:black;
+}
+.no-close, .ui-dialog-titlebar-close {
+	display:none;
+}
+.ui-dialog-titlebar {
+	display:none;
+}
+.ui-widget button {
+	font-size:14px !important; 
+	font-family:"Calibri" !important;
+}
+.ui-dialog, .ui-dialog-content {
+	font-size:16px;
+	font-family:"Calibri";
+}
+.ui-dialog {
+	margin-top:200px;
+	border:1px solid grey;
+}

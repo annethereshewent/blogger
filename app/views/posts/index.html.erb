@@ -1,0 +1,122 @@
+<head>
+	
+	<title><%= @user.blog_title %></title>
+	
+
+	
+	<style>
+	#postModal {
+		width: 375px;
+		height: 440px;
+		overflow: hidden;
+	}
+	#editContents {
+		-webkit-border-radius: 15px;
+		-moz-border-radius: 15px;
+		background: white;
+		//border: 1px solid black;
+		border-radius: 15px;
+		font-size: 16px;
+		font-family: "Calibri";
+		margin-bottom:10px;
+		margin-left:10px;
+		margin-right:10px;
+	}
+	#simplemodal-overlay {
+		background: #000;
+	}
+	</style>
+</head>
+
+	<%= render partial: "sidebar" %>
+	<div class="main">
+		<% if (@posts.size == 0)  %>
+				<div class="content" style="color:grey">
+					<i><h3>Your blog is empty. :(</h3>
+					<p>give your blog some loving and create your first post!</p></i>				
+				</div>
+		<% else %>
+			<%  @posts.each do |post|  %>
+				<div class="content" id="post_<%= post.id %>">
+					<p style="font-size:small;"><i>Creation Date: <%= @user.created_at %></i></p>
+					<div class="post"> 
+						<p><%= post.post.html_safe %></p>
+					</div>
+					<% if post.edited == 1 %>
+						<p style="font-size:small;"><i>(Edited on: <%= post.edited %>)</i></p>
+					<% end %>
+					<div class="post-buttons" style="font-size:12px">
+						<a href="<%= user_post_comments_path(@user, post) %>"><%= post.getCommentText %></a>
+						&nbsp;&nbsp;
+						<% if session[:userid] == @user.id %>
+							<a href="#" onClick="openEditModal(<%= post.id %>,<%= @user.id %>)">Edit Post</a>
+						<% end %>
+						<% if session[:userid] %>
+							<a href="#" onClick="openQuoteModal(<%= post.id %>,<%= @user.id %>)" style="margin-left:5px">Quote</a>
+						<% end %>
+						<% if session[:userid] == @user.id %>
+							<a class="delete" href="#" onclick="deletePost(<%= post.id %>);return false"><li class="fa fa-trash"></li></a>
+						<% end %>
+					</div>
+				</div>	
+				<div class="content-divider"></div>
+			<% end %>
+		<% end %>
+	</div>
+	<script src="/js/main.js"></script>
+	<script>
+	function openEditModal(pid) {
+		//need ajax to get contents
+		getPostContents(pid, function(data) {
+			openModal();
+			initEditor();
+			$("#editContents").editable("focus");
+			$("#editContents").editable("setHTML",data);
+			$("#newPost").attr("action", "/users/" + <%= @user.id %> + "/posts/" + pid);
+			$("#blogSubmit").text("Edit");
+
+			$("#postModal").next().html("Edit Post");
+		});
+	}
+	function deletePost(pID) {
+		var r = confirm("Are you sure you want to delete this post?");
+		if (r) {
+			$.ajax({
+				url: "/posts/" + pID + "/delete/",			
+				type: "post",
+				success: function(data) {
+					//console.log(data);
+					if (data == "success") {
+						$("#post_" + pID).fadeOut(1000).slideUp(1000, function() {
+							//this is setting the deleted post's content divider height to 0. otherwise it looks bad
+							$("#post_"+ pID).next().hide();
+						});
+					}
+					else {
+						alert("an error has occurred");
+					}
+				}
+			});
+		}
+	}
+	function openQuoteModal(pid) {
+		getPostContents(pid, function(data) {
+			//alert($("<div>").html(data).find("<iframe>"));
+			data = "<div class='block-quote-outer'><a href='/blog/" + <%= @user.id %> + "'>" + "<%= @user.displayname %>" + "</a><div class='block-quote'>" + data + "</div></div><p>";
+
+			openModal();
+			initEditor();
+			$("#editContents").editable("focus");
+			$("#editContents").editable("insertHTML",data);
+			$("#newPost").attr("action", "/users/<%= @user.id %>/posts");
+
+			$("#blogSubmit").text("Quote");
+			$("#postModal").next().html("Quote");
+		});
+		
+	}
+	</script>
+
+	
+</body>
+<%= render partial: "postModal" %>

@@ -1,0 +1,217 @@
+<html>
+<head>
+<style>
+.profile {
+    width:600px;
+    margin-left:325px;
+}
+.form-heading {
+    color:#6200A3;
+}
+.profile-pic {
+    max-width:80px;
+    max-height:80px;
+    -webkit-border-radius: 80px;
+    -moz-border-radius: 80px;
+    border-radius: 80px;
+}
+.profilepic-container {
+    text-align:center;
+    margin-bottom:20px;
+}
+.sub-heading {
+    color:#6200A3;
+    font-style:italic;
+    font-size:12px;
+    margin-top:-20px;
+}
+#security-row {
+    opacity:0;
+}
+#profile-pic:hover {
+    background:#000;
+    opacity: 0.2;
+    -webkit-transition-duration: 0.5s;
+    -moz-transition-duration: 0.5s;
+}
+#profilePicModal {
+    height:350px;
+    width:350px;
+}
+#simplemodal-overlay {
+    background: #000;
+}
+
+.fileUpload {
+    position: relative;
+    overflow: hidden;
+    margin: 10px;
+    text-align:center;
+    box-shadow: 3px 3px 1px #888888;
+
+}
+.fileUpload input.upload {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+.modal-upload {
+    margin-left:75px;
+    width:20%;
+    margin-bottom:20px
+}
+#fileupload-btn {
+    width:70px;
+    height:20px;
+}
+#description {
+    outline:none;
+    resize:none;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    border-radius:5px;
+    witdh:120px;
+    height:80px;
+    margin-left:20px;
+}
+</style>
+</head>
+<body>
+<%= render partial: '/posts/sidebar' %>
+	
+    <div class="profile content">
+        <h2 class="form-heading">General</h2>
+        <p class ="sub-heading">Display settings for the general look and feel of your blog.</p>
+        <p style="color:red"><%= flash[:notice] %></p>
+        <%= form_for @user, url: update_general_path(@user.id), method: :patch, id:'profile', name:'profile' do |f| %>
+            <div class="profilepic-container">
+                <a href="#" onClick="openEditProfPicModal(); return false;" ><img class="profile-pic" title="Change Profile Picture" src="<%= @profile_pic %>" alt="images/user_icon.png"></img></a>
+                <label class="control-label">Profile Picture</label>
+            </div>
+            <div class="inputs row">
+                <div class="col">
+                    <%= f.label 'Blog Title:' %>
+                    <%= f.text_field :blog_title, class: "control-text xlg", id: "blog_title" %>
+                </div>
+                <div class="col">
+                    <%= f.label "Username:" %>
+                    <%= f.text_field :displayname, class: "control-text xlg", id: 'username' %>
+                </div>
+             </div>
+             <div style="margin-bottom:10px"></div>
+             <div style="margin-left:200px;margin-bottom:20px">    
+                 <div class="inputs row">
+                    <%= f.label "Short Descripton of your Blog:" %>                   
+                    <%= f.text_area :description, id: "description", class: "control-text" %>
+                </div>
+            </div>
+             <div class="inputs" style="text-align:center">
+                <%= f.button "Save Changes", type: :submit, class: "btn confirm btn-lg" %>
+            </div>
+        <% end %>
+         <hr>
+         <h2 class="form-heading">Security</h2>
+         <p class ="sub-heading">Password and E-mail Changes</p>
+         <div id="secpass-section">
+             <div class="inputs" id="secpass-section">
+                <label class="control-label"><i>Please enter current password to continue:</i></label>
+                <input type="password" class="control-text lg" name="sec-pass" id="sec-pass" placeholder="Password"> 
+            </div>
+            <div class="inputs">
+                <button type="button" class="btn warn" onClick="checkPassword()">Verify</button>
+            </div>
+            <img src="/images/loading.gif" style="display:none" id="loading-gif"></img>
+        </div>
+        <div style="margin-bottom:20px"></div>
+        <form name="security-form" id="security-form" method="post" action="process_security.php"> 
+            <div id="security-row">
+                <div class="inputs row">
+                    <label class="control-label">Change E-mail:</label>
+                    <input type="text" name="email" id="email" class="control-text lg" placeholder="New E-mail Address">
+                </div>
+                <div style="margin-bottom:20px"></div>
+                <label class="control-label">Change Password:</label>
+            
+                <div class="inputs row">
+                    <input type="password" placeholder="Enter New Password" class="control-text lg" name="pass1" id="pass1" class="control-text lg">
+                </div>
+                <div class="inputs row">
+                    <input type="password" placeholder="Re-enter Password" class="control-text lg" name="pass2" id="pass2" class="control-text lg">
+                    <p class="error"></p>
+                </div>
+                <div class="inputs" style="text-align:center">
+                    <button type="button" onClick="validate()" class="btn confirm btn-lg">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    
+    <script src="/js/main.js"></script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            initEditor();
+            $("#upload-pic").change(function() {
+                var temp = ($(this).val()).split("\\");
+                var filename = temp[temp.length-1];
+                temp = null;
+                $("#uploadTxt").val(filename);
+            });
+        });
+        function checkPassword() {
+            $("#loading-gif").show();
+            $.ajax({
+                url: "/users/verify",
+                type: "POST",
+                data: { password: $("#sec-pass").val(), username: "<%= @user.username %>"},
+                success: function(result) {
+                    $("#sec-pass").val("");
+                    $("#loading-gif").hide();
+                    if (result == 'true') {
+                        $("#secpass-section").fadeOut(500).hide();
+                        $("#security-row").fadeIn(500).css("opacity", "1");
+                    }
+                }
+            });
+        }
+
+        function openEditProfPicModal() {
+            $("#profilePicModal").fadeIn(500).modal({
+                opacity:50, 
+                overlayClose:true,
+                position: ["200px", "200px"]
+            });
+        }
+        function validate() {
+            var errorMsg = $("#pass2").next();
+            $(errorMsg).hide();
+            if ($("#pass1").val() == "" && $("#email").val() == "" && $("#pass2").val() == "") {
+                $(errorMsg).html("<i>An error has occurred.</i>");
+                $(errorMsg).show();
+            }
+            else if ($("#pass1").val().length > 0 && $("#pass1").val().length < 8) {
+                $(errorMsg).html("<i>Password must be at least 8 characters.</i>");
+                $(errorMsg).show();
+            }
+            else if ($("#pass1").val() != $("#pass2").val()) {
+                $(errorMsg).html("<i>Passwords must match.</i>");
+                $(errorMsg).show();
+            }
+            else
+                $("#security-form").submit();
+
+        }
+    </script>
+</body>
+<%= render partial: 'profilePicModal' %>
+
+<%= render partial: 'posts/postModal' %>

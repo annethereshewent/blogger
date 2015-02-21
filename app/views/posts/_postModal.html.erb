@@ -1,0 +1,17 @@
+<div class="content" id="postModal" style="display:none">
+	<img src="/images/loading.gif" style="display:none" id="loading-post" style="margin-left:100px">
+	<p style="color:#7A7ACC;margin-left:10px">Create a New Post</p>
+	<form name="newPost" id="newPost" method="post">
+	<%= form_tag('/', method: "post",  :id => "newPost", :name => "newPost") do  %>
+		<div name="blogpost" id="editContents"></div>
+		<div style="margin-left:10px" class="tags-row">
+			<label class="control-label">Tags:</label>
+			<input type="text" name="tags" id="tags" class="tag-input control-text" style="width:350px">
+		</div>
+		<div  style="margin-left:15px;"class="buttonarea">
+	 	   <button type="button" onClick="submitContents()" id="blogSubmit" class="btn confirm sm" style="margin-right:20px">Post</button><button type="button" class="simplemodal-close btn cancel sm" id="post-cancel-btn">Cancel</button>
+		</div>
+		<input type="hidden" name="htmlContent" id="htmlContent">
+		<input type="hidden" name="blog" id="blog" value="<?= $info['blog'] ?>">
+	<% end %>
+</div>

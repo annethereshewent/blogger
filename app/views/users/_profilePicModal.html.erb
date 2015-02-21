@@ -1,0 +1,22 @@
+<div class="content" id="profilePicModal" style="display:none">
+    <h2 class="form-heading">Update Avatar</h2>
+    <p class="sub-heading">Avatar will be resized to 125x125 pixels.</p>
+    <!--<form enctype="multipart/form-data" name="upd_profpic" id="upd_profpic" method="post" action=""> -->
+    <%= form_for @user, name:"upd_profpic", id: "upd_profpic", method: :patch, url: update_picture_path(@user.id) do |f| %>
+        <div class="modal-upload">
+            <img style="margin-left:20px" class="profile-pic" src="<%= @profile_pic %>">
+            <input type="text" id="uploadTxt" disabled="true" placeholder="Choose File.." style="border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px">            
+            <div class="fileUpload btn warn" id="fileupload-btn" style="margin-left:20px">
+                <span>Select</span>
+                <%= f.file_field :profile_pic, class: "upload", id: "upload-pic" %>
+            </div> 
+        </div>
+         <div class="inputs">
+            <button style="margin-right:40px" type="submit" class="btn confirm">Save</button>
+            <button type="button" class="btn cancel simplemodal-close">Cancel</button>
+        </div>
+        <div class="inputs">
+            <img src="/images/loading.gif" style="display:none" id="modal-loading">
+        </div>
+    <% end %>
+</div>

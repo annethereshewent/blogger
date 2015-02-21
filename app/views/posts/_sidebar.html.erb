@@ -1,0 +1,24 @@
+<aside class="sidebar">
+    <div class="sidebar-main">
+        <div class="title">
+            <%= @user.blog_title %>
+        </div>
+        <div class="img-container">
+            <img class="sidebar-image" src="<%= @user.avatar %>">
+        </div>
+
+        <div class="description"><%= @user.description %></div>
+        <nav class="links">
+            <ul>
+                <li><a href="<%= user_posts_path @user %>">home</a></li>                         
+                <li><a href="<%= user_account_path @user %>">control panel</a></li>
+                <li><a href="/users/contact">contact</a></li> 
+                <% if session[:userid]  %>
+                    <li><a href="#" onClick="openNewModal(<%= @user.id %>);return false;">new</a></li>
+                    <li><a href="/users/logout">logout</a></li>
+                <% end %> 
+            </ul>
+        </nav>
+        <div class="pagination"><?= isset($info['page']) ? Common::getPageFooter($info["page"], $post_count) : '' ?></div>
+    </div>
+</aside>

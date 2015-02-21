@@ -1,0 +1,91 @@
+<html>
+<head>	
+	<style>
+	.content.comment-container {
+		width: 600px;
+		height:165px;
+		margin-left:-60px;
+	}
+	.comment-container {
+		display:none;
+	}
+	.comment-text {
+		width:90%;
+		height:100px;
+		-webkit-border-radius: 10px;
+		-moz-border-radius: 10px;
+		border-radius: 10px;
+		margin-top:30px;
+		margin-left:10px;
+		outline:none;
+		resize:none;
+	}
+	.comment-col {
+		display:table-cell;
+	}
+	.comment-row {
+		display:table-row;
+	}
+	.comment-header {
+		margin-right:10px;
+		font-size:small;
+
+	}
+	#comments-box {
+		word-wrap:break-word;
+		width:500px;
+		margin-left:-20px;
+	}
+	</style>
+</head>
+<body>
+	<%= render partial: "/posts/sidebar" %>
+	<div class="main">
+		<div class="content">
+			<p style="font-size:small;"><i>Creation Date: <%= @post.created_at %></i></p>
+			<div class="post"> 
+				<p><%= @post.post.html_safe %></p>
+			</div>
+			<div class="post-buttons" style="font-size:12px">
+				<% if session[:userid]  %>
+					<a href="#" onClick="$('#new-textbox-container').show()">New Comment</a>
+				<% end %>
+				&nbsp;&nbsp;
+				<a href="<%= user_posts_path @user %>">Back</a>
+			</div>
+		</div>
+		<div class="content-divider"></div>
+		<div class="content comment-container" id="new-textbox-container">
+			<%= form_for :comment, method: :post, id: 'commentsubm', name: 'commentsubm' do |f| %>
+				<%= f.text_area :comment, class: 'comment-text', id: 'comment', name:'comment', placeholder:"Enter comment here..." %>
+				<input type="hidden" name="pid" value="<%= @post.id %>">
+				<div class="buttonarea" style="margin-top:10px;margin-left:10px">
+					<button type="submit" class="comment-submit btn primary">Post</button>&nbsp;&nbsp;<button type="button" onClick="$('#new-textbox-container').hide()" class="btn cancel">Cancel</button>
+				</div>
+				<input type="hidden" name="blog" value="<%= @user.id %>">
+			<% end %>
+		</div>
+		<div class="content-divider"></div>
+		<% if @commentTree.size != 0  %>
+			<div class="content" id="comments-box">
+				<%= printCommentTree(@commentTree, 0).html_safe %>
+			</div>
+		<% end %>
+		<script src="/js/jquery-2.1.1.min.js" type="text/javascript"></script>	
+		<script type="text/javascript">
+		$(document).ready(function() {
+			$("#new-textbox-container").hide();
+			$	('.comment-text').on('input propertychange paste', function()  {
+				if ($(this).val() != "")
+					$(".comment-submit").removeAttr("disabled");
+				else
+					$(".comment-submit").attr("disabled","true");
+			});
+		});
+		function submit_reply(comment_id) {
+			$("#authenticity_token_" + comment_id).val($('meta[name="csrf-token"]').attr('content'));
+			$("#reply_form_" + comment_id).submit();
+		}
+		</script>
+</body>
+</html>
