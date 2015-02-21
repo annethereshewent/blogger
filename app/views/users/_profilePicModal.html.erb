@@ -4,11 +4,11 @@
     <!--<form enctype="multipart/form-data" name="upd_profpic" id="upd_profpic" method="post" action=""> -->
     <%= form_for @user, name:"upd_profpic", id: "upd_profpic", method: :patch, url: update_picture_path(@user.id) do |f| %>
         <div class="modal-upload">
-            <img style="margin-left:20px" class="profile-pic" src="<%= @profile_pic %>">
-            <input type="text" id="uploadTxt" disabled="true" placeholder="Choose File.." style="border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px">            
+            <img style="margin-left:20px" class="profile-pic" src="<%= @user.avatar.url(:thumb) %>">
+            <input type="text" id="uploadTxt" disabled="true" placeholder="Choose File..">            
             <div class="fileUpload btn warn" id="fileupload-btn" style="margin-left:20px">
                 <span>Select</span>
-                <%= f.file_field :profile_pic, class: "upload", id: "upload-pic" %>
+                <%= f.file_field :avatar, class: "upload", id: "upload-pic" %>
             </div> 
         </div>
          <div class="inputs">

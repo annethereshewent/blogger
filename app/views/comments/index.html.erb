@@ -36,6 +36,13 @@
 		width:500px;
 		margin-left:-20px;
 	}
+	.profile-thumb {
+		border-radius:80px;
+		-webkit-border-radius:80px;
+		-moz-border-radius:80px;
+		float:left;
+		margin-right:10px;
+	}
 	</style>
 </head>
 <body>
@@ -71,7 +78,6 @@
 				<%= printCommentTree(@commentTree, 0).html_safe %>
 			</div>
 		<% end %>
-		<script src="/js/jquery-2.1.1.min.js" type="text/javascript"></script>	
 		<script type="text/javascript">
 		$(document).ready(function() {
 			$("#new-textbox-container").hide();

@@ -2,21 +2,21 @@ class Comment < ActiveRecord::Base
   belongs_to :user
   belongs_to :post
 
-  def print_comment
+  def print_comment user_pic
   	replytextboxID = "reply-textbox-#{self.id}"
 	replySelector = "'\##{replytextboxID}'";
   	
   	return '
 		<div class="comment"> 
 			<div  style="font-size:small;">	
-				<img src="/images/user_icon.png">
+				<img src="' + user_pic + '" class="profile-thumb">
 				<b>' + self.getUser + '</b>
 				<i>Posted on:</i> ' + self.created_at.to_s + ' 
 			</div>
 			<div class="post">
 				<p>' + self.comment + '</p>
 			</div>
-			<p style="font-size:small"><a href="#" onClick="$(' + replySelector + ').show();return false;">Make a Reply</a></p>
+			<p style="font-size:small;"><a href="#" onClick="$(' + replySelector + ').show();return false;">Reply</a></p>
 		</div>
 		<div class="comment-container" id="' + replytextboxID + '">
 			<hr>

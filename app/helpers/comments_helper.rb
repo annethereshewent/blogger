@@ -13,7 +13,7 @@ module CommentsHelper
 
 	def printSubtree commentTree, comment
 		return "
-				<p>#{comment.print_comment}</p>
+				<p>#{comment.print_comment(@user.avatar.url(:thumb))}</p>
 				<div style='margin-left:15px;'>
 					#{printCommentTree(commentTree, comment.id)}
 				</div>

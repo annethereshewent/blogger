@@ -4,8 +4,9 @@
             <%= @user.blog_title %>
         </div>
         <div class="img-container">
-            <img class="sidebar-image" src="<%= @user.avatar %>">
-        </div>
+           
+           <%= image_tag checkAvatar(@user.avatar), class: 'sidebar-image' %> 
+         </div>
 
         <div class="description"><%= @user.description %></div>
         <nav class="links">

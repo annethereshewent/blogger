@@ -9,11 +9,10 @@
     color:#6200A3;
 }
 .profile-pic {
-    max-width:80px;
-    max-height:80px;
     -webkit-border-radius: 80px;
     -moz-border-radius: 80px;
     border-radius: 80px;
+    margin-left:10px;
 }
 .profilepic-container {
     text-align:center;
@@ -80,6 +79,11 @@
     height:80px;
     margin-left:20px;
 }
+#uploadTxt {
+    border-radius:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px
+}
 </style>
 </head>
 <body>
@@ -91,7 +95,7 @@
         <p style="color:red"><%= flash[:notice] %></p>
         <%= form_for @user, url: update_general_path(@user.id), method: :patch, id:'profile', name:'profile' do |f| %>
             <div class="profilepic-container">
-                <a href="#" onClick="openEditProfPicModal(); return false;" ><img class="profile-pic" title="Change Profile Picture" src="<%= @profile_pic %>" alt="images/user_icon.png"></img></a>
+                <a href="#" onClick="openEditProfPicModal(); return false;" ><%= image_tag @user.avatar.url(:small), class: 'profile-pic' %></img></a>
                 <label class="control-label">Profile Picture</label>
             </div>
             <div class="inputs row">
