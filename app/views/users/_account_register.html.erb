@@ -1,0 +1,20 @@
+<%= form_for @user, url: update_user_path(@user.id), html: { id: 'security-form', name: 'security-form' },  method: :patch do |f| %>
+    <div id="security-row">
+        <div class="inputs row">
+            <%= f.label "Change E-mail", class: "control-label" %>
+            <%= f.text_field :username, class: "control-text lg", id: "username", placeholder: "New E-mail Address" %>
+        </div>
+        <div style="margin-bottom:20px"></div>
+        <label class="control-label">Change Password:</label>
+        <div class="inputs row">
+            <%= f.password_field :password, class: "control-text lg", id: "password", placeholder: "Enter New Password" %>
+        </div>
+        <div class="inputs row">
+            <%= f.password_field :password_confirmation, class: "control-text lg", name: "pass2", id: "pass2", placeholder: "Re-enter Password" %>
+            <p class="error"></p>
+        </div>
+        <div class="inputs" style="text-align:center">
+            <button type="button" onClick="validate()" class="btn confirm btn-lg">Save Changes</button>
+        </div>
+    </div>
+<% end %>

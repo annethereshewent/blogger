@@ -7,12 +7,12 @@ Rails.application.routes.draw do
   get '/users/logout'
   post '/posts/:post_id/delete/' => "posts#delete", as: "delete_post"
   get '/posts/:post_id/fetch' => "posts#fetch", as: "fetch_post"
-  patch '/users/:id/update_general' => "users#update_general", as: "update_general"
-  patch '/users/:id/update_picture' => 'users#update_picture', as: "update_picture"
+  patch '/users/:id/update' => "users#update", as: "update_user"
   get '/users/:id/account' => 'users#account', as: 'user_account'
   root 'users#login'
   post '/users/verify'  => 'users#verify'
   post '/comments/:comment_id/reply' => 'comments#reply', as: 'comments_reply'
+  get '/users/:id/account' => 'users#account', as: 'account'
 
   resources :users do
     resources :posts do

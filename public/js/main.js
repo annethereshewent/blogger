@@ -1,31 +1,11 @@
 $(function(){
 	initEditor();
-	/*$("#newPost").submit(function(e) {
-		var postData = $(this).serialize();
-		var postContent = $("#htmlContent").val();		
-
-		e.preventDefault();
-		$(e).unbind();
-		
-		$("#loading-post").show();
-		$("#blogSubmit").prop('disabled', true);
-
-		$.post(
-			"/newpost.php",
-			postData,
-			function(data) {
-				//console.log("hello?");
-				if (data != "false") {
-					//console.log("great success");
-					$("#postModal").dialog("close");
-					$(".main").prepend(data).fadeIn(1000);
-					$("#blogSubmit").prop('disabled', false);
-					$("#loading-post").hide();
-				}
-			} 
-		)
-	}); */
-
+	$('#tags').tagsInput({
+		'height': "15px",
+		'width':  "340px",
+		'defaultText': 'add tag'
+	});
+	
 	$("#post-cancel-btn").click(function() {
 		$("#postModal").dialog("close");
 	});

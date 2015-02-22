@@ -8,13 +8,13 @@ class UsersController < ApplicationController
   
   def validate
   	returnStr = ""
-  	user = User.where("username = ?", params[:user])
+  	user = User.find_by_username(params[:user])
   	if user
   		returnStr += "user "
   	end
     if params[:display]
   	  user = User.where("displayname = ?", params[:display])
-  	  if user
+  	  if !user.empty
   		  returnStr += " display"
       end
   	end
@@ -63,53 +63,25 @@ class UsersController < ApplicationController
       # @profile_pic = @user.profile_pic ? @user.profile_pic : '/images/user_icon.png'
     else
       # redirect_to '/users/login', notice: "Account"
-      render plain: params.inspect
+      flash[:notice] = "Unable to access control panel: access denied"
+      redirect_to '/users/login'
     end
   end
   
-  def update_general
-    @user = User.find(params[:id])
-    if @user.update(user_params)
-      redirect_to edit_user_path @user
+  def update
+    if User.update(params[:id], user_params)
+      redirect_to user_account_path params[:id]
     else
       flash[:notice] = "error upploading account information"
-      redirect_to edit_user_path @user
+      redirect_to user_account_path params[:id]
     end
   end
 
-#
-#  def update_picture
-#    @user = User.find(params[:id])
-#    file_io = params[:user][:profile_pic]
-#    accepted_types = ["image/gif", "image/jpeg", "image/jpg", "image/png", "image/x-png", "image/pjpeg"]
-#    if accepted_types.include? file_io.content_type
-#      extension = file_io.content_type.split('/')[1]
-#      if extension == 'x-png'
-#        extension = 'png'
-#       elsif extension == 'pjpeg'
-#         extension = 'jpg'
-#       end
-#       filename = SecureRandom.hex + ".#{extension}"
-#       File.open(Rails.root.join('public', 'images', filename), 'wb') do |file|
-#         file.write(file_io.read)
-        
-#         if @user.update(profile_pic:"/images/#{filename}")
-#           redirect_to edit_user_path session[:userid]
-#         else
-#           redirect_to edit_user_path session[:userid], flash: { notice: "Error uploading profile picture." }
-#         end
-#       end
-#     else
-#       redirect_to edit_user_path @user.id, flash: { notice: "Error uploading picture: File type is not accepted." }
-#     end
-#   end
-
-
   def update_picture
      if User.update(session[:userid], user_params)
-      redirect_to edit_user_path session[:userid]
+      redirect_to user_account_path session[:userid]
     else
-      redirect_to edit_user_path session[:userid], flash: { notice: "Error uploading picture." }
+      redirect_to user_account_path session[:userid], flash: { notice: "Error uploading picture." }
     end
   end
 

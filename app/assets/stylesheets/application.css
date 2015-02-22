@@ -71,7 +71,7 @@ body {
 	background:#7A7ACC;
 	margin: 60px 100px 60px 100px;
 }
-.control-text {
+.control-text, #tags_tag  {
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
