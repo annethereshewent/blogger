@@ -48,7 +48,7 @@
 						<p style="font-size:small;"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
 					<% end %>
 					<% if post.tags.length > 0 && params[:action] != 'tags' %>
-						<p style="color:#666699;font-size:12px"><i>Tags: <%= print_tags(post.tags).html_safe %></i></p>
+						<p class="print-tags"><i>Tags: <%= print_tags(post.tags).html_safe %></i></p>
 					<% end %>
 					<div class="post-buttons" style="font-size:12px">
 						<a href="<%= user_post_comments_path(@user, post) %>"><%= post.getCommentText %></a>

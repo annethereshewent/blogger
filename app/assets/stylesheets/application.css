@@ -260,3 +260,13 @@ body {
 	margin-top:200px;
 	border:1px solid grey;
 }
+.print-tags {
+	color:#666699;
+	font-size:12px;
+	/*opacity: 0;
+	-webkit-transition-duration: 0.6s;
+    -moz-transition-duration: 0.5s;*/
+}
+.print-tags:hover {
+	/*opacity: 1; */
+}
