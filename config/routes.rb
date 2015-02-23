@@ -2,7 +2,7 @@ Rails.application.routes.draw do
 
   get '/users/checkLogin'
   get '/users' => 'users#login'
-  get '/users/validate'
+  post '/users/validate'
   post '/users/checkLogin' => "users#checkLogin"
   get '/users/logout'
   post '/posts/:post_id/delete/' => "posts#delete", as: "delete_post"
@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   post '/users/verify'  => 'users#verify'
   post '/comments/:comment_id/reply' => 'comments#reply', as: 'comments_reply'
   get '/users/:id/account' => 'users#account', as: 'account'
+  get '/users/:id/tags/:tag' => 'posts#tags', as: 'user_tags_path'
 
   resources :users do
     resources :posts do

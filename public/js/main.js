@@ -1,7 +1,7 @@
 $(function(){
 	initEditor();
 	$('#tags').tagsInput({
-		'height': "15px",
+		'height': "20px",
 		'width':  "340px",
 		'defaultText': 'add tag'
 	});

@@ -23,6 +23,12 @@ h2 {
 	font-size:30px;
 	
 }
+h3 {
+	font-family:"Calibri";
+	color:#EBD6FF;
+	font-size:20px;
+	font-style: italic;
+}
 .error {
 	color:red;;
 	display:none;
@@ -217,6 +223,15 @@ body {
 	margin-left:10px;
 	margin-bottom:10px;
 }
+.tags {
+	font-size:12px;	
+	margin-left: 10px;
+}
+.tags a {
+	text-decoration: none;
+	color: #666699;
+}
+
 .block-quote {
 	border-left: 2px solid grey;
 	padding-left:10px;

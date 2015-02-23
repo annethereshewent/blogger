@@ -58,7 +58,7 @@
 <p style="text-align:center;color:red"><%= flash[:notice] %></p>
 <div id="logonpanel">
 	<h2 style="padding-left:10px">Welcome!</h2>
-	<%= form_tag('/users/checkLogin', method: "post",  :id => "login", :name => "login ") do  %>
+	<%= form_tag('/users/checkLogin', method: "post",  :id => "login", :name => "login") do  %>
 		<div class="inputs">
 			<label class="control-label">E-mail:</label>
 			<input type="text" name="username" class="control-text">

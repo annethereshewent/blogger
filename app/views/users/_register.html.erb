@@ -8,13 +8,13 @@
 					<span class="error">
 				</div>
 				<div class="col" style="margin-left:20px">
-					<%= f.text_field :displayname, class:"control-text lg", placeholder:"Display Name (Optional)" %>
+					<%= f.text_field :displayname, class:"control-text lg", id: "displayname", placeholder:"Display Name (Optional)" %>
 					<span class="error"></span>	
 				</div>
 			</div>
 			<div style="margin-bottom:20px"></div>	
 			<div class="inputs">			
-					<%= f.text_field :username, class:"control-text", placeholder:"E-mail" %>
+					<%= f.text_field :username, class:"control-text", id: "email", placeholder:"E-mail" %>
 					<span class="error"><i>(Required)</i></span>
 					<label class="control-label"><i>(This will be used as your log-in.)</i></label>
 			</div>

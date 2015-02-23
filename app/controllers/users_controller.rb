@@ -12,9 +12,9 @@ class UsersController < ApplicationController
   	if user
   		returnStr += "user "
   	end
-    if params[:display]
+    if params[:display] != ''
   	  user = User.where("displayname = ?", params[:display])
-  	  if !user.empty
+  	  if user.count > 0 
   		  returnStr += " display"
       end
   	end
@@ -28,7 +28,7 @@ class UsersController < ApplicationController
       session[:userid]   = @user.id
       redirect_to user_posts_path @user
     else
-      redirect_to '/users/login', notice: "Username already exists"
+      redirect_to '/users', notice: "Username already exists"
     end
   end
   
@@ -39,7 +39,8 @@ class UsersController < ApplicationController
       session[:userid] = @user.id
   		redirect_to user_posts_path @user
   	else
-  		redirect_to '/users/login', notice: "Error logging in: Wrong username or password"
+      flash[:notice] = "Error logging in: Wrong username or password"
+  		redirect_to '/users'
   	end 
   end
 

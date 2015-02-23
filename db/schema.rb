@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150221195142) do
+ActiveRecord::Schema.define(version: 20150222234910) do
 
   create_table "comments", force: true do |t|
     t.text     "comment"
@@ -25,6 +25,16 @@ ActiveRecord::Schema.define(version: 20150221195142) do
   add_index "comments", ["post_id"], name: "index_comments_on_post_id", using: :btree
   add_index "comments", ["user_id"], name: "index_comments_on_user_id", using: :btree
 
+  create_table "post_tags", force: true do |t|
+    t.integer  "post_id"
+    t.integer  "tag_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "post_tags", ["post_id"], name: "index_post_tags_on_post_id", using: :btree
+  add_index "post_tags", ["tag_id"], name: "index_post_tags_on_tag_id", using: :btree
+
   create_table "posts", force: true do |t|
     t.text     "post"
     t.integer  "edited"
@@ -32,9 +42,18 @@ ActiveRecord::Schema.define(version: 20150221195142) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "tags"
   end
 
   add_index "posts", ["user_id"], name: "index_posts_on_user_id", using: :btree
+
+  create_table "tags", force: true do |t|
+    t.string   "tag_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "tags", ["tag_name"], name: "index_Tags_on_tag_name", unique: true, using: :btree
 
   create_table "users", force: true do |t|
     t.string   "username"

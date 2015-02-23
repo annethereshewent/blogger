@@ -30,20 +30,25 @@
 
 	<%= render partial: "sidebar" %>
 	<div class="main">
-		<% if (@posts.size == 0)  %>
+		<% if (@posts.length == 0)  %>
 				<div class="content" style="color:grey">
-					<i><h3>Your blog is empty. :(</h3>
-					<p>give your blog some loving and create your first post!</p></i>				
+					<i><h3>No posts to show</h3>			
 				</div>
 		<% else %>
+			<% if params[:action] == 'tags' %>
+				<h3>Posts tagged '<%= params[:tag] %>':</h3>
+			<% end %>
 			<%  @posts.each do |post|  %>
 				<div class="content" id="post_<%= post.id %>">
-					<p style="font-size:small;"><i>Creation Date: <%= @user.created_at %></i></p>
+					<p style="font-size:small;"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
 					<div class="post"> 
 						<p><%= post.post.html_safe %></p>
 					</div>
 					<% if post.edited == 1 %>
-						<p style="font-size:small;"><i>(Edited on: <%= post.edited %>)</i></p>
+						<p style="font-size:small;"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
+					<% end %>
+					<% if post.tags.length > 0 && params[:action] != 'tags' %>
+						<p style="color:#666699;font-size:12px"><i>Tags: <%= print_tags(post.tags).html_safe %></i></p>
 					<% end %>
 					<div class="post-buttons" style="font-size:12px">
 						<a href="<%= user_post_comments_path(@user, post) %>"><%= post.getCommentText %></a>
@@ -75,7 +80,7 @@
 			$("#editContents").editable("setHTML",data);
 			$("#newPost").attr("action", "/users/" + <%= @user.id %> + "/posts/" + pid);
 			$("#blogSubmit").text("Edit");
-
+			$("#_method").val("patch");
 			$("#postModal").next().html("Edit Post");
 		});
 	}

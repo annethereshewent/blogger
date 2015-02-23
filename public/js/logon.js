@@ -50,10 +50,11 @@ function validate() {
 
 function checkFieldsAjax(username, displayname) {
 	//need ajax to get contents
+
 	var temp = "";
 	var check = true;
 	$.ajax({
-		type: "GET",
+		type: "post",
 		url: "/users/validate",
 		data: {
 			user: username, 
@@ -61,11 +62,13 @@ function checkFieldsAjax(username, displayname) {
 		},
 		success: function(data) {
 			$("#loading-reg").hide();
+
 			if (data != "") {
+
 				var params = data.split(" ");
 				for (var i = 0; i < params.length; i++) {
 					if (params[i].trim() == "user") {
-						var user_warning = $("#user_username").next();
+						var user_warning = $("#email").next();
 						$(user_warning).html("<i>e-mail is already in use.</i>");
 						$(user_warning).show();
 						$("#pass-alert").html("<a href=\"forgotpassword.php\"><i>Forgot Password?</i></a>")
@@ -73,7 +76,7 @@ function checkFieldsAjax(username, displayname) {
 						check = false;
 					}
 					else if (params[i].trim() == "display") {
-						var disp_warn = $("#user_displayname").next();
+						var disp_warn = $("#displayname").next();
 						$(disp_warn).html("<i>username is already in use.</i>");
 						$(disp_warn).show();
 						check = false;

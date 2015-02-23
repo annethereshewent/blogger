@@ -6,12 +6,28 @@ class PostsController < ApplicationController
 
 	def create
 		if @post = Post.create(post: params[:htmlContent], user_id: params[:user_id])
+			params[:tags].split(',').each do |tag|
+				if (@tag = Tag.where('tag_name = ? ', tag)).present? 	
+					PostTag.create(tag_id: @tag[0].id, post_id: @post.id)
+				else
+					@tag = Tag.create(tag_name: tag)
+					PostTag.create(tag_id: @tag.id, post_id: @post.id)
+				end
+			end
 			redirect_to user_posts_path params[:user_id]
 		else
-			redirect_to user_posts_path params[:user_id], notice: "Could not save post"
+			flash[:notice] = "Could not save post"
+			redirect_to user_posts_path params[:user_id]
 		end
 	end
-
+	def update
+		if Post.update(params[:id], post: params[:htmlContent], edited: 1)
+			redirect_to user_posts_path params[:user_id]
+		else
+			flash[:notice] = "Unable to update post"
+			redirect_to user_posts_path params[:user_id]
+		end
+	end
 	def delete
 		if Post.destroy(params[:post_id])
 			render plain: "success"
@@ -32,5 +48,20 @@ class PostsController < ApplicationController
 							:status => false
 			  		  	}.to_json
 		end
+	end
+
+	def tags 
+		@user = User.find(params[:id])
+		params[:tag].gsub!('-', ' ')
+		@posts = @user.posts.where(
+			'id in 
+				( select post_tags.post_id
+					from post_tags, tags
+					where tag_name = ? and post_tags.tag_id = tags.id
+				)', 
+			params[:tag]
+		)
+
+		render 'index'
 	end
 end
