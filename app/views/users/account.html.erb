@@ -95,7 +95,7 @@
         <p style="color:red"><%= flash[:notice] %></p>
         <%= form_for @user, url: update_user_path(@user.id), method: :patch, html: { id: 'profile', name: 'profile' } do |f| %>
             <div class="profilepic-container">
-                <a href="#" onClick="openEditProfPicModal(); return false;" ><%= image_tag @user.avatar.url(:small), class: 'profile-pic' %></img></a>
+                <a href="#" onClick="openEditProfPicModal(); return false;" ><%= image_tag @user.avatar.url(:small), class: 'profile-pic' , title: "Change Profile Picture" %></img></a>
                 <label class="control-label">Profile Picture</label>
             </div>
             <div class="inputs row">

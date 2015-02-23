@@ -14,10 +14,10 @@
                 <li><a href="<%= user_posts_path @user %>">home</a></li>                         
                 <li><a href="<%= user_account_path session[:userid] %>">control panel</a></li>
                 <li><a href="/users/contact">contact</a></li> 
-                <% if session[:userid] %>
+                <% if has_access %>
                     <li><a href="#" onClick="openNewModal(<%= @user.id %>);return false;">new</a></li>
                     <li><a href="/users/logout">logout</a></li>
-                <% end %> 
+                <% end %>
             </ul>
         </nav>
         <% if params[:controller] == 'posts' && params[:action] == 'index' %> 

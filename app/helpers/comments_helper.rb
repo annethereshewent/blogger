@@ -27,8 +27,8 @@ module CommentsHelper
 		return ' 
 		<div class="comment"> 
 			<div  style="font-size:small;">	
-				<img src="' + @user.avatar.url(:thumb) + '" class="profile-thumb">
-				<b>' + @user.displayname + '</b>
+				<img src="' + comment.user.avatar.url(:thumb) + '" class="profile-thumb">
+				<b>' + comment.user.displayname + '</b>
 				<i>Posted on:</i> ' + comment.created_at.to_s + ' 
 			</div>
 			<div class="post">

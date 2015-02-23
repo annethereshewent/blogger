@@ -49,4 +49,12 @@ module PostsHelper
 			'<div style="margin-left:60px">Page 1</div>'
 		end
 	end
+
+	def has_access 
+		if params[:action] == 'account'
+			params[:id].to_i == session[:userid]
+		else 
+			params[:user_id].to_i == session[:userid]
+		end
+	end
 end

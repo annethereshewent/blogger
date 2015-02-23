@@ -4,7 +4,7 @@ class CommentsController < ApplicationController
 		@user = User.find(params[:user_id])
 
 		@commentTree = Hash.new 
-		@comments = @post.comments.order('parent, id')
+		@comments = @post.comments.order('comments.parent, comments.id').joins(:user)
 		@comments.each do |comment|
 			if @commentTree[comment.parent].nil?
 				@commentTree[comment.parent] = Array.new
@@ -12,6 +12,8 @@ class CommentsController < ApplicationController
 			@commentTree[comment.parent] << comment
 		end
 	end
+
+
 
 	def create
 		@post = Post.find(params[:pid])
@@ -27,7 +29,7 @@ class CommentsController < ApplicationController
 	def reply
 		@post = Post.find(params[:pid])
 		@post.num_comments += 1
-		if Comment.create(:comment => params[:comment], :parent => params[:comment_id], :user_id => params[:blog], :post_id => params[:pid]) && @post.save
+		if Comment.create(:comment => params[:comment], :parent => params[:comment_id], :user_id => session[:userid], :post_id => params[:pid]) && @post.save
 			redirect_to user_post_comments_path(params[:blog], params[:pid])
 		else
 			flash[:notice] = "Unable to save comment"
