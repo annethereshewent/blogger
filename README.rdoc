@@ -10,3 +10,5 @@ Things to do:
 - Archive Search
 - Ability to follow other people
 - Dashboard/Feed to see posts from followees
+
+To install and set up you will need Ruby 2 and Rails 4, as well as imagemagick to make use of the paperclip gem. 
