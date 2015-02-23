@@ -39,6 +39,9 @@ gem 'paperclip'
 # for pagination
 gem 'kaminari'
 
+#imageMagick
+gem 'RMagick'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
