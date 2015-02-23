@@ -12,9 +12,9 @@
         <nav class="links">
             <ul>
                 <li><a href="<%= user_posts_path @user %>">home</a></li>                         
-                <li><a href="<%= user_account_path @user %>">control panel</a></li>
+                <li><a href="<%= user_account_path session[:userid] %>">control panel</a></li>
                 <li><a href="/users/contact">contact</a></li> 
-                <% if session[:userid]  %>
+                <% if session[:userid] %>
                     <li><a href="#" onClick="openNewModal(<%= @user.id %>);return false;">new</a></li>
                     <li><a href="/users/logout">logout</a></li>
                 <% end %> 

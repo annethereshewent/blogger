@@ -16,7 +16,7 @@ class CommentsController < ApplicationController
 	def create
 		@post = Post.find(params[:pid])
 		@post.num_comments += 1
-		if @post.comments.create(:comment => params[:comment], :parent => 0, :user_id => params[:blog]) && @post.save
+		if @post.comments.create(:comment => params[:comment], :parent => 0, :user_id => session[:userid]) && @post.save
 			redirect_to user_post_comments_path(params[:blog], params[:pid])
 		else
 			flash[:notice] = 'Unable to save comment'

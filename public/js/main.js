@@ -18,7 +18,7 @@ function initEditor() {
 		placeholder:"",
 		width: "350px",
 		height: "250px",
-		buttons: ["indent", "outdent", "strikeThrough", "bold", "italic", "underline", "insert9UnorderedList", "insertOrderedList"],
+		buttons: ["indent", "outdent", "strikeThrough", "bold", "italic", "underline", "insertImage", "insertUnorderedList"],
 		inverseSkin: true,
 	});
 }

@@ -38,6 +38,9 @@ gem 'paperclip'
 # for pagination
 gem 'kaminari'
 
+#wysiwyg editor
+gem "wysiwyg-rails"
+
 group :production do
 	gem 'rails_12factor'
 	gem 'pg'

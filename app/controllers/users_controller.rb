@@ -63,9 +63,9 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       # @profile_pic = @user.profile_pic ? @user.profile_pic : '/images/user_icon.png'
     else
-      # redirect_to '/users/login', notice: "Account"
+      # redirect_to '/users', notice: "Account"
       flash[:notice] = "Unable to access control panel: access denied"
-      redirect_to '/users/login'
+      redirect_to '/users'
     end
   end
   

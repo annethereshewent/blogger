@@ -3,7 +3,7 @@ class PostsController < ApplicationController
 		page = params[:page].present? ? params[:page] : 1
 
 		@user = User.find(params[:user_id])
-		@posts = @user.posts.order('id desc').page(page).per(15)
+		@posts = @user.posts.order('posts.id desc').includes(:tags).order('post_tags.created_at desc').page(page).per(15)
 	end
 
 	def create
