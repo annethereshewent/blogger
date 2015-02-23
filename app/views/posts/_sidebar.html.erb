@@ -20,7 +20,7 @@
                 <% end %> 
             </ul>
         </nav>
-        <% if params[:action] != 'tags' %> 
+        <% if params[:controller] == 'posts' && params[:action] == 'index' %> 
             <div class="pagination"><%= getPageFooter.html_safe %></div>
         <% end %>
     </div>
