@@ -40,7 +40,7 @@ gem 'kaminari'
 
 group :production do
 	gem 'rails_12factor'
-	gem 'pg', '~> 0.18.1'
+	gem 'pg'
 end
 group :development do
 	# Use mysql as the database for Active Record (development)
