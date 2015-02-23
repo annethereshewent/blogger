@@ -5,8 +5,7 @@ source 'http://rubygems.org'
 gem 'rails', '4.1.5'
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
-# Use mysql as the database for Active Record
-gem 'mysql2'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
 # Use Uglifier as compressor for JavaScript assets
@@ -39,6 +38,14 @@ gem 'paperclip'
 # for pagination
 gem 'kaminari'
 
+group :production do
+	gem 'rails_12factor'
+	gem 'pg', '~> 0.18.1'
+end
+group :development do
+	# Use mysql as the database for Active Record (development)
+	gem 'mysql2'
+end
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
