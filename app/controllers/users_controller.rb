@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   
   def login
     if session[:userid]
-      redirect_to user_posts_path session[:userid]
+      redirect_to user_posts_page_path(session[:userid], 1) 
     end
   end
   
@@ -26,7 +26,7 @@ class UsersController < ApplicationController
     if @user.save
       session[:username] = @user.username
       session[:userid]   = @user.id
-      redirect_to user_posts_path @user
+      redirect_to user_posts_page_path(@user, 1)
     else
       redirect_to '/users', notice: "Username already exists"
     end
@@ -37,7 +37,7 @@ class UsersController < ApplicationController
   	if @user and @user.authenticate(params[:pass])
       session[:username] = @user.username
       session[:userid] = @user.id
-  		redirect_to user_posts_path @user
+  		redirect_to user_posts_page_path(@user, 1)
   	else
       flash[:notice] = "Error logging in: Wrong username or password"
   		redirect_to '/users'

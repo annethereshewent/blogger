@@ -1,7 +1,9 @@
 class PostsController < ApplicationController
 	def index
+		page = params[:page].present? ? params[:page] : 1
+
 		@user = User.find(params[:user_id])
-		@posts = @user.posts.order('id desc').first(15)
+		@posts = @user.posts.order('id desc').page(page).per(15)
 	end
 
 	def create
@@ -14,18 +16,18 @@ class PostsController < ApplicationController
 					PostTag.create(tag_id: @tag.id, post_id: @post.id)
 				end
 			end
-			redirect_to user_posts_path params[:user_id]
+			redirect_to user_posts_page_path(params[:user_id], 1)
 		else
 			flash[:notice] = "Could not save post"
-			redirect_to user_posts_path params[:user_id]
+			redirect_to user_posts_page_path(params[:user_id], 1)
 		end
 	end
 	def update
 		if Post.update(params[:id], post: params[:htmlContent], edited: 1)
-			redirect_to user_posts_path params[:user_id]
+			redirect_to user_posts_page_path(params[:user_id], 1)
 		else
 			flash[:notice] = "Unable to update post"
-			redirect_to user_posts_path params[:user_id]
+			redirect_to user_posts_page_path(params[:user_id], 1)
 		end
 	end
 	def delete
@@ -53,7 +55,7 @@ class PostsController < ApplicationController
 	def tags 
 		@user = User.find(params[:id])
 		params[:tag].gsub!('-', ' ')
-		@posts = @user.posts.where(
+		@posts = @user.posts.order('id desc').where(
 			'id in 
 				( select post_tags.post_id
 					from post_tags, tags

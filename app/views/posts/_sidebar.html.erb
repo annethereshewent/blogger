@@ -20,6 +20,8 @@
                 <% end %> 
             </ul>
         </nav>
-        <div class="pagination"><?= isset($info['page']) ? Common::getPageFooter($info["page"], $post_count) : '' ?></div>
+        <% if params[:action] != 'tags' %> 
+            <div class="pagination"><%= getPageFooter.html_safe %></div>
+        <% end %>
     </div>
 </aside>

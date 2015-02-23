@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   post '/comments/:comment_id/reply' => 'comments#reply', as: 'comments_reply'
   get '/users/:id/account' => 'users#account', as: 'account'
   get '/users/:id/tags/:tag' => 'posts#tags', as: 'user_tags_path'
+  get '/users/:user_id/posts/:page' => 'posts#index', as: 'user_posts_page'
 
   resources :users do
     resources :posts do

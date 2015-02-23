@@ -33,7 +33,11 @@ gem 'bcrypt'
 # font awesome for rails
 gem 'font-awesome-rails'
 
+# for handling attachments
 gem 'paperclip'
+
+# for pagination
+gem 'kaminari'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
