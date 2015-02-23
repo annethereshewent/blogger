@@ -11,9 +11,6 @@
  * file per style scope.
  *
  *= require font-awesome
- *= require froala_editor.min.css
- *= require froala_style.min.css
- *= require themes/dark.min.css
  *= require_tree .
  *= require_self
  */

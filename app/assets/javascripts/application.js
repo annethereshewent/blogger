@@ -13,5 +13,4 @@
 //= require jquery-2.1.1.min.js
 //= require jquery_ujs
 //= require turbolinks
-//= require froala_editor.min.js
 //= require_tree .
