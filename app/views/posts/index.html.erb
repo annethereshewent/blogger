@@ -77,10 +77,18 @@
 			openModal();
 			initEditor();
 			$("#editContents").editable("focus");
-			$("#editContents").editable("setHTML",data);
+			$("#editContents").editable("setHTML",data.content);
 			$("#newPost").attr("action", "/users/" + <%= @user.id %> + "/posts/" + pid);
 			$("#blogSubmit").text("Edit");
 			$("#_method").val("patch");
+
+			/*$.each(data.tags, function(i, val) {
+				$("#tags").addTag(val);
+			});*/
+
+			for (var i = 0; i < data.tags.length; i++)
+				$("#tags").addTag(data.tags[i]);
+
 			$("#postModal").next().html("Edit Post");
 		});
 	}

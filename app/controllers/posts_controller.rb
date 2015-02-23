@@ -8,14 +8,7 @@ class PostsController < ApplicationController
 
 	def create
 		if @post = Post.create(post: params[:htmlContent], user_id: params[:user_id])
-			params[:tags].split(',').each do |tag|
-				if (@tag = Tag.where('tag_name = ? ', tag)).present?
-					PostTag.create(tag_id: @tag[0].id, post_id: @post.id)
-				else
-					@tag = Tag.create(tag_name: tag)
-					PostTag.create(tag_id: @tag.id, post_id: @post.id)
-				end
-			end
+			parse_tags(params[:tags])
 			redirect_to user_posts_page_path(params[:user_id], 1)
 
 		else
@@ -23,12 +16,25 @@ class PostsController < ApplicationController
 			redirect_to user_posts_page_path(params[:user_id], 1)
 		end
 	end
+	
 	def update
-		if Post.update(params[:id], post: params[:htmlContent], edited: 1)
+		if @post = Post.update(params[:id], post: params[:htmlContent], edited: 1)
+			parse_tags(params[:tags])
 			redirect_to user_posts_page_path(params[:user_id], 1)
 		else
 			flash[:notice] = "Unable to update post"
 			redirect_to user_posts_page_path(params[:user_id], 1)
+		end
+	end
+
+	def parse_tags(tags)
+		tags.split(',').each do |tag|
+			if (@tag = Tag.where('tag_name = ? ', tag)).present?
+				PostTag.create(tag_id: @tag[0].id, post_id: @post.id)
+			else
+				@tag = Tag.create(tag_name: tag)
+				PostTag.create(tag_id: @tag.id, post_id: @post.id)
+			end
 		end
 	end
 	def delete
@@ -45,6 +51,7 @@ class PostsController < ApplicationController
 			render plain: {
 							:status  => true,
 							:content => @post.post,
+							:tags 	 => @post.tags.order('post_tags.created_at desc').map { |tag| tag.tag_name }
 				  		}.to_json				
 		else
 			render plain: {

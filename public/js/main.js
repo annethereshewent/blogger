@@ -77,7 +77,7 @@ function getPostContents(pid, callback) {
 		dataType: "json",
 		success: function(data) {
 			if (data.status != false) {
-				callback(data.content);
+				callback(data);
 			} 
 		}
 	});
