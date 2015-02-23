@@ -9,7 +9,7 @@ class PostsController < ApplicationController
 	def create
 		if @post = Post.create(post: params[:htmlContent], user_id: params[:user_id])
 			params[:tags].split(',').each do |tag|
-				if (@tag = Tag.where('tag_name = ? ', tag)).present? 	
+				if (@tag = Tag.where('tag_name = ? ', tag)).present?
 					PostTag.create(tag_id: @tag[0].id, post_id: @post.id)
 				else
 					@tag = Tag.create(tag_name: tag)
@@ -17,6 +17,7 @@ class PostsController < ApplicationController
 				end
 			end
 			redirect_to user_posts_page_path(params[:user_id], 1)
+
 		else
 			flash[:notice] = "Could not save post"
 			redirect_to user_posts_page_path(params[:user_id], 1)

@@ -7,10 +7,13 @@ module PostsHelper
 		end
 	end
 
-	def print_tags(tags)
+	def print_tags(post)
 		if params[:action] == 'tags'
 			return ''
 		end
+		
+		tags = post.tags.order('post_tags.created_at')
+		
 		returnStr = ""
 		tags.each do |tag| 
 			returnStr += "<span class='tags'><a href='/users/#{@user.id}/tags/#{tag.tag_name.gsub(' ', '-')}'>#{tag.tag_name}</a></span>" 
