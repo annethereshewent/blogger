@@ -21,10 +21,10 @@ module PostsHelper
 	end
 
 	def getPageFooter
-		page = params[:page].present? ? params[:page].to_i : 1
-		num_posts = @user.posts.page(page).per(20).count
+		page = params[:page].present? ? params[:page] : "1"
+		num_posts = @user.posts.page(page.to_i).per(20).count
 		if num_posts > 15
-			if page == 1
+			if page == "1"
 				
 				'<span class="navi">
 					<a class="pagi-link" href="/users/' + params[:user_id] + '/posts/' + page.to_i.next.to_s + '">Next Page</a>
@@ -40,7 +40,7 @@ module PostsHelper
 				  </span>
 				  <div style="margin-left:60px">Page ' + page + '</div>'
 			end
-		elsif page != 1
+		elsif page != "1"
 			'<span class="navi">
 				<a class="pagi-link" href="/users/' + params[:user_id] + '/posts/' + (page.to_i  - 1).to_s + '">Previous Page</a>
 			 </span>
