@@ -22,7 +22,7 @@ module PostsHelper
 
 	def getPageFooter
 		page = params[:page].present? ? params[:page] : "1"
-		num_posts = @user.posts.page(page.to_i).per(20).count
+		num_posts = @user.posts.paginate(page: page, per_page: 20).count
 		if num_posts > 15
 			if page == "1"
 				
