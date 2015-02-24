@@ -43,7 +43,7 @@ gem 'aws-sdk', '< 2.0'
 
 
 # for pagination
-gem 'will_paginate'
+gem 'kaminari'
 
 
 group :production do
