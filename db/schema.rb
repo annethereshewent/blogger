@@ -13,6 +13,9 @@
 
 ActiveRecord::Schema.define(version: 20150222234910) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "comments", force: true do |t|
     t.text     "comment"
     t.integer  "parent"
@@ -53,7 +56,7 @@ ActiveRecord::Schema.define(version: 20150222234910) do
     t.datetime "updated_at"
   end
 
-  add_index "tags", ["tag_name"], name: "index_Tags_on_tag_name", unique: true, using: :btree
+  add_index "tags", ["tag_name"], name: "index_tags_on_tag_name", unique: true, using: :btree
 
   create_table "users", force: true do |t|
     t.string   "username"

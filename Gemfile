@@ -45,15 +45,13 @@ gem 'aws-sdk', '< 2.0'
 # for pagination
 gem 'kaminari'
 
+# use postgres as the default database
+gem 'pg'
 
 group :production do
 	gem 'rails_12factor'
-	gem 'pg'
 end
-group :development do
-	# Use mysql as the database for Active Record (development)
-	gem 'mysql2'
-end
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

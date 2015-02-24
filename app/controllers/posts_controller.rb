@@ -1,9 +1,9 @@
 class PostsController < ApplicationController
 	def index
-		page = params[:page].present? ? params[:page] : 1
+		page = params[:page].present? ? params[:page].to_i : 1
 
 		@user = User.find(params[:user_id])
-		@posts = @user.posts.order('posts.id desc').includes(:tags).order('post_tags.created_at').page(page).per(20)
+		@posts = @user.posts.order('posts.id desc').includes(:tags).order('post_tags.created_at').page(page).per(18)
 	end
 
 	def create
