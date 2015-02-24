@@ -35,8 +35,12 @@ gem 'font-awesome-rails'
 # for handling attachments
 gem 'paperclip'
 
+# for uploading to aws s3 service
+gem 'aws-sdk'
+
 # for pagination
 gem 'kaminari'
+
 
 group :production do
 	gem 'rails_12factor'
