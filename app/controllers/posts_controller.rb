@@ -3,7 +3,8 @@ class PostsController < ApplicationController
 		page = params[:page].present? ? params[:page].to_i : 1
 
 		@user = User.find(params[:user_id])
-		@posts = @user.posts.order('posts.id desc').includes(:tags).order('post_tags.created_at').limit(18).offset((page-1)*18)
+		@posts = @user.posts.order('posts.id desc').page(page).per(15)
+
 	end
 
 	def create
