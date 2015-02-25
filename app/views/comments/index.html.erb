@@ -49,7 +49,7 @@
 	<%= render partial: "/posts/sidebar" %>
 	<div class="main">
 		<div class="content">
-			<p style="font-size:small;"><i>Creation Date: <%= @post.created_at %></i></p>
+			<p style="font-size:small;"><i>Creation Date: <%= @post.created_at.strftime("%m-%d-%y %I:%M %P")  %></i></p>
 			<div class="post"> 
 				<p><%= @post.post.html_safe %></p>
 			</div>
