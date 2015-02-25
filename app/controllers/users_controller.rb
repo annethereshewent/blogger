@@ -59,12 +59,12 @@ class UsersController < ApplicationController
   end
 
   def account
-    if session[:userid].to_i == params[:id].to_i
+    if session[:userid].present? && session[:userid].to_i == params[:id].to_i
       @user = User.find(params[:id])
       # @profile_pic = @user.profile_pic ? @user.profile_pic : '/images/user_icon.png'
     else
       # redirect_to '/users', notice: "Account"
-      flash[:notice] = "Unable to access control panel: access denied"
+      flash[:notice] = "Please log in to continue"
       redirect_to '/users'
     end
   end

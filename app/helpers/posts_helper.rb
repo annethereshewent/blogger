@@ -57,4 +57,13 @@ module PostsHelper
 			params[:user_id].to_i == session[:userid]
 		end
 	end
+
+	def get_account_path
+		if params['controller'] == 'users' 
+			return user_account_path(params[:id])
+		end
+			
+		user_account_path(params[:user_id])
+	end
+	
 end
