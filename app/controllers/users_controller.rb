@@ -1,9 +1,9 @@
 class UsersController < ApplicationController
   
   def login
-    # if session[:userid]
-    #  redirect_to user_posts_page_path(session[:userid], 1) 
-    # end
+    if session[:userid]
+      redirect_to user_posts_page_path(session[:userid], 1) 
+    end
   end
   
   def validate
