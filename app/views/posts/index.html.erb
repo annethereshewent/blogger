@@ -48,8 +48,8 @@
 					<% if post.edited == 1 %>
 						<p style="font-size:small;"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
 					<% end %>
-					<% if tags.length > 0 && params[:action] != 'tags' %>
-						<p class="print-tags"><i>Tags: <%= print_tags(tags).html_safe %></i></p>
+					<% if tags.length > 0 %> 
+						<p class="print-tags"><i>Tags: <%= render partial: 'tag', collection: tags %></i></p>
 					<% end %>
 					<div class="post-buttons" style="font-size:12px">
 						<a href="<%= user_post_comments_path(@user, post) %>"><%= post.getCommentText %></a>

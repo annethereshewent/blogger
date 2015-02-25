@@ -43,7 +43,7 @@ gem 'aws-sdk', '< 2.0'
 
 
 # for pagination
-gem 'kaminari'
+gem 'will_paginate'
 
 # use postgres as the default database
 gem 'pg'

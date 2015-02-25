@@ -3,7 +3,7 @@ class PostsController < ApplicationController
 		page = params[:page].present? ? params[:page].to_i : 1
 
 		@user = User.find(params[:user_id])
-		@posts = @user.posts.order('posts.id desc').page(page).per(15)
+		@posts = @user.posts.order('posts.id desc').paginate(page: params[:page], per_page: 15)
 
 	end
 

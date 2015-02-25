@@ -21,7 +21,7 @@
             </ul>
         </nav>
         <% if params[:controller] == 'posts' && params[:action] == 'index' %> 
-            <div class="pagination"><%= getPageFooter.html_safe %></div>
+            <div class="pagination"><%= will_paginate(@posts, :page_links => false) %></div>
         <% end %>
     </div>
 </aside>
