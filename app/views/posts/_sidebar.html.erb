@@ -22,6 +22,7 @@
         </nav>
         <% if params[:controller] == 'posts' && params[:action] == 'index' %> 
             <div class="pagination"><%= will_paginate(@posts, :page_links => false) %></div>
+            <div class="pagination-number pagination">Page <%= params[:page] ? params[:page] : 1 %></div>
         <% end %>
     </div>
 </aside>

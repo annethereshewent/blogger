@@ -143,6 +143,9 @@ body {
 .pagination {
     font-size:10px;
 }
+.pagination-number {
+	margin-left:50px;
+}
 .next_page, .previous_page {
     color:white;
     text-decoration:none;
