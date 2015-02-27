@@ -31,20 +31,20 @@ class UsersController < ApplicationController
     @posts = []
     
     @friends.each do |friend|
-      friend.posts.each do |post|
+      friend.posts.includes(:tags).each do |post|
         @posts << post
       end
     end
 
     # include logged in user's posts as well
-    @user.posts.each do |post|
+    @user.posts.includes(:tags).each do |post|
       @posts << post
     end
 
     @posts.sort! do |a,b|
       b.id <=> a.id
     end
-    
+
   end
   
   def create
@@ -113,15 +113,6 @@ class UsersController < ApplicationController
       render plain: "true"
     else
       render plain: "false"
-    end
-  end
-
-  def check_requests
-    if session[:userid]
-      friendship_count = Friendship.where('user_id = ? and accepted = ? and sender <> user_id', session[:userid], false).count
-      render plain: friendship_count
-    else
-      render plain: 'N/A'
     end
   end
 

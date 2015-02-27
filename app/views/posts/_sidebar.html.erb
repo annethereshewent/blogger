@@ -14,9 +14,8 @@
                 <li><a href="<%= user_posts_path @user %>">home</a></li>                         
                 <li><a href="<%= get_account_path %>">control panel</a></li>
                 <li><a href="/users/contact">contact</a></li> 
-                <% if has_access %>
+                <% if has_access? %>
                     <li><a href="#" onClick="openNewModal(<%= @user.id %>);return false;">new</a></li>
-                    <li><a href="/users/logout">logout</a></li>
                 <% end %>
             </ul>
         </nav>
@@ -27,10 +26,17 @@
     </div>
 </aside>
 <div class="navigation-content">
-    <li class="nav-buttons">
-    <% if !is_friends? %>
-            <ul id="addFriend"><a href="#" onclick="addFriend()"><i class="fa fa-user-plus"></i>Add Friend</a></ul>
-    <% end %>
-         <ul id="Requests"><a href="#" onClick="openRequests()"><p id="num-requests" ></p><i class="fa fa-users"></i><i>Requests</i></a></ul>
-  </li>
+    <ul class="nav-buttons">
+        <% if !is_friends? %>
+            <li id="addFriend"><a href="#" onclick="addFriend()"><i class="fa fa-user-plus"></i>Add Friend</a></li>
+        <% end %>
+        <% if session[:userid] == params[:user_id].to_i %>
+            <li id="Requests"><a href="#" onClick="openRequests()"><p id="num-requests" ><%= check_requests %></p><i class="fa fa-users"></i><i>Requests</i></a></li>
+        <% end %>
+        <% if session[:userid] %>
+            <li id="Logout"><a href="/users/logout"><i class="fa fa-sign-out"></i>Logout</a></li>
+            <li id="Dashboard"><a href="<%= user_dashboard_path @user.id %>"><i class="fa fa-tachometer"></i>Dashboard</a></li>
+        <% end %>
+        
+    </ul>
 </div>

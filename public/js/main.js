@@ -5,31 +5,23 @@ $(function(){
 		'width':  "340px",
 		'defaultText': 'add tag'
 	});
+	$('#youtube-tags').tagsInput({
+		'height': "20px",
+		'width':  "340px",
+		'defaultText': 'add tag'
+	});
 	
 	$("#post-cancel-btn").click(function() {
 		$("#postModal").dialog("close");
 	});
 	$("#request-cancel-btn").click(function() {
 		$("#requestModal").dialog("close");
-	})
+	});
 
-	checkRequests();
+	if (parseInt($("#num-requests").html()) > 0)
+		$("#num-requests").css('display', 'inline');
+
 });
-
-function checkRequests() {
-	$.get('/users/checkRequests',
-		function(data) {
-			if (data != 'N/A') {
-				$("#num-requests").html(data);
-				if (data > 0)
-					$("#num-requests").css('display', 'inline');
-			}
-			else {
-				$("#Requests").hide();
-			}
-		}
-	);
-}
 function openRequests() {
 	num_requests = $("#num-requests").html() != '' ? $("#num-requests").html() : 0
 
@@ -130,7 +122,7 @@ function getPostContents(pid, callback) {
 function parseYoutubeURL(content) {
 	var regEx = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
 	var match = content.match(regEx);
-	//the youtube id will be in match[4]. can verify with console.log
+	//the youtube id will be in match[7]. can verify with console.log
 	//console.log(match);
 
 	return match;
@@ -152,6 +144,8 @@ function openNewModal(userID) {
 	$("#blogSubmit").text("Post");
 	$("#postModal").next().html("New Post");
 }
+
+
 
 
 

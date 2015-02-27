@@ -48,6 +48,12 @@
 		#editContents {
 			background:white;
 		}
+		.content-divider {
+			height: 30px;
+		}
+		#youtube-content {
+			margin-bottom:25px;
+		}
 	</style>
 </head>
 <body>
@@ -57,16 +63,23 @@
 	</div>
 	<div class="buttons">
 		<ul class="list-buttons">
-			<li><a href="#" onclick="openNewModal(<%= params[:user_id] %>);return false;"><img src="/images/write-document-icon.png" class="icon"></a></li>
-			<li><img src="/images/video_icon.png" class="icon"></li>
-			<li><img src="/images/control_panel.png" class="icon"></li>
-			<li><a href="/users/logout"><img src="/images/logout2.png" class="icon"></a></li>
+			<li><a href="#" onclick="openNewDashModal(<%= params[:user_id] %>);return false;"><img src="/images/write-document-icon.png" class="icon"></a></li>
+			<li><a href="#" onclick="openYoutubeModal()" ><img src="/images/video_icon.png" class="icon"></a></li>
+			<li><a href="<%= user_account_path session[:userid] %>"><img src="/images/control_panel.png" class="icon"></li></a>
+			<li><a href="/users/logout"><img src="/images/logout3.png" class="icon"></a></li>
 		</ul>
 	</div>
 	<div class="main">
 		<h2>Posts in your Feed</h2>
 		<% @posts.each do |post| %>
-			<img class="avatar-dash" src="<%= get_avatar(post) %>">
+			<% user = get_user(post) %>
+			<a href="<%= user_posts_page_path post.user_id, 1 %>">
+				<div class="avatar-dash">
+					<img src="<%= user.avatar.url(:small)%>">
+					<p style="font-size:12px;color:white"><b><%= user.displayname %></b></p>
+				</div>
+			</a>
+
 			<div class="dash content">
 				<p style="font-size:small;"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
 				<div class="post"> 
@@ -75,9 +88,16 @@
 				<% if post.edited == 1 %>
 					<p style="font-size:small;"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
 				<% end %>
+				<% if post.tags.length > 0 %> 
+						<p class="print-tags"><i>Tags: <%= render partial: 'posts/tag', collection: post.tags %></i></p>
+					<% end %>
 				<div class="post-buttons" style="font-size:12px">
 					<a href="<%= user_post_comments_path(post.user_id, post) %>"><%= post.getCommentText %></a>
 					&nbsp;&nbsp;
+					<a href="#" onClick="openQuoteModal(<%= post.id %>,<%= @user.id %>)" style="margin-left:5px">Quote</a>
+					<% if post.user_id = session[:userid] %>
+						<a class="delete" href="#" onclick="deletePost(<%= post.id %>);return false"><li class="fa fa-trash"></li></a>
+					<% end %>
 				</div>
 			</div>
 			<div class="content-divider"></div>
@@ -85,7 +105,43 @@
 		<% end %>
 	</div>
 	<script src="/js/main.js"></script>
+	<script>
+		$(function() {
+			$("#youtube-url").change(function() {
+
+			});
+		});
+		function openNewDashModal(userID) {
+			openNewModal(userID);
+			$("#source").val("dashboard");
+		}
+
+		function openYoutubeModal() {
+			$("#youtubeModal").fadeIn(500).dialog({
+				autoOpen:true,
+				closeOnEscape:true,
+				modal:true,
+				resizable:false,
+				width:430,
+				height:250,
+				position: {at:"top"}
+			});
+		}
+
+		function submitYoutube(user_id) {
+			var match = parseYoutubeURL($("#youtube-url").val());
+
+
+			var youtube_vid = '<iframe src="https://www.youtube.com/embed/' + match[7] + '" width="375" height="211" frameborder="0" allowfullscreen></iframe>';
+
+			$("#youtube_content").val(youtube_vid);
+			
+			$("#newYoutubePost").attr("action", "<%= user_posts_path session[:userid] %>")
+			$("#newYoutubePost").submit();
+		}
+	</script>
 </body>
 
 <%= render partial: 'posts/postModal' %>
+<%= render partial: 'posts/youtubeModal' %>
 

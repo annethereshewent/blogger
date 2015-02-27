@@ -137,7 +137,7 @@ body {
 	margin: 0;
 	padding: 0;
 }
-.nav-buttons ul {
+.nav-buttons li {
 	background:grey;
 	opacity:0.7;
 	border: 1px solid black;
@@ -171,7 +171,7 @@ body {
 	display:none;
 	padding: 5px 5px 5px 5px;
 }
-.nav-buttons ul a {
+.nav-buttons li a {
 	text-decoration:none;
 	color:black;
 }
@@ -279,7 +279,7 @@ body {
     width:175px;
 }
 .tags-row {
-	margin-left:10px;
+	//margin-left:10px;
 	margin-bottom:10px;
 }
 .tags {

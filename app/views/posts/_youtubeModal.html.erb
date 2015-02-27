@@ -1,0 +1,21 @@
+<div class="content" id="youtubeModal" style="display:none">
+	<img src="/images/loading.gif" style="display:none" id="youtube-loading-post" style="margin-left:100px">
+	<h2>New Youtube Video</h2>
+	<div id="youtube-content">
+		<%= form_tag('/', method: "post",  :id => "newYoutubePost", :name => "newYoutubePost") do  %>
+			<label class="control-label">URL:</label>
+			<input type="text" class="control-text lg" style="width:345px" name="youtube-url" id="youtube-url" placeholder="Enter Youtube URL">
+			<div class="youtube-video"></div>
+			<div class="tags-row" style="margin-top:10px">
+				<label class="control-label">Tags:</label>
+				<input type="text" name="tags" id="youtube-tags" class="tag-input control-text" style="width:350px">
+			</div>
+			<input type="hidden" name="youtube_content" id="youtube_content">
+		<% end %>
+	</div>
+	<div class="youtube-buttons">
+		<button type="button" class="btn confirm sm" style="margin-right:20px" onclick="submitYoutube()">Submit</button>
+		<button type="button" class="btn cancel sm" id="youtube-cancel-btn">Go Back</button>
+	</div>
+
+</div>

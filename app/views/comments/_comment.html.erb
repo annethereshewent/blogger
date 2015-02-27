@@ -16,7 +16,7 @@
 		<div class="buttonarea" style="margin-top:10px;margin-left:10px">
 			<button type="button" onclick="submit_reply(<%= comment.id %>)" class="comment-submit btn primary sm">Reply</button>&nbsp;&nbsp;&nbsp;<button type="button" class="btn cancel sm" onClick="$(<%= replySelector %>).hide();return false;">Cancel</button>
 		</div>
-		<input type="hidden" name="blog" value="<%= comment.user_id %>">
+		<input type="hidden" name="blog" value="<%= @user.id %>">
 		<input type="hidden" name="pid" value="<%= comment.post_id %>">
 		<input type="hidden" name="authenticity_token" id="authenticity_token_<%= comment.id %>">
 	</form>

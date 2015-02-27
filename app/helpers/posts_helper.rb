@@ -7,7 +7,7 @@ module PostsHelper
 		end
 	end
 
-	def has_access 
+	def has_access? 
 		if params[:action] == 'account'
 			params[:id].to_i == session[:userid]
 		else 
@@ -23,6 +23,10 @@ module PostsHelper
 		user_account_path(params[:user_id])
 	end
 
+	def check_requests
+  		return 	Friendship.where('user_id = ? and accepted = ? and sender <> user_id', session[:userid], false).count
+	end
+
 	def is_friends? 
 		user_id = params[:user_id].present? ? params[:user_id] : params[:id]
 		friendship = Friendship.where('user_id = ? and friend_id = ? ', session[:userid], user_id)
@@ -30,12 +34,21 @@ module PostsHelper
 		friendship.present? || user_id.to_i == session[:userid]
 	end
 
-	def get_avatar post
+	def get_user post
 		index = @friends.index { |friend| friend.id == post.user_id }
 		if index.present?
-			@friends[index].avatar.url(:small)
+			@friends[index]
 		else
-			@user.avatar.url(:small)
+			@user
+		end
+	end
+
+	def getTagMargins
+		puts "DEBUG: #{params[:controller]}"
+		if params[:controller] == 'posts'
+			'margin-left:10px'
+		else
+			''
 		end
 	end
 	

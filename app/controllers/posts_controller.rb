@@ -8,9 +8,15 @@ class PostsController < ApplicationController
 	end
 
 	def create
-		if @post = Post.create(post: params[:htmlContent], user_id: params[:user_id])
+		content = params[:htmlContent].present? ? params[:htmlContent] : params[:youtube_content]
+
+		if @post = Post.create(post: content, user_id: params[:user_id])
 			parse_tags(params[:tags])
-			redirect_to user_posts_page_path(params[:user_id], 1)
+			if params[:source] == 'dashboard' || params[:youtube_content].present?
+				redirect_to user_dashboard_path session[:userid]
+			else
+				redirect_to user_posts_page_path(params[:user_id], 1)
+			end
 
 		else
 			flash[:notice] = "Could not save post"
