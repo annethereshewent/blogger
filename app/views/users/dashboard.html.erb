@@ -1,0 +1,91 @@
+<head>
+	<style>
+		body {
+			background:#666699
+		}
+		.main {
+			margin-left: 150px;
+			padding-top: 0;
+			padding-bottom:20px;
+			background:#52527A;
+			width:600px;
+			padding: 0 30px 0 30px;
+			border-radius: 20px;
+
+		}
+		.dash.content {
+			margin-left:95px;
+		}
+
+		.list-buttons {
+			list-style-type: none
+
+		}
+		.list-buttons li {
+			display:inline;
+		}
+		.icon {
+			width:60px;
+			height:60px;
+			margin-right:10px;
+		}
+		.buttons {
+			margin-left:240px;
+			background:#52527A;
+			width:470px;
+			border-radius:20px;
+			border: solid 1px #393955;
+			
+		}
+		.search-row {
+			top: 60px;
+			right: 20px;
+			position:absolute;
+		}
+		.control-text {
+			display:inline;
+		}
+		#editContents {
+			background:white;
+		}
+	</style>
+</head>
+<body>
+	<h1 class="logo"><span class="logo-bracket">[</span>blogger<span class="logo-bracket">].</span></h1>
+	<div class="search-row">
+		<i class="fa fa-search" style="margin-right:10px;"></i><input type="text" class="control-text" name="search" id="search">
+	</div>
+	<div class="buttons">
+		<ul class="list-buttons">
+			<li><a href="#" onclick="openNewModal(<%= params[:user_id] %>);return false;"><img src="/images/write-document-icon.png" class="icon"></a></li>
+			<li><img src="/images/video_icon.png" class="icon"></li>
+			<li><img src="/images/control_panel.png" class="icon"></li>
+			<li><a href="/users/logout"><img src="/images/logout2.png" class="icon"></a></li>
+		</ul>
+	</div>
+	<div class="main">
+		<h2>Posts in your Feed</h2>
+		<% @posts.each do |post| %>
+			<img class="avatar-dash" src="<%= get_avatar(post) %>">
+			<div class="dash content">
+				<p style="font-size:small;"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
+				<div class="post"> 
+					<p><%= post.post.html_safe %></p>
+				</div>
+				<% if post.edited == 1 %>
+					<p style="font-size:small;"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
+				<% end %>
+				<div class="post-buttons" style="font-size:12px">
+					<a href="<%= user_post_comments_path(post.user_id, post) %>"><%= post.getCommentText %></a>
+					&nbsp;&nbsp;
+				</div>
+			</div>
+			<div class="content-divider"></div>
+		
+		<% end %>
+	</div>
+	<script src="/js/main.js"></script>
+</body>
+
+<%= render partial: 'posts/postModal' %>
+

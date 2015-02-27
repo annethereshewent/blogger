@@ -5,11 +5,12 @@
 
 	
 	<style>
-	#postModal {
+	#postModal, #requestModal {
 		width: 375px;
 		height: 440px;
 		overflow: hidden;
 	}
+
 	#editContents {
 		-webkit-border-radius: 15px;
 		-moz-border-radius: 15px;
@@ -71,7 +72,6 @@
 	</div>
 	<script src="/js/main.js"></script>
 	<script>
-
 	function openEditModal(pid) {
 		//need ajax to get contents
 		getPostContents(pid, function(data) {
@@ -114,6 +114,21 @@
 			});
 		}
 	}
+
+	function addFriend() {
+		var user_id = <%= params[:user_id].present? ? params[:user_id] : params[:id] %>
+		$.post('/users/' + user_id + '/friend',
+			function(data) {
+				if (data == 'true') {
+					$("#addFriend").fadeOut('slow').hide();
+				} 
+				else
+					alert("unable to add friend."); 
+			}
+		)
+
+	}
+
 	function openQuoteModal(pid) {
 		getPostContents(pid, function(data) {
 			//alert($("<div>").html(data).find("<iframe>"));
@@ -135,3 +150,4 @@
 	
 </body>
 <%= render partial: "postModal" %>
+<%= render partial: "requestModal" %>

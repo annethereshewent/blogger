@@ -1,0 +1,14 @@
+<h2>Friend Requests:</h2>
+<% users.each do |user| %>
+	<div class="user-info" style="margin-bottom:20px">
+		<img src="<%= user.avatar.url(:small) %>" class="user-avatar">
+		<p><b><%= user.displayname %></b></p>
+		<p><%= user.description %></p>
+		<%= form_tag '/users/' + session[:userid].to_s + '/confirmFriend/' + user.id.to_s, method: :post do %>
+			<button type="submit" class="btn confirm sm" value="Confirm">Confirm</button>
+		<% end %>
+	</div>
+
+<a href="#" id="show-requests-link">Show All Requests</a>
+
+<% end %>

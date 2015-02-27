@@ -15,6 +15,12 @@ Rails.application.routes.draw do
   get '/users/:id/account' => 'users#account', as: 'account'
   get '/users/:id/tags/:tag' => 'posts#tags', as: 'user_tags_path'
   get '/users/:user_id/posts/:page' => 'posts#index', as: 'user_posts_page'
+  post '/users/:user_id/friend' => 'users#add_friend', as: 'add_friend'
+  get '/users/:user_id/dashboard' => 'users#dashboard', as: 'user_dashboard'
+  get '/users/checkRequests' => 'users#check_requests'
+  get '/users/getRequests/:num' => 'users#get_requests'
+  post '/users/:id/confirmFriend/:user_id' => 'users#confirm_friend'
+
 
   resources :users do
     resources :posts do

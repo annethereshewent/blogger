@@ -22,5 +22,21 @@ module PostsHelper
 			
 		user_account_path(params[:user_id])
 	end
+
+	def is_friends? 
+		user_id = params[:user_id].present? ? params[:user_id] : params[:id]
+		friendship = Friendship.where('user_id = ? and friend_id = ? ', session[:userid], user_id)
+
+		friendship.present? || user_id.to_i == session[:userid]
+	end
+
+	def get_avatar post
+		index = @friends.index { |friend| friend.id == post.user_id }
+		if index.present?
+			@friends[index].avatar.url(:small)
+		else
+			@user.avatar.url(:small)
+		end
+	end
 	
 end

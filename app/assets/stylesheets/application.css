@@ -23,6 +23,11 @@ h2 {
 	font-size:30px;
 	
 }
+.avatar-dash {
+	float: left;
+	border-radius: 80px;
+	margin-right:40px;
+}
 h3 {
 	font-family:"Calibri";
 	color:#C2C2D6;
@@ -122,6 +127,54 @@ body {
     font-family: Cambria, serif;
     color:white;
 }
+.navigation-content {
+	top:10px;
+	right:10px;
+	position:fixed;
+}
+.nav-buttons {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+.nav-buttons ul {
+	background:grey;
+	opacity:0.7;
+	border: 1px solid black;
+	border-radius:10px;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	width:60px;
+	font-size:10px;
+	display:inline;
+	margin:0;
+	padding: 0 10px 0 10px;
+
+}
+#show-requests-link {
+	text-decoration:none;
+	color:#6600CC;
+}
+.user-avatar {
+	border-radius:80px;
+	-moz-border-radius:80px;
+	-webkit-border-radius:80px;
+	float:left;
+	margin-right:10px;
+}
+#num-requests {
+	background:red;
+	color:yellow;
+	border-radius:40px;
+	-moz-border-radius:40px;
+	-webkit-border-radius:40px;
+	display:none;
+	padding: 5px 5px 5px 5px;
+}
+.nav-buttons ul a {
+	text-decoration:none;
+	color:black;
+}
 .sidebar-main {
     margin-left:40px;
 }
@@ -198,7 +251,7 @@ body {
 }
 .btn.confirm {
     background:#0099CC;
-    color:#FFFFFF;
+    color: #ffffff;
 }
 .btn.cancel {
     background:#993366;

@@ -1,1 +1,1 @@
-<span class="tags"><a href="/users/<%= @user.id %>/tags/<%= tag.tag_name %>"><%= tag.tag_name %></a></span>
+<span class="tags"><a href="/users/<%= @user.id %>/tags/<%= tag.tag_name.gsub(' ','-') %>"><%= tag.tag_name %></a></span>

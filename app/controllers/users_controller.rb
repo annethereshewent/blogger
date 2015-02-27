@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   
   def login
     if session[:userid]
-      redirect_to user_posts_page_path(session[:userid], 1) 
+      redirect_to user_dashboard_path(session[:userid], 1) 
     end
   end
   
@@ -19,6 +19,32 @@ class UsersController < ApplicationController
       end
   	end
   	render plain: returnStr
+  end
+
+  def dashboard
+    unless (session[:userid] == params[:user_id].to_i)
+      redirect_to '/users'
+    end
+    @user = User.find(session[:userid])
+    @friends = @user.friends.where('friendships.accepted = true').includes(:posts)
+    
+    @posts = []
+    
+    @friends.each do |friend|
+      friend.posts.each do |post|
+        @posts << post
+      end
+    end
+
+    # include logged in user's posts as well
+    @user.posts.each do |post|
+      @posts << post
+    end
+
+    @posts.sort! do |a,b|
+      b.id <=> a.id
+    end
+    
   end
   
   def create
@@ -37,7 +63,7 @@ class UsersController < ApplicationController
   	if @user and @user.authenticate(params[:pass])
       session[:username] = @user.username
       session[:userid] = @user.id
-  		redirect_to user_posts_page_path(@user, 1)
+  		redirect_to user_dashboard_path @user
   	else
       flash[:notice] = "Error logging in: Wrong username or password"
   		redirect_to '/users'
@@ -73,19 +99,50 @@ class UsersController < ApplicationController
     if User.update(params[:id], user_params)
       redirect_to user_account_path params[:id]
     else
-      flash[:notice] = "error upploading account information"
+      flash[:notice] = "Error updating account information"
       redirect_to user_account_path params[:id]
     end
   end
 
-  def update_picture
-     if User.update(session[:userid], user_params)
-      redirect_to user_account_path session[:userid]
+  def add_friend
+    unless session[:userid]
+      return render plain: 'false'
+    end
+
+    if Friendship.create(user_id: session[:userid], friend_id: params[:user_id], accepted: false, sender: session[:userid]) && Friendship.create(user_id: params[:user_id], friend_id: session[:userid], accepted: false, sender: session[:userid])
+      render plain: "true"
     else
-      redirect_to user_account_path session[:userid], flash: { notice: "Error uploading picture." }
+      render plain: "false"
     end
   end
 
+  def check_requests
+    if session[:userid]
+      friendship_count = Friendship.where('user_id = ? and accepted = ? and sender <> user_id', session[:userid], false).count
+      render plain: friendship_count
+    else
+      render plain: 'N/A'
+    end
+  end
+
+  def get_requests 
+    if session[:userid] && params[:num].to_i > 0 
+      friendships = Friendship.where('user_id = ? and accepted = ? and sender <> user_id', session[:userid], false).limit(2)
+      
+      friendship_str = friendships.map{ |friendship| friendship.friend_id }.join(',')
+      
+      users = User.where("id in (#{friendship_str})")
+      render partial: 'friendships', locals: { users: users }
+    else
+      render plain: 'N/A'
+    end
+  end
+
+  def confirm_friend
+    Friendship.where('(user_id = ? and friend_id = ?) or (user_id = ? and friend_id=?)', params[:id], params[:user_id], params[:user_paramsid], params[:id]).update_all(:accepted => true)
+
+    redirect_to user_dashboard_path params[:id]
+  end
 
   private
   	def user_params

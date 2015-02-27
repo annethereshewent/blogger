@@ -26,3 +26,11 @@
         <% end %>
     </div>
 </aside>
+<div class="navigation-content">
+    <li class="nav-buttons">
+    <% if !is_friends? %>
+            <ul id="addFriend"><a href="#" onclick="addFriend()"><i class="fa fa-user-plus"></i>Add Friend</a></ul>
+    <% end %>
+         <ul id="Requests"><a href="#" onClick="openRequests()"><p id="num-requests" ></p><i class="fa fa-users"></i><i>Requests</i></a></ul>
+  </li>
+</div>

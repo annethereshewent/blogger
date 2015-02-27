@@ -9,8 +9,50 @@ $(function(){
 	$("#post-cancel-btn").click(function() {
 		$("#postModal").dialog("close");
 	});
+	$("#request-cancel-btn").click(function() {
+		$("#requestModal").dialog("close");
+	})
+
+	checkRequests();
 });
 
+function checkRequests() {
+	$.get('/users/checkRequests',
+		function(data) {
+			if (data != 'N/A') {
+				$("#num-requests").html(data);
+				if (data > 0)
+					$("#num-requests").css('display', 'inline');
+			}
+			else {
+				$("#Requests").hide();
+			}
+		}
+	);
+}
+function openRequests() {
+	num_requests = $("#num-requests").html() != '' ? $("#num-requests").html() : 0
+
+	$.get('/users/getRequests/' + num_requests,
+		function(data) {
+			if (data != 'N/A') {
+				$("#request-content").html(data);
+				$("#requestModal").fadeIn(500).dialog({
+					autoOpen:true,
+					closeOnEscape:true,
+					modal:true,
+					resizable:false,
+					width:600,
+					height:350,
+					position: {at:"top"},
+					close: function() {
+						$("#editContents").editable("setHTML", "");
+					}
+				});
+			}
+		}
+	);
+}
 function initEditor() {
 	$('#editContents').editable({
 		inlineMode: false,
