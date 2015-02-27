@@ -35,11 +35,13 @@ gem 'font-awesome-rails'
 # for handling attachments
 gem 'paperclip'
 
+# used with aws-sdk, something about xml
 gem 'nokogiri'
 
 # for uploading to aws s3 service
 gem 'aws-sdk', '< 2.0'
 
+#authentication gem
 gem 'devise'
 
 # for pagination

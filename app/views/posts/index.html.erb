@@ -35,7 +35,7 @@
 				<div class="content" style="color:grey">
 					<i><h3>No posts to show</h3>			
 				</div>
-		<% else %>
+		<% end %>
 			<% if params[:action] == 'tags' %>
 				<h3>Posts tagged '<%= params[:tag] %>':</h3>
 			<% end %>
@@ -68,7 +68,6 @@
 				</div>	
 				<div class="content-divider"></div>
 			<% end %>
-		<% end %>
 	</div>
 	<script src="/js/main.js"></script>
 	<script>

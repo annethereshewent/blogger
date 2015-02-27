@@ -80,9 +80,14 @@ function submitContents() {
 
 //checks whether content is empty, after stripping HTML tags
 function isEmpty(content) {
+	//if there are any images then the post is not empty
+	if (content.indexOf('<img ') > 0)
+		return false;
+
 	//cheap hack to get text content
 	var sanitized_content = $("<div>").html(content).text();
 	//console.log("sanitized content = '" + sanitized_content + "'");
+	
 	if (sanitized_content == '')
 		return true;
 	return false;
