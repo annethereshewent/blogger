@@ -40,7 +40,7 @@ gem 'nokogiri'
 # for uploading to aws s3 service
 gem 'aws-sdk', '< 2.0'
 
-
+gem 'devise'
 
 # for pagination
 gem 'will_paginate'

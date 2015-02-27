@@ -2,13 +2,13 @@ class UsersController < ApplicationController
   
   def login
     if session[:userid]
-      redirect_to user_dashboard_path(session[:userid], 1) 
+      redirect_to user_dashboard_path session[:userid] 
     end
   end
   
   def validate
   	returnStr = ""
-  	user = User.find_by_username(params[:user])
+  	user = User.find_by_email(params[:user])
   	if user
   		returnStr += "user "
   	end
@@ -25,6 +25,7 @@ class UsersController < ApplicationController
     unless (session[:userid] == params[:user_id].to_i)
       redirect_to '/users'
     end
+
     @user = User.find(session[:userid])
     @friends = @user.friends.where('friendships.accepted = true').includes(:posts)
     
@@ -50,18 +51,18 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      session[:username] = @user.username
+      session[:username] = @user.email
       session[:userid]   = @user.id
-      redirect_to user_posts_page_path(@user, 1)
+      redirect_to user_dashboard_path @user.id
     else
       redirect_to '/users', notice: "Username already exists"
     end
   end
   
   def checkLogin
-  	@user = User.find_by_username(params[:username])
+  	@user = User.find_by_email(params[:username])
   	if @user and @user.authenticate(params[:pass])
-      session[:username] = @user.username
+      session[:username] = @user.email
       session[:userid] = @user.id
   		redirect_to user_dashboard_path @user
   	else
@@ -71,7 +72,7 @@ class UsersController < ApplicationController
   end
 
   def verify
-    @user = User.select('password_digest').find_by_username(params[:username])
+    @user = User.select('password_digest').find_by_email(params[:username])
     if @user.authenticate(params[:password])
       render plain: 'true'
     else
@@ -130,13 +131,13 @@ class UsersController < ApplicationController
   end
 
   def confirm_friend
-    Friendship.where('(user_id = ? and friend_id = ?) or (user_id = ? and friend_id=?)', params[:id], params[:user_id], params[:user_paramsid], params[:id]).update_all(:accepted => true)
+    Friendship.where('(user_id = ? and friend_id = ?) or (user_id = ? and friend_id=?)', params[:id], params[:user_id], params[:user_id], params[:id]).update_all(:accepted => true)
 
     redirect_to user_dashboard_path params[:id]
   end
 
   private
   	def user_params
-  		params.require(:user).permit(:username, :displayname, :password, :blog_title, :description, :avatar)
+  		params.require(:user).permit(:email, :displayname, :password, :blog_title, :description, :avatar)
   	end
 end

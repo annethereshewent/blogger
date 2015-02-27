@@ -1,9 +1,9 @@
 module PostsHelper
 	def checkAvatar(avatar)
 		if avatar.url == '/images/user_icon.png'
-			return ''
+			''
 		else
-			return avatar.url(:medium)
+			avatar.url(:medium)
 		end
 	end
 
@@ -34,6 +34,11 @@ module PostsHelper
 		friendship.present? || user_id.to_i == session[:userid]
 	end
 
+	def show_requests?
+		user_id = params[:controller] == 'posts' ? params[:user_id] : params[:id]
+		
+		session[:userid] == user_id.to_i 
+	end
 	def get_user post
 		index = @friends.index { |friend| friend.id == post.user_id }
 		if index.present?
@@ -44,7 +49,6 @@ module PostsHelper
 	end
 
 	def getTagMargins
-		puts "DEBUG: #{params[:controller]}"
 		if params[:controller] == 'posts'
 			'margin-left:10px'
 		else

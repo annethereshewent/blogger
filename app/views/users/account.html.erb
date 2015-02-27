@@ -156,7 +156,7 @@
             $.ajax({
                 url: "/users/verify",
                 type: "POST",
-                data: { password: $("#sec-pass").val(), username: "<%= @user.username %>"},
+                data: { password: $("#sec-pass").val(), username: "<%= @user.email %>"},
                 success: function(result) {
                     $("#sec-pass").val("");
                     $("#loading-gif").hide();

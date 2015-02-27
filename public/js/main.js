@@ -17,6 +17,10 @@ $(function(){
 	$("#request-cancel-btn").click(function() {
 		$("#requestModal").dialog("close");
 	});
+	$("#youtube-cancel-btn").click(function() {
+		$("#youtubeModal").dialog("close");
+	})
+
 
 	if (parseInt($("#num-requests").html()) > 0)
 		$("#num-requests").css('display', 'inline');
@@ -133,7 +137,7 @@ function embedYoutube(match, content) {
 
 
 	//replace youtube url with iframe object
-	var youtube_vid = '<iframe src="https://www.youtube.com/embed/' + youtube_id + '" width="375" height="211" frameborder="0" allowfullscreen></iframe>';
+	var youtube_vid = getYoutubeVideo(match[7]);
 
 	//only going to work with youtube.com and youtu.be urls for now
 	return content.replace(/http(s){0,1}:\/\/.*youtu(\.be|be\.com)\/.*/, youtube_vid);
@@ -145,6 +149,12 @@ function openNewModal(userID) {
 	$("#postModal").next().html("New Post");
 }
 
+function getYoutubeVideo(id) {
+	if (id == '')
+		return '';
+
+	return '<iframe src="https://www.youtube.com/embed/' + id + '" width="375" height="211" frameborder="0" allowfullscreen></iframe>';
+}
 
 
 

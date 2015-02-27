@@ -25,8 +25,11 @@ h2 {
 }
 .avatar-dash {
 	float: left;
-	border-radius: 80px;
 	margin-right:40px;
+	text-align:center;
+}
+.avatar {
+	border-radius: 80px;
 }
 h3 {
 	font-family:"Calibri";

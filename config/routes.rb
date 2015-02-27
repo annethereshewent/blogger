@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  devise_for :users
   get '/users/checkLogin'
   get '/users' => 'users#login'
   post '/users/validate'

@@ -30,7 +30,7 @@
         <% if !is_friends? %>
             <li id="addFriend"><a href="#" onclick="addFriend()"><i class="fa fa-user-plus"></i>Add Friend</a></li>
         <% end %>
-        <% if session[:userid] == params[:user_id].to_i %>
+        <% if show_requests? %>
             <li id="Requests"><a href="#" onClick="openRequests()"><p id="num-requests" ><%= check_requests %></p><i class="fa fa-users"></i><i>Requests</i></a></li>
         <% end %>
         <% if session[:userid] %>
