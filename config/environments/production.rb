@@ -90,7 +90,7 @@ Rails.application.configure do
   }
 
   # Configure the mailer
-  config.action_mailer.default_url_options = { host: 'localhost' }
+  # config.action_mailer.default_url_options = { host: 'localhost' }
 
   ActionMailer::Base.smtp_settings = {  
   :address              => "smtp.gmail.com",  
