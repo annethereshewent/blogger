@@ -90,5 +90,14 @@ Rails.application.configure do
   }
 
   # Configure the mailer
-  config.action_mailer.default_url_options = { host: 'localhost', port: 81 }
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+
+  ActionMailer::Base.smtp_settings = {  
+  :address              => "smtp.gmail.com",  
+  :port                 => 587,  
+  :domain               => "gmail.com",  
+  :user_name            => "blogger243.bot@gmail.com",  
+  :password             => "FAKEPASSWORD123123",  
+  :authentication       => "plain"
+} 
 end
