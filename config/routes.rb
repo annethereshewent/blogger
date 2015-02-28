@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   get '/users/checkRequests' => 'users#check_requests'
   get '/users/getRequests/:num' => 'users#get_requests'
   post '/users/:id/confirmFriend/:user_id' => 'users#confirm_friend'
+  post '/posts/upload_images' => 'posts#upload_images', as: 'image_upload'
 
 
   resources :users do

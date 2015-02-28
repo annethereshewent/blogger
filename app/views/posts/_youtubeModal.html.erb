@@ -1,14 +1,14 @@
 <div class="content" id="youtubeModal" style="display:none">
 	<img src="/images/loading.gif" style="display:none" id="youtube-loading-post" style="margin-left:100px">
-	<h2>New Youtube Video</h2>
+	<h3>New Youtube Video</h3>
 	<div class="youtube-content">
 		<%= form_tag('/', method: "post",  :id => "newYoutubePost", :name => "newYoutubePost") do  %>
 			<label class="control-label">URL:</label>
-			<input type="text" class="control-text lg" style="width:345px" name="youtube-url" id="youtube-url" placeholder="Enter Youtube URL">
+			<input type="text" class="control-text lg" style="width:360px" name="youtube-url" id="youtube-url" placeholder="Enter Youtube URL">
 			<div id="youtube-video"></div>
 			<div class="tags-row" style="margin-top:10px">
 				<label class="control-label">Tags:</label>
-				<input type="text" name="tags" id="youtube-tags" class="tag-input control-text" style="width:350px">
+				<input type="text" name="tags" id="youtube-tags" class="tag-input control-text" style="width:380px">
 			</div>
 			<input type="hidden" name="youtube_content" id="youtube_content">
 		<% end %>

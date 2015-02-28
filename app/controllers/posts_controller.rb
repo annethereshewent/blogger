@@ -3,7 +3,7 @@ class PostsController < ApplicationController
 		page = params[:page].present? ? params[:page].to_i : 1
 
 		@user = User.find(params[:user_id])
-		@posts = @user.posts.order('posts.id desc').paginate(page: params[:page], per_page: 15)
+		@posts = @user.posts.order('posts.id desc').includes(:tags).includes(:images).paginate(page: params[:page], per_page: 15)
 
 	end
 
@@ -81,4 +81,23 @@ class PostsController < ApplicationController
 
 		render 'index'
 	end
+
+	def upload_images
+		if post = Post.create(user_id: session[:userid], post: '')
+			if post.images.create(post_params)
+				redirect_to user_dashboard_path session[:userid]
+			else
+				flash[:notice] = "Unable to save image"
+				redirect_to user_dashboard_path session[:userid]
+			end
+		else
+			flash[:notice] = "Unable to save image"
+			redirec_to user_dashboard_path session[:userid]
+		end
+	end
+
+	private
+	  	def post_params
+	  		params.require(:post).permit(:file)
+	  	end
 end

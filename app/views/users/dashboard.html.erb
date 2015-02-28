@@ -8,7 +8,7 @@
 			padding-top: 0;
 			padding-bottom:20px;
 			background:#52527A;
-			width:600px;
+			width:700px;
 			padding: 0 30px 0 30px;
 			border-radius: 20px;
 
@@ -31,9 +31,9 @@
 			margin-right:10px;
 		}
 		.buttons {
-			margin-left:240px;
+			margin-left:300px;
 			background:#52527A;
-			width:470px;
+			width:450px;
 			border-radius:20px;
 			border: solid 1px #393955;
 			
@@ -51,6 +51,7 @@
 		}
 		.content-divider {
 			height: 30px;
+			clear:left;
 		}
 		.youtube-content {
 			margin-bottom:25px;
@@ -59,6 +60,23 @@
 			width: 375px;
 			height: 211px;
 			margin-top:40px;
+		}
+		#image-upload {
+			border: 5px dashed grey;
+			background: #52527A;
+			width:300px;
+			height:100px;
+			text-align:center;
+			margin-top:20px;
+		}
+		#image-file {
+			width:auto;
+			max-height:250px;
+			display:none;
+			margin-top:10px;
+		}
+		#youtube-tags_tagsinput {
+			width: 370px !important;
 		}
 	</style>
 </head>
@@ -71,15 +89,16 @@
 		<ul class="list-buttons">
 			<li><a href="#" onclick="openNewDashModal(<%= params[:user_id] %>);return false;"><img src="/images/write-document-icon.png" class="icon"></a></li>
 			<li><a href="#" onclick="openYoutubeModal()" ><img src="/images/video_icon.png" class="icon"></a></li>
+			<li><a href="#" onclick="openImageModal()" ><img src="/images/photo_upload.png" class="icon"></a></li>
 			<li><a href="<%= user_account_path session[:userid] %>"><img src="/images/control_panel.png" class="icon"></li></a>
-			<li><a href="/users/logout"><img src="/images/logout3.png" class="icon"></a></li>
+			<li><a href="/users/logout"><img src="/images/logout.png" class="icon"></a></li>
 		</ul>
 	</div>
 	<div class="main">
 		<h2>Posts in your Feed</h2>
 		<% if @posts.empty? %>
 			<div class="dash content" style="color:grey">
-				<h2>No Posts to Show</h2>
+				<h3>No Posts to Show</h3>
 			</div>
 			<div class="content-divider"></div>
 		<% end %>
@@ -96,14 +115,17 @@
 			<div class="dash content">
 				<p style="font-size:small;"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
 				<div class="post"> 
+					<% post.images.each do |image| %>
+						<p><img src="<%= image.file.url(:medium) %>"></p>
+					<% end %>
 					<p><%= post.post.html_safe %></p>
 				</div>
 				<% if post.edited == 1 %>
 					<p style="font-size:small;"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
 				<% end %>
 				<% if post.tags.length > 0 %> 
-						<p class="print-tags"><i>Tags: <%= render partial: 'posts/tag', collection: post.tags %></i></p>
-					<% end %>
+					<p class="print-tags"><i>Tags: <%= render partial: 'posts/tag', collection: post.tags %></i></p>
+				<% end %>
 				<div class="post-buttons" style="font-size:12px">
 					<a href="<%= user_post_comments_path(post.user_id, post) %>"><%= post.getCommentText %></a>
 					&nbsp;&nbsp;
@@ -132,6 +154,29 @@
 				var youtube_vid = getYoutubeVideo(youtube_id[7]);
 				$("#youtube-video").html(youtube_vid).hide().fadeIn("slow");
 			});
+
+			$("#image-upload").click(function() {
+				$("#image").click();
+			});
+
+			$("#image").change(function() {
+				var reader = new FileReader();
+
+				reader.onload = function (e) {
+					image = $("#image-file");
+
+
+		            $(image).attr('src', e.target.result);
+		            $(image).fadeIn("slow").show();
+
+		            $("#image-upload").hide();
+		            $("#imageModal").dialog("option", 'height', $(image).height()+150);
+		            $("#imageModal").dialog("option", 'width', $(image).width()+90)
+		        }
+
+				reader.readAsDataURL(this.files[0])
+			});
+
 		});
 		function openNewDashModal(userID) {
 			openNewModal(userID);
@@ -143,12 +188,29 @@
 				autoOpen:true,
 				closeOnEscape:true,
 				modal:true,
-				resizable:false,
-				width:440,
-				height:500,
+				resizable:true,
+				width:480,
+				height:520,
 				position: {at:"top"},
 				close: function() {
 					$("#youtube-video").html("");
+				}
+			});
+		}
+
+		function openImageModal() {
+			$("#imageModal").fadeIn(500).dialog({
+				autoOpen:true,
+				closeOnEscape:true,
+				modal:true,
+				resizable:true,
+				width:380,
+				height:220,
+				position: {at:"top"},
+				close: function() {
+					$("#image-file").attr("src", '');
+					$("#image-upload").show();
+					$("#image-file").hide();
 				}
 			});
 		}
@@ -172,4 +234,5 @@
 
 <%= render partial: 'posts/postModal' %>
 <%= render partial: 'posts/youtubeModal' %>
+<%= render partial: 'posts/imageModal' %>
 

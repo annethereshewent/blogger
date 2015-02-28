@@ -43,6 +43,9 @@
 				<% tags = post.tags.order('post_tags.created_at') %>
 				<div class="content" id="post_<%= post.id %>">
 					<p style="font-size:small;"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
+					<% post.images.each do |image| %>
+						<p><img src="<%= image.file.url(:medium) %>"></p>
+					<% end %>
 					<div class="post"> 
 						<p><%= post.post.html_safe %></p>
 					</div>

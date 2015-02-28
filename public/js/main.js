@@ -19,6 +19,9 @@ $(function(){
 	});
 	$("#youtube-cancel-btn").click(function() {
 		$("#youtubeModal").dialog("close");
+	});
+	$("#image-cancel-btn").click(function() {
+		$("#imageModal").dialog("close");
 	})
 
 

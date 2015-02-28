@@ -39,9 +39,10 @@ module PostsHelper
 		
 		session[:userid] == user_id.to_i 
 	end
+
 	def get_user post
 		index = @friends.index { |friend| friend.id == post.user_id }
-		if index.present?
+		if index
 			@friends[index]
 		else
 			@user

@@ -29,9 +29,15 @@ class UsersController < ApplicationController
     @user = User.find(session[:userid])
     @friends = @user.friends.where('friendships.accepted = true').includes(:posts)
     
-    # get friends posts as well as all of the logged in user's posts
-    @posts = @friends.map(&:posts).flatten + @user.posts
+    @posts = []
 
+    @friends.each do |friend|
+      friend.posts.includes(:tags).includes(:images).each do |post|
+        @posts << post
+      end
+    end
+
+    @posts = @posts + @user.posts.includes(:tags).includes(:images)
 
     @posts.sort! do |a,b|
       b.id <=> a.id
