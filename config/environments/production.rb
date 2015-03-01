@@ -98,7 +98,7 @@ Rails.application.configure do
   :domain               => "gmail.com",  
   :user_name            => "blogger243.bot@gmail.com",  
   :password             => "FAKEPASSWORD123123",  
-  :authentication       => "plain"
+  :authentication       => "plain",
   :enable_starttls_auto => true
 } 
 end
