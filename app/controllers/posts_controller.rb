@@ -25,9 +25,12 @@ class PostsController < ApplicationController
 	end
 	
 	def fetch_posts 
-	    posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc').paginate(page: params[:page], per_page: 15).includes(:tags).includes(:images)
 
-	    render partial: 'dashPosts', locals: { posts: posts }
+		@friends = User.where("id in (#{params[:friend_ids]})")
+		@user =  @friends[ @friends.index { |friend| friend.id == session[:userid] } ]
+	    @posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc').paginate(page: params[:page], per_page: 15).includes(:tags).includes(:images)
+
+	    render partial: 'dashPosts'
 	end
 
 	def update

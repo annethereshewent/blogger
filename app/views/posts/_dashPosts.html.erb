@@ -1,4 +1,4 @@
-<% posts.each do |post| %>
+<% @posts.each do |post| %>
 	<% user = get_user(post) %>
 	<a href="<%= user_posts_page_path post.user_id, 1 %>">
 		<div class="avatar-dash">

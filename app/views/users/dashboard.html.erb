@@ -141,17 +141,19 @@
 	</div>
 	<script src="/js/main.js"></script>
 	<script>
-		$page = 1;
+		$page = 2; //since we've already loaded the first "page"
 		$loading = false;
 		$(function() {
 
 			$(window).scroll(function() {
-				if ($(window).scrollTop() + $(window).height() == $(document).height()) {
-					if ($loading)
-						return;
 
-					console.log("let's get medicated");
-					load_posts($page++);
+				if (window.location.href.indexOf('dashboard') > -1)
+					if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+						if ($loading)
+							return;
+
+						load_posts($page++);
+					}
 				}
 			});
 
@@ -206,14 +208,17 @@
 					friend_ids: "<%= @friends.push(@user).map{ |friend| friend.id }.join(',') %>",
 				} ,
 				function(data) {
-					console.log(data);
-					$('.main').append(data);
+				
+					$('.main').fadeIn("slow").append(data);
+					
+					//wait a second before the next ajax request
+					setTimeout(function() {
+						$loading = false;
+					}, 1000);
 				}
 			);
 
-			setTimeout(function() {
-				$loading = false;
-			}, 1000)
+			
 
 		}
 		function openNewDashModal(userID) {
