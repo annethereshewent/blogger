@@ -51,6 +51,9 @@
 		<div class="content">
 			<p style="font-size:small;"><i>Creation Date: <%= @post.created_at.strftime("%m-%d-%y %I:%M %P")  %></i></p>
 			<div class="post"> 
+				<% @post.images.each do |image| %>
+					<p><img src="<%= image.file.url(:medium) %>"></p>
+				<% end %>
 				<p><%= @post.post.html_safe %></p>
 			</div>
 			<div class="post-buttons" style="font-size:12px">

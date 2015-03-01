@@ -22,28 +22,25 @@ class UsersController < ApplicationController
   end
 
   def dashboard
-    unless (session[:userid] == params[:user_id].to_i)
-      redirect_to '/users'
+    unless (session[:userid] && session[:userid] == params[:user_id].to_i)
+      return redirect_to '/users'
     end
 
-    @user = User.find(session[:userid])
-    @friends = @user.friends.where('friendships.accepted = true').includes(:posts)
-    
-    @posts = []
+    if @user = User.find(session[:userid])
+      @friends = @user.friends.where('friendships.accepted = true')
+      
+      @posts = Post.where("user_id in (#{ @friends.map{ |friend| friend.id }.push(@user.id).join(',') })")
+        .limit(10)
+        .order('id desc')
+        .includes(:tags)
+        .includes(:images)
 
-    @friends.each do |friend|
-      friend.posts.includes(:tags).includes(:images).each do |post|
-        @posts << post
-      end
+    else
+      flash[:notice] = "An Error has occurred"
+      redirect_to 'users'
     end
-
-    @posts = @posts + @user.posts.includes(:tags).includes(:images)
-
-    @posts.sort! do |a,b|
-      b.id <=> a.id
-    end
-
   end
+
   
   def create
     @user = User.new(user_params)

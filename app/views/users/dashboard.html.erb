@@ -90,7 +90,7 @@
 			<li><a href="#" onclick="openNewDashModal(<%= params[:user_id] %>);return false;"><img src="/images/write-document-icon.png" class="icon"></a></li>
 			<li><a href="#" onclick="openYoutubeModal()" ><img src="/images/video_icon.png" class="icon"></a></li>
 			<li><a href="#" onclick="openImageModal()" ><img src="/images/photo_upload.png" class="icon"></a></li>
-			<li><a href="<%= user_account_path session[:userid] %>"><img src="/images/control_panel.png" class="icon"></li></a>
+			<li><a href="<%= user_account_path session[:userid] %>"><img src="/images/control_panel copy.png" class="icon"></li></a>
 			<li><a href="/users/logout"><img src="/images/logout.png" class="icon"></a></li>
 		</ul>
 	</div>
@@ -141,7 +141,21 @@
 	</div>
 	<script src="/js/main.js"></script>
 	<script>
+		$page = 1;
+		$loading = false;
 		$(function() {
+
+			$(window).scroll(function() {
+				if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+					if ($loading)
+						return;
+
+					console.log("let's get medicated");
+					load_posts($page++);
+				}
+			});
+
+
 			$("#youtube-url").on("input propertychange paste", function() {
 
 				var youtube_id = parseYoutubeURL($("#youtube-url").val());
@@ -153,6 +167,7 @@
 				
 				var youtube_vid = getYoutubeVideo(youtube_id[7]);
 				$("#youtube-video").html(youtube_vid).hide().fadeIn("slow");
+
 			});
 
 			$("#image-upload").click(function() {
@@ -178,6 +193,29 @@
 			});
 
 		});
+
+
+		function load_posts(page) {
+			
+
+			$loading = true;
+
+			$.get(
+				'/posts/' + page + '/fetch_posts',
+				{ 
+					friend_ids: "<%= @friends.push(@user).map{ |friend| friend.id }.join(',') %>",
+				} ,
+				function(data) {
+					console.log(data);
+					$('.main').append(data);
+				}
+			);
+
+			setTimeout(function() {
+				$loading = false;
+			}, 1000)
+
+		}
 		function openNewDashModal(userID) {
 			openNewModal(userID);
 			$("#source").val("dashboard");

@@ -24,6 +24,12 @@ class PostsController < ApplicationController
 		end
 	end
 	
+	def fetch_posts 
+	    posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc').paginate(page: params[:page], per_page: 15).includes(:tags).includes(:images)
+
+	    render partial: 'dashPosts', locals: { posts: posts }
+	end
+
 	def update
 		if @post = Post.update(params[:id], post: params[:htmlContent], edited: 1)
 			parse_tags(params[:tags])

@@ -99,5 +99,6 @@ Rails.application.configure do
   :user_name            => "blogger243.bot@gmail.com",  
   :password             => "FAKEPASSWORD123123",  
   :authentication       => "plain"
+  :enable_starttls_auto => true
 } 
 end
