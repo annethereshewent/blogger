@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
 	validates_attachment :avatar,
   		:content_type => { :content_type => ["image/jpeg", "image/gif", "image/png"] }
 
+  	belongs_to :theme
+
 	has_many :posts
 	has_many :comments
 	has_many :friendships

@@ -2,7 +2,7 @@
 	font-size:16px;
 }
 .content {
-	font-family:"Calibri";
+	font-family:"Cambria";
 	background: #ADFFD6;
 	border:1px solid #000000;
 	//-webkit-border-radius: 20px;
@@ -31,11 +31,11 @@ body {
 .sidebar {
     position:fixed;
     height: 100%;
-    width: 300px;
+    width: 275px;
     background:#006600;
     top: 0;
     left: 0;
-    font-family: cambria, serif;
+    font-family: "Lucida Sans", serif;
     color:white;
 }
 .navigation-content {
@@ -91,23 +91,26 @@ body {
 }
 .links ul {
     list-style:none;
-    font-size:11px;
+    font-size:12px;
 	margin-top:10px;
 	
-	font-family: cambria, serif;
+	font-family: "Lucida Sans", serif;
 }
 .links li a {
     color:white;
     text-decoration:none;
 
 }
+.main {
+	margin-left:350px;
+}
 .links li {
 	margin-left:-30px;
     width:100px;
-     border-bottom: 1px solid white;
+    
 }
 .pagination {
-    font-size:11px;
+    font-size:12px;
 }
 .pagination-number {
 	margin-left:50px;
@@ -120,26 +123,30 @@ body {
 	margin-left:40px;
 }
 .links a:hover {
-	padding-left:20px;
     color:#E6B8E6;
-    border-color:#E6B8E6;
      -webkit-transition: all 0.6s ease-in-out;
     -moz-transition: all 0.6s ease-in-out;
     -o-transition: all 0.6s ease-in-out;
     -ms-transition: all 0.6s ease-in-out;
     transition: all 0.6s ease-in-out;
 }
+.post-date {
+	font-size: small;
+}
+.title:hover {
+	color:#E6B8E6;
+}
 .next_page:enabled:hover, .previous_page:enabled:hover {
-    color:#c285ff;
+    color:#E6B8E6;
 }
 .title {
     color: white;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
     font-size:20px;
     padding-bottom:10px;
     padding-top:10px;
     margin-top:20px;
-    border-top:1px solid white;
-    border-bottom:1px solid white;
     width:150px;
     text-align:center;
 }
@@ -159,7 +166,7 @@ body {
 .description {
     font-size:10px;
     width:100px;
-    font-family:Cambria, serif;
+    font-family:"Lucida Sans", serif;
     margin-left:10px;
     text-align: center;
 }

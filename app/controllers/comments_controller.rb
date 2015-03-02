@@ -2,7 +2,7 @@ class CommentsController < ApplicationController
 	
 	def index
 		@post = Post.find(params[:post_id])
-		@user = User.find(params[:user_id])
+		@user = User.find(params[:user_id]).includes(:theme)
 
 		@commentTree = Hash.new 
 		@comments = @post.comments.order('comments.parent, comments.id').joins(:user)

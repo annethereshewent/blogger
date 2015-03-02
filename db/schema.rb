@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150301225218) do
+ActiveRecord::Schema.define(version: 20150302031237) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -81,6 +81,12 @@ ActiveRecord::Schema.define(version: 20150301225218) do
 
   add_index "tags", ["tag_name"], name: "index_tags_on_tag_name", unique: true, using: :btree
 
+  create_table "themes", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "theme_name"
+  end
+
   create_table "users", force: true do |t|
     t.string   "email"
     t.string   "displayname"
@@ -104,12 +110,13 @@ ActiveRecord::Schema.define(version: 20150301225218) do
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
     t.string   "unconfirmed_email"
-    t.string   "theme"
+    t.integer  "theme_id"
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
   add_index "users", ["displayname"], name: "index_users_on_displayname", unique: true, using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  add_index "users", ["theme_id"], name: "index_users_on_theme_id", using: :btree
 
 end

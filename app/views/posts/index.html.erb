@@ -41,7 +41,7 @@
 			<%  @posts.each do |post|  %>
 				<% tags = post.tags.order('post_tags.created_at') %>
 				<div class="content" id="post_<%= post.id %>">
-					<p style="font-size:small;"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
+					<p class="post-date"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
 					<% post.images.each do |image| %>
 						<p><img src="<%= image.file.url(:medium) %>"></p>
 					<% end %>
@@ -49,7 +49,7 @@
 						<p><%= post.post.html_safe %></p>
 					</div>
 					<% if post.edited == 1 %>
-						<p style="font-size:small;"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
+						<p class="post-date"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
 					<% end %>
 					<% if tags.length > 0 %> 
 						<p class="print-tags"><i>Tags: <%= render partial: 'tag', collection: tags %></i></p>

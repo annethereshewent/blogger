@@ -115,7 +115,10 @@
                         <a href="#" onclick="switchTheme('default');return false;")><li style="background:#7A7ACC" title="Default"></li></a>
                         <a href="#" onclick="switchTheme('forest');return false;"><li style="background:#4DB870" title="Forest"></li></a>
                         <a href="#" onclick="switchTheme('strawberry');return false;"><li style="background:#FFB2B2" title="Strawberry"></li></a>
+                        <a href="#" onclick="switchTheme('ruby');return false;"><li style="background:#FF0000" title="Ruby"></li></a>
+                        <a href="#" onclick="switchTheme('aqua');return false;"><li style="background:#0099FF" title="Aqua"></li></a>
                     </ul>
+                    <img src="/images/loading.gif" style="display:none" id="loading-theme"></img>
                 </div>
             </div>
              <div class="inputs" style="text-align:center">
@@ -199,12 +202,33 @@
         }
 
         function switchTheme(theme) {
+            var theme_id = 1;
+
+            switch (theme) {
+                case 'forest':
+                    theme_id = 2;
+                    break;
+                case 'strawberry':
+                    theme_id = 3;
+                    break;
+                case 'ruby':
+                    theme_id = 4;
+                    break;
+                case 'aqua':
+                    theme_id = 5;
+                    break;
+                default:
+                    theme_id = 1;
+                    break;
+            }
+            $("#loading-theme").show();
             $.post(
                 '/users/<%= session[:userid] %>/switch_theme',
                 {
-                    theme: theme
+                    theme_id: theme_id
                 },
                 function(data) {
+                    $("#loading-theme").hide();
                     if (data == 'success') {
                         $("#theme-stylesheet").attr("href", "/stylesheets/" + theme + ".css");
                     }

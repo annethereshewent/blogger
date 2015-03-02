@@ -1,4 +1,4 @@
-class UsersController < ApplicationController
+ class UsersController < ApplicationController
   
   def login
     if session[:userid]
@@ -131,7 +131,8 @@ class UsersController < ApplicationController
   end
 
   def switch_theme
-    if User.update(session[:userid], theme: params[:theme])
+
+    if User.update(session[:userid], theme_id: params[:theme_id])
       render plain: 'success'
     else
       render plain: 'failure'
