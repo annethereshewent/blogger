@@ -15,6 +15,9 @@
 	padding-right:20px;
 	width: 440px;
 }
+#editContents {
+	background: white !important;
+}
 .form-heading {
     color:#006600;
 }

@@ -19,7 +19,9 @@ h2 {
 	//color:#EBD6FF;
 	color:#C2C2D6;
 	font-size:30px;
-	
+}
+#editContents {
+	background: white !important;
 }
 .avatar-dash {
 	float: left;

@@ -6,9 +6,9 @@
 	background: #CCF5FF;
 	border:2px solid grey;
 	box-shadow: 5px 2px 2px blue;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
 	//margin: 30px 30px 30px 30px;
 	padding-left: 40px;
 	padding-bottom:20px;
@@ -94,7 +94,7 @@ body {
 }
 .links ul {
     list-style:none;
-    font-size:10px;
+    font-size:12px;
 	margin-top:10px;
 	font-family:"lucida san", serif;
 }
@@ -108,7 +108,7 @@ body {
     width:100px;
 }
 .pagination {
-    font-size:10px;
+    font-size:12px;
 }
 .pagination-number {
 	margin-left:50px;
@@ -168,6 +168,8 @@ body {
     font-family:"Lucida Sans", serif;
     margin-left:10px;
     text-align:center;
+    padding-top:7px;
+    padding-bottom:7px;
 }
 .tags-row {
 	//margin-left:10px;
