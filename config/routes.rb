@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   post '/users/:id/confirmFriend/:user_id' => 'users#confirm_friend'
   post '/posts/upload_images' => 'posts#upload_images', as: 'image_upload'
   get '/posts/:page/fetch_posts'  => 'posts#fetch_posts',  as: 'fetch_posts'
+  post '/users/:user_id/switch_theme' => 'users#switch_theme', as: 'switch_theme'
 
   resources :users do
     resources :posts do

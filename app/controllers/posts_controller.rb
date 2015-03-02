@@ -1,4 +1,6 @@
 class PostsController < ApplicationController
+
+	
 	def index
 		page = params[:page].present? ? params[:page].to_i : 1
 
@@ -94,10 +96,18 @@ class PostsController < ApplicationController
 	def upload_images
 		if post = Post.create(user_id: session[:userid], post: '')
 			if post.images.create(post_params)
-				redirect_to user_dashboard_path session[:userid]
+				if request.xhr?
+					render plain: 'success'
+				else
+					redirect_to user_dashboard_path session[:userid]
+				end
 			else
 				flash[:notice] = "Unable to save image"
-				redirect_to user_dashboard_path session[:userid]
+				if request.xhr?
+					render plain: 'failure'
+				else
+					redirect_to user_dashboard_path session[:userid]
+				end
 			end
 		else
 			flash[:notice] = "Unable to save image"

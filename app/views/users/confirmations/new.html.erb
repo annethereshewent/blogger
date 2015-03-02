@@ -4,12 +4,12 @@
   <%= devise_error_messages! %>
 
   <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true %>
+    <%= f.label :email, class: 'control-label' %><br />
+    <%= f.email_field :email, autofocus: true, class: 'control-text' %>
   </div>
 asdfasdfasdf
   <div class="actions">
-    <%= f.submit "Resend confirmation instructions" %>
+    <%= f.submit "Resend confirmation instructions", class: 'btn confirm lg' %>
   </div>
 <% end %>
 

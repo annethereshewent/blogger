@@ -24,7 +24,7 @@ module PostsHelper
 	end
 
 	def check_requests
-  		return 	Friendship.where('user_id = ? and accepted = ? and sender <> user_id', session[:userid], false).count
+  		return 	Friendship.where('user_id = ? and accepted = false	 and sender <> user_id', session[:userid]).count
 	end
 
 	def is_friends? 
@@ -58,6 +58,18 @@ module PostsHelper
 			'margin-left:10px'
 		else
 			''
+		end
+	end
+
+	def getStylesheet
+		if params[:action] == 'dashboard' || !@user.present?
+			'/stylesheets/default.css'
+		else
+			if @user.theme.present?
+				"/stylesheets/#{@user.theme}.css"
+			else
+				"/stylesheets/default.css"
+			end
 		end
 	end
 	

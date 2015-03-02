@@ -1,4 +1,6 @@
 $(function(){
+
+
 	initEditor();
 	$('#tags').tagsInput({
 		'height': "20px",

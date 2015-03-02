@@ -113,7 +113,7 @@ class UsersController < ApplicationController
 
   def get_requests 
     if session[:userid] && params[:num].to_i > 0 
-      friendships = Friendship.where('user_id = ? and accepted = ? and sender <> user_id', session[:userid], false).limit(2)
+      friendships = Friendship.where('user_id = ? and accepted = false and sender <> user_id', session[:userid]).limit(2)
       
       friendship_str = friendships.map{ |friendship| friendship.friend_id }.join(',')
       
@@ -128,6 +128,14 @@ class UsersController < ApplicationController
     Friendship.where('(user_id = ? and friend_id = ?) or (user_id = ? and friend_id=?)', params[:id], params[:user_id], params[:user_id], params[:id]).update_all(:accepted => true)
 
     redirect_to user_dashboard_path params[:id]
+  end
+
+  def switch_theme
+    if User.update(session[:userid], theme: params[:theme])
+      render plain: 'success'
+    else
+      render plain: 'failure'
+    end
   end
 
   private

@@ -1,17 +1,17 @@
 <div class="content" id="imageModal" style="display:none">
 	<img src="/images/loading.gif" style="display:none" id="loading-post" style="margin-left:100px">
-	<div id="image-content">
-		<h3>Image Upload</h3>
-		<div id="image-upload">
-			<h3>Drag an image or click here to upload.</h3>
+	<%= form_for :post, name:"image-form", method: :post, url: image_upload_path do |f| %>
+		<%= f.file_field :file, style: 'display:none', id: 'image' %>
+		<div id="image-content">
+			<h3>Image Upload</h3>
+			<div id="image-upload">
+				<h3>Drag an image or click here to upload.</h3>
+			</div>
+			<img id="image-file">
 		</div>
-		<img id="image-file">
-	</div>
-	<div class="image-buttons">
-		<%= form_for :post, name:"image-form", id: "image-form", method: :post, url: image_upload_path do |f| %>
-			<%= f.file_field :file, style: 'display:none', id: 'image' %>
+		<div class="image-buttons">
 			<button type="submit" class="btn btn confirm sm">Submit</button>
 			<button type="button" class="btn cancel sm" id="image-cancel-btn" style="margin: 0 40px 40px 0">Go Back</button>
-		<% end %>
-	</div>
+		</div>
+	<% end %>
 </div>

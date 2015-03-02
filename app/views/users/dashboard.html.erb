@@ -29,6 +29,7 @@
 			width:60px;
 			height:60px;
 			margin-right:10px;
+		]
 		}
 		.buttons {
 			margin-left:300px;
@@ -78,6 +79,12 @@
 		#youtube-tags_tagsinput {
 			width: 370px !important;
 		}
+		.loading-dash {
+			text-align:center;
+		}
+		.dz-preview {
+			display: none;
+		}
 	</style>
 </head>
 <body>
@@ -95,6 +102,7 @@
 		</ul>
 	</div>
 	<div class="main">
+
 		<h2>Posts in your Feed</h2>
 		<% if @posts.empty? %>
 			<div class="dash content" style="color:grey">
@@ -138,36 +146,63 @@
 			<div class="content-divider"></div>
 		
 		<% end %>
+		
 	</div>
 	<script src="/js/main.js"></script>
 	<script>
-		$page = 2; //since we've already loaded the first "page"
-		$loading = false;
+		
 		$(function() {
+			$.ajaxSetup({
+			  
+			});
 
-			$(window).scroll(function() {
+			$page = 2; //since we've already loaded the first "page"
+			$loading = false;
 
-				if (window.location.href.indexOf('dashboard') > -1) {
+		 	$("#image-upload").dropzone({
+		 		url: '<%= image_upload_path %>',
+		 		paramName: 'post[file]',
+		 		headers: {
+			    	'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+			    },
+			    init: function() {
+			    	this.on("success", function(file) { 
+			    		window.location.href = '<%= user_dashboard_path @user %>' 
+			    	});
+				}
+		 	})
+
+
+
+			if (window.location.href.indexOf('dashboard') > -1) {
+				$(window).scroll(function() {
+
+				
 					if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+						//only append a loading gif if it doesn't exist already
+						if (!$(".loading-dash").is(':visible'))
+							$(".main").append('<div class="loading-dash"><img src="/images/loading.gif"></div>').show();
+						
 						if ($loading)
 							return;
-
+						
 						load_posts($page++);
 					}
-				}
-			});
+					
+				});
+			}
 
 
 			$("#youtube-url").on("input propertychange paste", function() {
 
-				var youtube_id = parseYoutubeURL($("#youtube-url").val());
+				var youtube_id = parseYoutubeURL($("#youtube-url").val())[7];
 
 				if (youtube_id == null) {
 					$("#youtube-video").html("");
 					return;
 				}
 				
-				var youtube_vid = getYoutubeVideo(youtube_id[7]);
+				var youtube_vid = getYoutubeVideo(youtube_id);
 				$("#youtube-video").html(youtube_vid).hide().fadeIn("slow");
 
 			});
@@ -199,22 +234,27 @@
 
 		function load_posts(page) {
 			
-
 			$loading = true;
-
+			
 			$.get(
 				'/posts/' + page + '/fetch_posts',
 				{ 
 					friend_ids: "<%= @friends.push(@user).map{ |friend| friend.id }.join(',') %>",
+
 				} ,
 				function(data) {
-				
-					$('.main').fadeIn("slow").append(data);
+					$(".loading-dash").hide();
+					if (data != '')
+						$('.main').fadeIn("slow").append(data);
 					
+
+		
+
 					//wait a second before the next ajax request
 					setTimeout(function() {
 						$loading = false;
 					}, 1000);
+
 				}
 			);
 
@@ -231,7 +271,7 @@
 				autoOpen:true,
 				closeOnEscape:true,
 				modal:true,
-				resizable:true,
+				resizable:false,
 				width:480,
 				height:520,
 				position: {at:"top"},
@@ -246,7 +286,7 @@
 				autoOpen:true,
 				closeOnEscape:true,
 				modal:true,
-				resizable:true,
+				resizable:false,
 				width:380,
 				height:220,
 				position: {at:"top"},

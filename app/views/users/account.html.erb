@@ -5,9 +5,7 @@
     width:600px;
     margin-left:325px;
 }
-.form-heading {
-    color:#6200A3;
-}
+
 .profile-pic {
     -webkit-border-radius: 80px;
     -moz-border-radius: 80px;
@@ -18,12 +16,7 @@
     text-align:center;
     margin-bottom:20px;
 }
-.sub-heading {
-    color:#6200A3;
-    font-style:italic;
-    font-size:12px;
-    margin-top:-20px;
-}
+
 #security-row {
     opacity:0;
 }
@@ -115,6 +108,16 @@
                     <%= f.text_area :description, id: "description", class: "control-text" %>
                 </div>
             </div>
+            <div class="inputs row">
+                <div class="col">
+                    <h3 class="form-heading">Select Theme:</h3>
+                    <ul class="theme-colors">
+                        <a href="#" onclick="switchTheme('default');return false;")><li style="background:#7A7ACC" title="Default"></li></a>
+                        <a href="#" onclick="switchTheme('forest');return false;"><li style="background:#4DB870" title="Forest"></li></a>
+                        <a href="#" onclick="switchTheme('strawberry');return false;"><li style="background:#FFB2B2" title="Strawberry"></li></a>
+                    </ul>
+                </div>
+            </div>
              <div class="inputs" style="text-align:center">
                 <%= f.button "Save Changes", type: :submit, class: "btn confirm btn-lg" %>
             </div>
@@ -193,6 +196,20 @@
             else
                 $("#security-form").submit();
 
+        }
+
+        function switchTheme(theme) {
+            $.post(
+                '/users/<%= session[:userid] %>/switch_theme',
+                {
+                    theme: theme
+                },
+                function(data) {
+                    if (data == 'success') {
+                        $("#theme-stylesheet").attr("href", "/stylesheets/" + theme + ".css");
+                    }
+                }
+            );
         }
     </script>
 </body>
