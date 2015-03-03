@@ -72,7 +72,7 @@ a.tlink {
 	margin-left: 440px;
 	width:400px;
 }
-.modal:focus, .list-buttons li a:focus {
+.list-buttons li a:focus {
     outline: none;
 }
 .control-text, #tags_tag  {
@@ -168,6 +168,7 @@ a.tlink {
 .ui-dialog, .ui-dialog-content {
 	font-size:16px;
 	font-family:"Calibri";
+	outline:none;
 }
 .ui-dialog {
 	margin-top:200px;
