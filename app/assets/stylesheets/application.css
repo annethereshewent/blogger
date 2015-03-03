@@ -72,7 +72,7 @@ a.tlink {
 	margin-left: 440px;
 	width:400px;
 }
-*:focus {
+.modal:focus, .icon:focus {
     outline: 0;
 }
 .control-text, #tags_tag  {

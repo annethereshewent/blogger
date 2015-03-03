@@ -1,4 +1,4 @@
-<div class="content" id="imageModal" style="display:none">
+<div class="content modal" id="imageModal" style="display:none">
 	<img src="/images/loading.gif" style="display:none" id="loading-post" style="margin-left:100px">
 	<%= form_for :post, name:"image-form", method: :post, url: image_upload_path do |f| %>
 		<%= f.file_field :file, style: 'display:none', id: 'image' %>
@@ -8,6 +8,10 @@
 				<h3>Drag an image or click here to upload.</h3>
 			</div>
 			<img id="image-file">
+			<div class="tags-row" style="margin-top:10px">
+				<label class="control-label">Tags:</label>
+				<input type="text" name="tags" id="image-tags" class="tag-input control-text" style="width:380px">
+			</div>
 		</div>
 		<div class="image-buttons">
 			<button type="submit" class="btn btn confirm sm">Submit</button>

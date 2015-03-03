@@ -30,46 +30,47 @@
 
 	<%= render partial: "sidebar" %>
 	<div class="main">
+		<% if params[:action] == 'tags' %>
+			<h3>Posts tagged '<%= params[:tag] %>':</h3>
+		<% end %>
 		<% if (@posts.length == 0)  %>
 				<div class="content" style="color:grey">
 					<i><h3>No posts to show</h3>			
 				</div>
 		<% end %>
-			<% if params[:action] == 'tags' %>
-				<h3>Posts tagged '<%= params[:tag] %>':</h3>
-			<% end %>
-			<%  @posts.each do |post|  %>
-				<% tags = post.tags.order('post_tags.created_at') %>
-				<div class="content" id="post_<%= post.id %>">
-					<p class="post-date"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
-					<% post.images.each do |image| %>
-						<p><img src="<%= image.file.url(:medium) %>"></p>
+
+		<%  @posts.each do |post|  %>
+			<% tags = post.tags.order('post_tags.created_at') %>
+			<div class="content" id="post_<%= post.id %>">
+				<p class="post-date"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
+				<% post.images.each do |image| %>
+					<p><img src="<%= image.file.url(:medium) %>"></p>
+				<% end %>
+				<div class="post"> 
+					<p><%= post.post.html_safe %></p>
+				</div>
+				<% if post.edited == 1 %>
+					<p class="post-date"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
+				<% end %>
+				<% if tags.length > 0 %> 
+					<p class="print-tags"><i>Tags: <%= render partial: 'tag', collection: tags %></i></p>
+				<% end %>
+				<div class="post-buttons" style="font-size:12px">
+					<a href="<%= user_post_comments_path(@user, post) %>"><%= post.getCommentText %></a>
+					&nbsp;&nbsp;
+					<% if session[:userid] == @user.id %>
+						<a href="#" onClick="openEditModal(<%= post.id %>,<%= @user.id %>)">Edit Post</a>
 					<% end %>
-					<div class="post"> 
-						<p><%= post.post.html_safe %></p>
-					</div>
-					<% if post.edited == 1 %>
-						<p class="post-date"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
+					<% if session[:userid] %>
+						<a href="#" onClick="openQuoteModal(<%= post.id %>,<%= @user.id %>)" style="margin-left:5px">Quote</a>
 					<% end %>
-					<% if tags.length > 0 %> 
-						<p class="print-tags"><i>Tags: <%= render partial: 'tag', collection: tags %></i></p>
+					<% if session[:userid] == @user.id %>
+						<a class="delete" href="#" onclick="deletePost(<%= post.id %>);return false"><li class="fa fa-trash"></li></a>
 					<% end %>
-					<div class="post-buttons" style="font-size:12px">
-						<a href="<%= user_post_comments_path(@user, post) %>"><%= post.getCommentText %></a>
-						&nbsp;&nbsp;
-						<% if session[:userid] == @user.id %>
-							<a href="#" onClick="openEditModal(<%= post.id %>,<%= @user.id %>)">Edit Post</a>
-						<% end %>
-						<% if session[:userid] %>
-							<a href="#" onClick="openQuoteModal(<%= post.id %>,<%= @user.id %>)" style="margin-left:5px">Quote</a>
-						<% end %>
-						<% if session[:userid] == @user.id %>
-							<a class="delete" href="#" onclick="deletePost(<%= post.id %>);return false"><li class="fa fa-trash"></li></a>
-						<% end %>
-					</div>
-				</div>	
-				<div class="content-divider"></div>
-			<% end %>
+				</div>
+			</div>	
+			<div class="content-divider"></div>
+		<% end %>
 	</div>
 	<script src="/js/main.js"></script>
 	<script>

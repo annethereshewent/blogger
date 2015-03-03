@@ -15,7 +15,7 @@
 		}
 		.dash.content {
 			margin-left:95px;
-			box-shadow: grey 1px 1px;
+			box-shadow: 1px 1px grey;
 		}
 
 		.list-buttons {
@@ -65,16 +65,17 @@
 		#image-upload {
 			border: 5px dashed grey;
 			background: #52527A;
-			width:300px;
+			width:340px;
 			height:100px;
 			text-align:center;
 			margin-top:20px;
 		}
 		#image-file {
-			width:auto;
-			max-height:250px;
+			max-width:420px;
+			height: auto;
 			display:none;
 			margin-top:10px;
+			
 		}
 		#youtube-tags_tagsinput {
 			width: 370px !important;
@@ -85,6 +86,10 @@
 		.dz-preview {
 			display: none;
 		}
+		#image-content, .image-buttons {
+			margin-left:80px;
+		}
+
 	</style>
 </head>
 <body>
@@ -152,10 +157,6 @@
 	<script>
 		
 		$(function() {
-			$.ajaxSetup({
-			  
-			});
-
 			$page = 2; //since we've already loaded the first "page"
 			$loading = false;
 
@@ -169,6 +170,7 @@
 			    	this.on("success", function(file) { 
 			    		window.location.href = '<%= user_dashboard_path @user %>' 
 			    	});
+			    	$('#image-upload')[0].removeEventListener('click', this.listeners[1].events.click);
 				}
 		 	})
 
@@ -221,9 +223,14 @@
 		            $(image).attr('src', e.target.result);
 		            $(image).fadeIn("slow").show();
 
+		            console.log($(image).width());
+		            if ($(image).width() < 200) {
+		            	console.log("it got here");
+		            	$(image).css('margin-left', '100px');
+		            }
+
+
 		            $("#image-upload").hide();
-		            $("#imageModal").dialog("option", 'height', $(image).height()+150);
-		            $("#imageModal").dialog("option", 'width', $(image).width()+90)
 		        }
 
 				reader.readAsDataURL(this.files[0])
@@ -277,6 +284,7 @@
 				position: {at:"top"},
 				close: function() {
 					$("#youtube-video").html("");
+					remove_tags($("#youtube-tags"));
 				}
 			});
 		}
@@ -287,13 +295,14 @@
 				closeOnEscape:true,
 				modal:true,
 				resizable:false,
-				width:380,
-				height:220,
+				width: 600,
+				height:'auto',
 				position: {at:"top"},
 				close: function() {
 					$("#image-file").attr("src", '');
 					$("#image-upload").show();
 					$("#image-file").hide();
+					remove_tags($("#image-tags"));
 				}
 			});
 		}

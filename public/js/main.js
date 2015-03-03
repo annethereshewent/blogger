@@ -2,17 +2,15 @@ $(function(){
 
 
 	initEditor();
-	$('#tags').tagsInput({
-		'height': "20px",
-		'width':  "340px",
-		'defaultText': 'add tag'
-	});
-	$('#youtube-tags').tagsInput({
-		'height': "20px",
-		'width':  "340px",
-		'defaultText': 'add tag'
-	});
+	$('.tag-input').each(function() {
+		$(this).tagsInput({
+			'height': '20px',
+			'width': '340px',
+			'defaultText': 'add tag'
+		});
+	})
 	
+
 	$("#post-cancel-btn").click(function() {
 		$("#postModal").dialog("close");
 	});
@@ -31,6 +29,7 @@ $(function(){
 		$("#num-requests").css('display', 'inline');
 
 });
+
 function openRequests() {
 	num_requests = $("#num-requests").html() != '' ? $("#num-requests").html() : 0
 
@@ -46,14 +45,17 @@ function openRequests() {
 					width:600,
 					height:350,
 					position: {at:"top"},
-					close: function() {
-						$("#editContents").editable("setHTML", "");
-					}
+
 				});
 			}
 		}
 	);
 }
+
+function remove_tags(selector) {
+	$(selector).importTags('');
+}
+
 function initEditor() {
 	$('#editContents').editable({
 		inlineMode: false,
@@ -114,6 +116,7 @@ function openModal() {
 		position: {at:"top"},
 		close: function() {
 			$("#editContents").editable("setHTML", "");
+			remove_tags($("#tags"));
 		}
 	});
 }

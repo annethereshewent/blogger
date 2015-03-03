@@ -30,7 +30,9 @@ class PostsController < ApplicationController
 
 		@friends = User.where("id in (#{params[:friend_ids]})")
 		@user =  @friends[ @friends.index { |friend| friend.id == session[:userid] } ]
-	    @posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc').paginate(page: params[:page], per_page: 15).includes(:tags).includes(:images)
+	    @posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc')
+	    			.paginate(page: params[:page], per_page: 15)
+	    			.includes(:tags).includes(:images)
 
 	    render partial: 'dashPosts'
 	end
@@ -70,11 +72,11 @@ class PostsController < ApplicationController
 							:status  => true,
 							:content => @post.post,
 							:tags 	 => @post.tags.order('post_tags.created_at desc').map { |tag| tag.tag_name }
-				  		}.to_json				
+				  		  }.to_json				
 		else
 			render plain: {
 							:status => false
-			  		  	}.to_json
+			  		  	  }.to_json
 		end
 	end
 
@@ -94,8 +96,9 @@ class PostsController < ApplicationController
 	end
 
 	def upload_images
-		if post = Post.create(user_id: session[:userid], post: '')
-			if post.images.create(post_params)
+		if @post = Post.create(user_id: session[:userid], post: '')
+			if @post.images.create(post_params)
+				parse_tags(params[:tags])
 				if request.xhr?
 					render plain: 'success'
 				else
