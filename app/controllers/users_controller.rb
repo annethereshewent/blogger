@@ -21,6 +21,16 @@
   	render plain: returnStr
   end
 
+def fetch_posts 
+
+  @friends = User.where("id in (#{params[:friend_ids]})")
+  @user =  @friends[ @friends.index { |friend| friend.id == session[:userid] } ]
+  @posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc')
+          .paginate(page: params[:page], per_page: 15)
+          .includes(:tags).includes(:images).includes(:user)
+
+  render partial: 'dashPosts'
+end
   def dashboard
     unless (session[:userid] && session[:userid] == params[:user_id].to_i)
       return redirect_to '/users'
@@ -34,6 +44,7 @@
         .order('id desc')
         .includes(:tags)
         .includes(:images)
+        .includes(:user)
 
     else
       flash[:notice] = "An Error has occurred"
@@ -139,8 +150,25 @@
     end
   end
 
+  def tags
+    params[:tag].gsub!('-', ' ')
+
+    @user = User.find(session[:userid])
+    @posts = Post.order('posts.id desc')
+              .includes(:tags)
+              .includes(:images)
+              .where('posts.id in (
+                                    select post_tags.post_id
+                                    from post_tags, tags
+                                    where post_tags.tag_id = tags.id and tags.tag_name = ?
+                                  )
+              ', params[:tag])
+
+    render 'dash_tags'
+  end
+
   private
   	def user_params
-  		params.require(:user).permit(:email, :displayname, :password, :blog_title, :description, :avatar)
+  		params.require(:user).permit(:email, :displayname, :password, :blog_title, :description, :avatar, :theme)
   	end
 end

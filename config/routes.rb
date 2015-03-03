@@ -17,7 +17,7 @@ Rails.application.routes.draw do
   post '/users/verify'  => 'users#verify'
   post '/comments/:comment_id/reply' => 'comments#reply', as: 'comments_reply'
   get '/users/:id/account' => 'users#account', as: 'account'
-  get '/users/:id/tags/:tag' => 'posts#tags', as: 'user_tags_path'
+  get '/users/:id/tags/:tag' => 'posts#tags', as: 'user_tags'
   get '/users/:user_id/posts/:page' => 'posts#index', as: 'user_posts_page'
   post '/users/:user_id/friend' => 'users#add_friend', as: 'add_friend'
   get '/users/:user_id/dashboard' => 'users#dashboard', as: 'user_dashboard'
@@ -25,8 +25,9 @@ Rails.application.routes.draw do
   get '/users/getRequests/:num' => 'users#get_requests'
   post '/users/:id/confirmFriend/:user_id' => 'users#confirm_friend'
   post '/posts/upload_images' => 'posts#upload_images', as: 'image_upload'
-  get '/posts/:page/fetch_posts'  => 'posts#fetch_posts',  as: 'fetch_posts'
+  get '/posts/:page/fetch_posts'  => 'users#fetch_posts',  as: 'fetch_posts'
   post '/users/:user_id/switch_theme' => 'users#switch_theme', as: 'switch_theme'
+  get '/users/tags/:tag' => 'users#tags', as: 'dashboard_tags'
 
   resources :users do
     resources :posts do

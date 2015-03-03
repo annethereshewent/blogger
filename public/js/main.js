@@ -1,6 +1,6 @@
 $(function(){
 
-
+	
 	initEditor();
 	$('.tag-input').each(function() {
 		$(this).tagsInput({

@@ -51,7 +51,7 @@ module PostsHelper
 	end
 
 	def getStylesheet
-		if params[:action] == 'dashboard' || !@user.present?
+		if params[:action] == 'dashboard' || !@user.present? || (params[:controller] == 'users' && params['action'] == 'tags')
 			'/stylesheets/default.css'
 		else
 			if @user.theme.present?
@@ -59,6 +59,14 @@ module PostsHelper
 			else
 				"/stylesheets/default.css"
 			end
+		end
+	end
+
+	def getTagURL tag
+		if params[:controller] == 'users'
+			'/users/tags/' + tag.tag_name.gsub(' ', '-')
+		else
+			"/users/#{params[:user_id]}/tags/#{tag.tag_name.gsub(' ','-')}"
 		end
 	end
 	

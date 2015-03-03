@@ -12,28 +12,7 @@
 			padding: 0 30px 0 30px;
 			border-radius: 20px;
 
-		}
-
-		.list-buttons {
-			list-style-type: none
-
-		}
-		.list-buttons li {
-			display:inline;
-		}
-		.icon {
-			width:60px;
-			height:60px;
-			margin-right:10px;
-		}
-		.buttons {
-			margin-left:300px;
-			background:#52527A;
-			width:450px;
-			border-radius:20px;
-			border: solid 1px #393955;
-			
-		}
+		}	
 		.control-text {
 			display:inline;
 		}
@@ -41,32 +20,7 @@
 			height: 30px;
 			clear:left;
 		}
-		.youtube-content {
-			margin-bottom:25px;
-		}
-		#youtube-video {
-			width: 375px;
-			height: 211px;
-			margin-top:40px;
-		}
-		#image-upload {
-			border: 5px dashed grey;
-			background: #52527A;
-			width:340px;
-			height:100px;
-			text-align:center;
-			margin-top:20px;
-		}
-		#image-file {
-			max-width:420px;
-			height: auto;
-			display:none;
-			margin-top:10px;
-			
-		}
-		#youtube-tags_tagsinput {
-			width: 370px !important;
-		}
+		
 		#image-content, .image-buttons {
 			margin-left:80px;
 		}
@@ -78,24 +32,14 @@
 	<div class="search-row">
 		<i class="fa fa-search" style="margin-right:10px;"></i><input type="text" class="control-text" name="search" id="search">
 	</div>
-	<div class="buttons">
-		<ul class="list-buttons">
-			<li><a href="#" onclick="openNewDashModal(<%= params[:user_id] %>);return false;"><img src="/images/write-document-icon.png" class="icon"></a></li>
-			<li><a href="#" onclick="openYoutubeModal()" ><img src="/images/video_icon.png" class="icon"></a></li>
-			<li><a href="#" onclick="openImageModal()" ><img src="/images/photo_upload.png" class="icon"></a></li>
-			<li><a href="<%= user_account_path session[:userid] %>"><img src="/images/control_panel copy.png" class="icon"></li></a>
-			<li><a href="/users/logout"><img src="/images/logout.png" class="icon"></a></li>
-		</ul>
-	</div>
 	<div class="main">
-		<h2>Posts in your Feed</h2>
+		<h2>Posts tagged <%= params[:tag] %></h2>
 		<% if @posts.empty? %>
 			<div class="dash content" style="color:grey">
 				<h3>No Posts to Show</h3>
 			</div>
 			<div class="content-divider"></div>
 		<% end %>
-
 		<%= render partial: 'dashPosts' %>
 	</div>
 	<script src="/js/main.js"></script>
@@ -191,7 +135,7 @@
 			$.get(
 				'/posts/' + page + '/fetch_posts',
 				{ 
-					friend_ids: "<%= @friends.push(@user).map{ |friend| friend.id }.join(',') %>",
+					tag: <%= params[:tag] %>
 
 				} ,
 				function(data) {
@@ -268,8 +212,3 @@
 		}
 	</script>
 </body>
-
-<%= render partial: 'posts/postModal' %>
-<%= render partial: 'posts/youtubeModal' %>
-<%= render partial: 'posts/imageModal' %>
-

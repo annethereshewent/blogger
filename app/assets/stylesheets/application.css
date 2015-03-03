@@ -72,8 +72,8 @@ a.tlink {
 	margin-left: 440px;
 	width:400px;
 }
-.modal:focus, .icon:focus {
-    outline: 0;
+.modal:focus, .list-buttons li a:focus {
+    outline: none;
 }
 .control-text, #tags_tag  {
 	-webkit-border-radius: 5px;
@@ -145,6 +145,21 @@ a.tlink {
 }
 .ui-dialog-titlebar {
 	display:none;
+}
+.dz-preview {
+	display: none;
+}
+.search-row {
+	top: 60px;
+	right: 20px;
+	position:absolute;
+}
+.dash.content {
+	margin-left:95px;
+	box-shadow: 1px 1px grey;
+}
+.loading-dash {
+	text-align:center;
 }
 .ui-widget button {
 	font-size:14px !important; 

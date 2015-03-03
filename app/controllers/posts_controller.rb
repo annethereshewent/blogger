@@ -25,17 +25,6 @@ class PostsController < ApplicationController
 			redirect_to user_posts_page_path(params[:user_id], 1)
 		end
 	end
-	
-	def fetch_posts 
-
-		@friends = User.where("id in (#{params[:friend_ids]})")
-		@user =  @friends[ @friends.index { |friend| friend.id == session[:userid] } ]
-	    @posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc')
-	    			.paginate(page: params[:page], per_page: 15)
-	    			.includes(:tags).includes(:images)
-
-	    render partial: 'dashPosts'
-	end
 
 	def update
 		if @post = Post.update(params[:id], post: params[:htmlContent], edited: 1)
