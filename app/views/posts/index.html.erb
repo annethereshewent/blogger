@@ -40,7 +40,7 @@
 		<% end %>
 
 		<%  @posts.each do |post|  %>
-			<% tags = post.tags.order('post_tags.created_at') %>
+			<% tags = post.tags.order('post_tags.created_at')%>
 			<div class="content" id="post_<%= post.id %>">
 				<p class="post-date"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
 				<% post.images.each do |image| %>

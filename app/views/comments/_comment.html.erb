@@ -1,6 +1,6 @@
 <div class="comment"> 
 	<div  style="font-size:small;">	
-		<img src="<%= comment.user.avatar.url(:thumb) %>" class="profile-thumb">
+		<a href="<%= user_posts_path comment.user %>"><img src="<%= comment.user.avatar.url(:thumb) %>" class="profile-thumb"></a>
 		<b><%= comment.user.displayname %></b>
 		<i>Posted on:</i> <%= comment.created_at.strftime("%m-%d-%y %I:%M %P")  %> 
 	</div>

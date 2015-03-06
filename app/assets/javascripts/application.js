@@ -10,7 +10,7 @@
 // Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require jquery-2.1.1.min.js
+//= require jquery-2.1.3.min.js
 //= require jquery_ujs
 //= require_tree .
 //= require dropzone

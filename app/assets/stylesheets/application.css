@@ -188,3 +188,7 @@ a.tlink {
 	display:inline;
 	margin-left: -20px;
 }
+.logo a {
+	text-decoration: none;
+	color:white;
+}

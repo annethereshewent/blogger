@@ -74,7 +74,7 @@
 	</style>
 </head>
 <body>
-	<h1 class="logo"><span class="logo-bracket">[</span>blogger<span class="logo-bracket">].</span></h1>
+	<h1 class="logo"><a href="<%= user_dashboard_path @user %>"><span class="logo-bracket">[</span>blogger<span class="logo-bracket">].</span></a></h1>
 	<div class="search-row">
 		<i class="fa fa-search" style="margin-right:10px;"></i><input type="text" class="control-text" name="search" id="search">
 	</div>
@@ -123,15 +123,19 @@
 
 			if (window.location.href.indexOf('dashboard') > -1) {
 				$(window).scroll(function() {
-
+					if ($loading)
+							return;
+			
 				
 					if ($(window).scrollTop() + $(window).height() == $(document).height()) {
 						//only append a loading gif if it doesn't exist already
+
+						console.log("it's not making it here");
+
 						if (!$(".loading-dash").is(':visible'))
 							$(".main").append('<div class="loading-dash"><img src="/images/loading.gif"></div>').show();
 						
-						if ($loading)
-							return;
+						
 						
 						load_posts($page++);
 					}
@@ -196,8 +200,9 @@
 				} ,
 				function(data) {
 					$(".loading-dash").hide();
-					if (data != '')
+					if (data != '') 
 						$('.main').fadeIn("slow").append(data);
+					
 					
 
 		

@@ -40,7 +40,7 @@ end
       @friends = @user.friends.where('friendships.accepted = true')
       
       @posts = Post.where("user_id in (#{ @friends.map{ |friend| friend.id }.push(@user.id).join(',') })")
-        .limit(10)
+        .limit(15)
         .order('id desc')
         .includes(:tags)
         .includes(:images)

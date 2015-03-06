@@ -28,7 +28,7 @@
 	</style>
 </head>
 <body>
-	<h1 class="logo"><span class="logo-bracket">[</span>blogger<span class="logo-bracket">].</span></h1>
+	<h1 class="logo"><a href="<%= user_dashboard_path @user %>"><span class="logo-bracket">[</span>blogger<span class="logo-bracket">].</span></a></h1>
 	<div class="search-row">
 		<i class="fa fa-search" style="margin-right:10px;"></i><input type="text" class="control-text" name="search" id="search">
 	</div>
@@ -48,6 +48,7 @@
 		$(function() {
 			$page = 2; //since we've already loaded the first "page"
 			$loading = false;
+			$show_loading = true;
 
 		 	$("#image-upload").dropzone({
 		 		url: '<%= image_upload_path %>',
@@ -71,7 +72,7 @@
 				
 					if ($(window).scrollTop() + $(window).height() == $(document).height()) {
 						//only append a loading gif if it doesn't exist already
-						if (!$(".loading-dash").is(':visible'))
+						if (!$(".loading-dash").is(':visible') && $show_loading)
 							$(".main").append('<div class="loading-dash"><img src="/images/loading.gif"></div>').show();
 						
 						if ($loading)
@@ -140,8 +141,13 @@
 				} ,
 				function(data) {
 					$(".loading-dash").hide();
-					if (data != '')
+					if (data != '') {
 						$('.main').fadeIn("slow").append(data);
+						$show_loading = true;
+					}
+					else {
+						$show_loading = false;
+					}
 					
 
 		
