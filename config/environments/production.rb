@@ -104,4 +104,4 @@ Rails.application.configure do
 end
 
 
-ENV['CHAT_SERVER'] = 'http://blogger243chat.herokuapp.com'
+ENV['CHAT_SERVER'] = 'https://blogger243chat.herokuapp.com'
