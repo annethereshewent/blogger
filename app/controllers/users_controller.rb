@@ -1,4 +1,10 @@
  class UsersController < ApplicationController
+   after_action :access_control_headers
+
+   def access_control_headers
+     headers['Access-Control-Allow-Origin'] = "http://blogger243chat.herokuapp.com"
+     headers['Access-Control-Request-Method'] = %w{GET POST OPTIONS}.join(",")
+   end
   
   def login
     if session[:userid]
