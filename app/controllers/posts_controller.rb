@@ -46,6 +46,7 @@ class PostsController < ApplicationController
 			end
 		end
 	end
+	
 	def delete
 		if Post.destroy(params[:post_id])
 			render plain: "success"

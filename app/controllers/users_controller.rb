@@ -27,7 +27,9 @@ def fetch_posts
   @user =  @friends[ @friends.index { |friend| friend.id == session[:userid] } ]
   @posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc')
           .paginate(page: params[:page], per_page: 15)
-          .includes(:tags).includes(:images).includes(:user)
+          .includes(:tags)
+          .includes(:images)
+          .includes(:user)
 
   render partial: 'dashPosts'
 end
@@ -37,7 +39,7 @@ end
     end
 
     if @user = User.find(session[:userid])
-      @friends = @user.friends.where('friendships.accepted = true')
+      @friends = @user.friends.where('(sender = ?) or (friendships.accepted = true)', @user.id)
       
       @posts = Post.where("user_id in (#{ @friends.map{ |friend| friend.id }.push(@user.id).join(',') })")
         .limit(15)

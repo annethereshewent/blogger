@@ -2,6 +2,14 @@
 	<img src="/images/loading.gif" style="display:none" id="loading-post" style="margin-left:100px">
 	<p style="color:#7A7ACC;margin-left:10px">Create a New Post</p>
 	<%= form_tag('/', method: "post",  :id => "newPost", :name => "newPost") do  %>
+		<div style="margin-bottom:10px">
+			<label class="control-label">Security:</label>
+			<select name="security" id="security" class="control-text lg">
+				<option value="0">All</option>
+				<option value="1">Friends</option>
+				<option value="2">Private</option>
+			</select>
+		</div>
 		<div name="blogpost" id="editContents"></div>
 		<div style="<%= getTagMargins %>" class="tags-row">
 			<label class="control-label">Tags:</label>

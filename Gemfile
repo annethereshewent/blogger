@@ -53,6 +53,8 @@ gem 'pg'
 # for dropzone js
 gem 'dropzonejs-rails'
 
+gem 'socket.io-rails'
+
 group :production do
 	gem 'rails_12factor'
 end

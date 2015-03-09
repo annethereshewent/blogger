@@ -48,3 +48,5 @@ ActionMailer::Base.smtp_settings = {
 } 
 
 end
+
+ENV['CHAT_SERVER'] = 'http://localhost:3001'

@@ -102,3 +102,6 @@ Rails.application.configure do
   :enable_starttls_auto => true
 } 
 end
+
+
+ENV['CHAT_SERVER'] = 'http://blogger243chat.herokuapp.com'

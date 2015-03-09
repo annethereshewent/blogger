@@ -14,7 +14,7 @@
 
 		}
 
-		.list-buttons {
+		.list-buttons, .private-message-list, .chat-list {
 			list-style-type: none
 
 		}
@@ -70,7 +70,86 @@
 		#image-content, .image-buttons {
 			margin-left:80px;
 		}
+		.chat {
+			position: fixed;
+			bottom: 0;
+			right: 0;
+			background: #C2C2D6;
+			height:15px;
 
+		}
+		.chat-header ,.chat {
+			width: 200px;
+			border-radius:3px;
+		}
+		.chat-header {
+			background: blue;
+			font-size:12px;
+			text-align:center;
+			border: 1px solid #000099;
+			margin: 0;
+		}
+
+		.chat-list li {
+			font-size:11px;
+			height:30px;
+		}
+		.chat-avatar {
+			border-radius:30px;
+			float:left;
+			width:30px;
+			height:30px
+		}
+		.chat-username {
+			margin-top:15px;
+		}
+		.private-message {
+			position:fixed;
+			bottom:0;
+			right:205px;
+			height:250px;
+			width:160px;
+			background: #C2C2D6;
+		}
+		.private-message-header {
+			margin:0;
+			background:blue;
+			font-size:12px;
+			text-align:center;
+			box-shadow: 1px 1px grey;
+
+		}
+		.private-message, .private-message-header {
+			border-radius:3px;
+
+		}
+		.private-message-list {
+			border-radius:20px;
+			height:184px;
+			padding:0;
+		}
+		.message-from {
+			background: grey;
+			margin-left:50px;
+		}
+		.message-from, .message-self {
+			font-size:12px;
+			margin-bottom:10px;
+			width:80px;
+			border-radius:20px;
+			padding: 5px 10px 5px 10px;
+		}
+		.message-self {
+			background:#9191C8;
+			margin-left:10px;
+		}
+		.chat-text {
+			width: 80%;
+			height:12px;
+		}
+		.chat-button {
+			width:16%;
+		}
 	</style>
 </head>
 <body>
@@ -100,10 +179,53 @@
 	</div>
 	<script src="/js/main.js"></script>
 	<script>
-		
+		var socket = '';
+		var users = [];
+		var num_messages = 0;
 		$(function() {
 			$page = 2; //since we've already loaded the first "page"
 			$loading = false;
+			socket = new io('<%= ENV['CHAT_SERVER'] %>');
+
+			logIn();
+
+			socket.emit('list');
+
+			socket.on('list', function() {
+				console.log('sending user info back')
+				sendUserInfo();
+			});
+
+			socket.on('logout', function(user) {
+
+				users.splice(userIndex(user.username),1)
+				updateUserList();
+			});
+
+			socket.on('user-list', function(user) {
+				console.log("user " + user.username + " has sent their info")
+				if (userIndex(user.username) == -1)
+					users.push(user);
+				
+				updateUserList();
+			})
+
+			socket.on('message', function(message) {
+				if (num_messages == 6) {
+					$("#pm-" + username).empty();
+					num_messages = 0;
+				}
+
+				console.log("message received: " + message.from + ": " + message.content);
+				if (!$("#private-message-" + message.from).length) {
+					console.log("should go here");
+					privateMessageBox(message.from);
+				}
+
+				$("#pm-" + message.from).append('<li class="message-from">' + message.content + '</li>');
+				num_messages++;
+
+			});
 
 		 	$("#image-upload").dropzone({
 		 		url: '<%= image_upload_path %>',
@@ -113,18 +235,29 @@
 			    },
 			    init: function() {
 			    	this.on("success", function(file) { 
-			    		window.location.href = '<%= user_dashboard_path @user %>' 
+			    		window.location.href = '<%= user_dashboard_path @user %>';
 			    	});
 			    	$('#image-upload')[0].removeEventListener('click', this.listeners[1].events.click);
 				}
-		 	})
+		 	});
+		 	var expanded = false;
+		 	$(".chat-header").click(function() {
+		 		if (!expanded) {
+		 			$(".chat").css('height', '200px');
+		 			expanded = true;
+		 		}	
+		 		else {
+		 			$(".chat").css('height', '20px');
+		 			expanded = false;
+		 		}
+		 	});
 
 
 
 			if (window.location.href.indexOf('dashboard') > -1) {
 				$(window).scroll(function() {
 					if ($loading)
-							return;
+						return;
 			
 				
 					if ($(window).scrollTop() + $(window).height() == $(document).height()) {
@@ -271,7 +404,79 @@
 			$("#newYoutubePost").attr("action", "<%= user_posts_path session[:userid] %>")
 			$("#newYoutubePost").submit();
 		}
+
+		function sendUserInfo() {
+			socket.emit('user-list', {
+				username: "<%= @user.displayname %>",
+				avatar: "<%= @user.avatar.url(:thumb) %>"
+			});
+		}
+		function logIn() {
+			socket.emit('login', {
+				username: "<%= @user.displayname %>",
+				avatar: "<%= @user.avatar.url(:thumb) %>"
+			});
+		}
+
+		function updateUserList() {
+			console.log("users = " + users);
+			$(".chat-list").empty();
+			for (var i = 0; i < users.length; i++) {
+				if (users[i].username != "<%= @user.displayname %>")
+					$(".chat-list").append("<li><a href='#' onclick='privateMessageBox(\"" + users[i].username + "\")'><img class='chat-avatar' src='" + users[i].avatar + " '>" + '</a><span class="chat-username">' + users[i].username + "</span></li>");
+			}
+		}
+		function userIndex(username) {
+			for (var i = 0; i < users.length; i++) {
+				if (users[i].username == username) {
+					return i;
+				}
+			}
+
+			return -1;
+		}
+
+		function privateMessageBox(username) {
+			if ($("#private-message-" + username).length) {
+				console.log("removing private message box from DOM")
+				//$("#private-message-" + username).remove();
+			}
+
+			$('body').append('<div class="private-message" id="private-message-' + username + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><form method="" id="pm-form-' + username + '"><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '"><input type="submit" class="btn confirm chat-button" value="Ok"></form></div>');
+
+			//bind a submit event to the form
+			$('#pm-form-' + username).submit(function(e) {
+
+				e.preventDefault();
+				console.log('sending message to ' + username);
+				
+				socket.emit('message', {
+					from: "<%= @user.displayname %>",
+					to: username,
+					content: $("#chat-text-" + username).val()
+				});
+
+				if (num_messages == 6) {
+					$("#pm-" + username).empty();
+					num_messages = 0;
+				}
+
+				$("#pm-" + username).append('<li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
+				$("#chat-text-" + username).val("");
+
+
+				num_messages++;
+
+
+
+			});
+		}
+
 	</script>
+	<div class="chat">
+		<h3 class="chat-header">Chat</h3>
+		<ul class="chat-list"></ul>
+	</div>
 </body>
 
 <%= render partial: 'posts/postModal' %>

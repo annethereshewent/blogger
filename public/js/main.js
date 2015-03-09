@@ -112,7 +112,7 @@ function openModal() {
 		modal:true,
 		resizable:false,
 		width:430,
-		height:480,
+		height:"auto",
 		position: {at:"top"},
 		close: function() {
 			$("#editContents").editable("setHTML", "");
@@ -168,7 +168,3 @@ function getYoutubeVideo(id) {
 
 	return '<iframe src="https://www.youtube.com/embed/' + id + '" width="375" height="211" frameborder="0" allowfullscreen></iframe>';
 }
-
-
-
-
