@@ -106,7 +106,6 @@
 		.private-message {
 			position:fixed;
 			bottom:0;
-			right:205px;
 			height:250px;
 			width:160px;
 			background: #C2C2D6;
@@ -150,6 +149,13 @@
 		.chat-button {
 			width:16%;
 		}
+		.status-circle {
+			background:green;
+			padding:5px 5px 5px 5px;
+			border-radius:20px;
+			float: left;
+			vertical-align:middle;
+		}
 	</style>
 </head>
 <body>
@@ -182,6 +188,7 @@
 		var socket = '';
 		var users = [];
 		var num_messages = 0;
+		var num_windows = 0;
 		$(function() {
 			$page = 2; //since we've already loaded the first "page"
 			$loading = false;
@@ -437,12 +444,17 @@
 		}
 
 		function privateMessageBox(username) {
-			if ($("#private-message-" + username).length) {
-				console.log("removing private message box from DOM")
-				//$("#private-message-" + username).remove();
-			}
+			//if the box exists already do nothing
+			if ($("#private-message-" + username).length) 
+				return;
+			
+			num_windows++;
 
-			$('body').append('<div class="private-message" id="private-message-' + username + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><form method="" id="pm-form-' + username + '"><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '"><input type="submit" class="btn confirm chat-button" value="Ok"></form></div>');
+			var position = 'right: ' + (num_windows*205) + "px"
+
+			
+
+			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><form method="" id="pm-form-' + username + '"><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '"><input type="submit" class="btn confirm chat-button" value="Ok"></form></div>');
 
 			//bind a submit event to the form
 			$('#pm-form-' + username).submit(function(e) {
