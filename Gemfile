@@ -50,6 +50,9 @@ gem 'will_paginate'
 # use postgres as the default database
 gem 'pg'
 
+# gem 'mysql2'
+
+
 # for dropzone js
 gem 'dropzonejs-rails'
 

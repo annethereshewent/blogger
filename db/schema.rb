@@ -13,9 +13,6 @@
 
 ActiveRecord::Schema.define(version: 20150306234540) do
 
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-
   create_table "comments", force: true do |t|
     t.text     "comment"
     t.integer  "parent"
@@ -80,7 +77,7 @@ ActiveRecord::Schema.define(version: 20150306234540) do
     t.datetime "updated_at"
   end
 
-  add_index "tags", ["tag_name"], name: "index_tags_on_tag_name", unique: true, using: :btree
+  add_index "tags", ["tag_name"], name: "index_Tags_on_tag_name", unique: true, using: :btree
 
   create_table "themes", force: true do |t|
     t.datetime "created_at"
@@ -102,11 +99,6 @@ ActiveRecord::Schema.define(version: 20150306234540) do
     t.datetime "avatar_updated_at"
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
-    t.integer  "sign_in_count",          default: 0, null: false
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.inet     "current_sign_in_ip"
-    t.inet     "last_sign_in_ip"
     t.string   "confirmation_token"
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"

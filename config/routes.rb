@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   get '/posts/:page/fetch_posts'  => 'users#fetch_posts',  as: 'fetch_posts'
   post '/users/:user_id/switch_theme' => 'users#switch_theme', as: 'switch_theme'
   get '/users/tags/:tag' => 'users#tags', as: 'dashboard_tags'
+  get '/users/:user_id/isFriends' => 'users#isFriends'
 
   resources :users do
     resources :posts do

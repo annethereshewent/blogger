@@ -150,11 +150,20 @@ end
   end
 
   def switch_theme
-
     if User.update(session[:userid], theme_id: params[:theme_id])
       render plain: 'success'
     else
       render plain: 'failure'
+    end
+  end
+
+  def isFriends
+    @user = User.find(params[:user_id])
+    friends = @user.friends.where('friendships.accepted = true and users.displayname = ?', params[:username])
+    if friends.present?
+      render plain: 'true'
+    else
+      render plain: friends.inspect
     end
   end
 

@@ -131,6 +131,10 @@
 			background: grey;
 			margin-left:50px;
 		}
+		.message-self {
+			background:#9191C8;
+			margin-left:10px;
+		}
 		.message-from, .message-self {
 			font-size:12px;
 			margin-bottom:10px;
@@ -138,23 +142,13 @@
 			border-radius:20px;
 			padding: 5px 10px 5px 10px;
 		}
-		.message-self {
-			background:#9191C8;
-			margin-left:10px;
-		}
+		
 		.chat-text {
 			width: 80%;
 			height:12px;
 		}
 		.chat-button {
 			width:16%;
-		}
-		.status-circle {
-			background:green;
-			padding:5px 5px 5px 5px;
-			border-radius:20px;
-			float: left;
-			vertical-align:middle;
 		}
 	</style>
 </head>
@@ -187,7 +181,6 @@
 	<script>
 		var socket = '';
 		var users = [];
-		var num_messages = 0;
 		var num_windows = 0;
 		$(function() {
 			$page = 2; //since we've already loaded the first "page"
@@ -210,27 +203,26 @@
 			});
 
 			socket.on('user-list', function(user) {
-				console.log("user " + user.username + " has sent their info")
-				if (userIndex(user.username) == -1)
-					users.push(user);
-				
-				updateUserList();
+				console.log("user " + user.username + " has sent their info");
+				//checks whether a user is a friend and adds them to the user list
+				isFriends(user);
 			})
 
 			socket.on('message', function(message) {
-				if (num_messages == 6) {
-					$("#pm-" + username).empty();
-					num_messages = 0;
-				}
-
-				console.log("message received: " + message.from + ": " + message.content);
 				if (!$("#private-message-" + message.from).length) {
 					console.log("should go here");
 					privateMessageBox(message.from);
 				}
+				if ($("#pm-" + message.from)[0].scrollHeight > $("#pm-" + message.from).innerHeight()) {
+					$("#pm-" + message.from).empty();
+			
+				}
+
+				console.log("message received: " + message.from + ": " + message.content);
+				
 
 				$("#pm-" + message.from).append('<li class="message-from">' + message.content + '</li>');
-				num_messages++;
+			
 
 			});
 
@@ -254,7 +246,7 @@
 		 			expanded = true;
 		 		}	
 		 		else {
-		 			$(".chat").css('height', '20px');
+		 			$(".chat").css('height', '15px');
 		 			expanded = false;
 		 		}
 		 	});
@@ -430,7 +422,7 @@
 			$(".chat-list").empty();
 			for (var i = 0; i < users.length; i++) {
 				if (users[i].username != "<%= @user.displayname %>")
-					$(".chat-list").append("<li><a href='#' onclick='privateMessageBox(\"" + users[i].username + "\")'><img class='chat-avatar' src='" + users[i].avatar + " '>" + '</a><span class="chat-username">' + users[i].username + "</span></li>");
+					$(".chat-list").append("<li><a href='#' onclick='privateMessageBox(\"" + users[i].username + "\");return false;'><img class='chat-avatar' src='" + users[i].avatar + " '>" + '</a><span class="chat-username">' + users[i].username + "</span></li>");
 			}
 		}
 		function userIndex(username) {
@@ -467,21 +459,39 @@
 					to: username,
 					content: $("#chat-text-" + username).val()
 				});
-
-				if (num_messages == 6) {
+				console.log($("#pm-" + username)[0].scrollHeight);
+				if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {
+					console.log('test');
 					$("#pm-" + username).empty();
-					num_messages = 0;
 				}
 
 				$("#pm-" + username).append('<li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
 				$("#chat-text-" + username).val("");
 
 
-				num_messages++;
-
-
 
 			});
+		}
+
+		function isFriends(user) {
+			$.get(
+				'/users/<%= @user.id %>/isFriends',
+				{ username: user.username },
+				function(data) {
+					if (data == 'true') {
+						
+						if (userIndex(user.username) == -1) {
+							console.log('friend found, adding to users list');
+							users.push(user);
+						}
+
+						updateUserList();
+					}
+					console.log('friend not found');
+					return false;
+				}
+			);
+
 		}
 
 	</script>
