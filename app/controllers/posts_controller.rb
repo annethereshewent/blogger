@@ -57,11 +57,17 @@ class PostsController < ApplicationController
 
 	def fetch 
 		@post = Post.find(params[:post_id])
+		user = @post.user
 		if @post
 			render plain: {
-							:status  => true,
-							:content => @post.post,
-							:tags 	 => @post.tags.order('post_tags.created_at desc').map { |tag| tag.tag_name }
+							status: true,
+							content: @post.post,
+							images: @post.images.map{ |image| image.file.url(:medium) },
+							user: {
+									displayname: user.displayname,
+									id: user.id
+						    },
+							tags: @post.tags.order('post_tags.created_at desc').map { |tag| tag.tag_name }
 				  		  }.to_json				
 		else
 			render plain: {

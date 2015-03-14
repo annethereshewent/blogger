@@ -24,7 +24,7 @@
 		<div class="post-buttons" style="font-size:12px">
 			<a href="<%= user_post_comments_path(post.user_id, post) %>"><%= post.getCommentText %></a>
 			&nbsp;&nbsp;
-			<a href="#" onClick="openQuoteModal(<%= post.id %>,<%= @user.id %>);return false" style="margin-left:5px">Quote</a>
+			<a href="#" onClick="openQuoteModal(<%= post.id %>);return false" style="margin-left:5px">Quote</a>
 			<% if post.user_id == session[:userid] %>
 				<a class="delete" href="#" onclick="deletePost(<%= post.id %>);return false"><li class="fa fa-trash"></li></a>
 			<% end %>

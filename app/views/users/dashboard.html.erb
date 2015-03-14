@@ -494,6 +494,24 @@
 
 		}
 
+		function openQuoteModal(pid) {
+			getPostContents(pid, function(data) {
+				//alert($("<div>").html(data).find("<iframe>"));
+				data = "<div class='block-quote-outer'><a href='/users/" + data.user.id + "/posts'>" + data.user.displayname + "</a><div class='block-quote'>" + data.content + "</div></div><p>";
+
+				openModal();
+				initEditor();
+				$("#editContents").editable("focus");
+				$("#editContents").editable("insertHTML",data);
+				$("#newPost").attr("action", "/users/<%= @user.id %>/posts");
+
+				$("#blogSubmit").text("Quote");
+				$("#postModal").next().html("Quote");
+				$("#source").val("dashboard");
+			});
+			
+		}
+
 	</script>
 	<div class="chat">
 		<h3 class="chat-header">Chat</h3>
