@@ -1,11 +1,4 @@
  class UsersController < ApplicationController
-   after_action :access_control_headers
-
-   def access_control_headers
-     headers['Access-Control-Allow-Origin'] = "https://blogger-243.herokuapp.com"
-     headers['Access-Control-Request-Method'] = %w{GET POST OPTIONS}.join(",")
-   end
-  
   def login
     if session[:userid]
       redirect_to user_dashboard_path session[:userid] 

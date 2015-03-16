@@ -127,7 +127,7 @@ function getPostContents(pid, callback) {
 		url: "/posts/" + pid + "/fetch",
 		dataType: "json",
 		success: function(data) {
-			if (data.status != false) {
+			if (data.status) {
 				callback(data);
 			} 
 		}

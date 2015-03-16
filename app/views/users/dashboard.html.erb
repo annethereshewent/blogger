@@ -192,7 +192,7 @@
 			socket.emit('list');
 
 			socket.on('list', function() {
-				console.log('sending user info back')
+				//console.log('sending user info back')
 				sendUserInfo();
 			});
 
@@ -203,14 +203,14 @@
 			});
 
 			socket.on('user-list', function(user) {
-				console.log("user " + user.username + " has sent their info");
+				//console.log("user " + user.username + " has sent their info");
 				//checks whether a user is a friend and adds them to the user list
 				isFriends(user);
-			})
+			});
 
 			socket.on('message', function(message) {
 				if (!$("#private-message-" + message.from).length) {
-					console.log("should go here");
+					//console.log("should go here");
 					privateMessageBox(message.from);
 				}
 				if ($("#pm-" + message.from)[0].scrollHeight > $("#pm-" + message.from).innerHeight()) {
@@ -218,7 +218,7 @@
 			
 				}
 
-				console.log("message received: " + message.from + ": " + message.content);
+				//console.log("message received: " + message.from + ": " + message.content);
 				
 
 				$("#pm-" + message.from).append('<li class="message-from">' + message.content + '</li>');
@@ -255,20 +255,15 @@
 
 			if (window.location.href.indexOf('dashboard') > -1) {
 				$(window).scroll(function() {
+					//only append a loading gif if it doesn't exist already
+					if (!$(".loading-dash").is(':visible'))
+							$(".main").append('<div class="loading-dash"><img src="/images/loading.gif"></div>').show();
+
 					if ($loading)
 						return;
 			
 				
 					if ($(window).scrollTop() + $(window).height() == $(document).height()) {
-						//only append a loading gif if it doesn't exist already
-
-						console.log("it's not making it here");
-
-						if (!$(".loading-dash").is(':visible'))
-							$(".main").append('<div class="loading-dash"><img src="/images/loading.gif"></div>').show();
-						
-						
-						
 						load_posts($page++);
 					}
 					
@@ -306,7 +301,7 @@
 
 		  
 		            if ($(image).width() < 200) {
-		            	console.log("it got here");
+		            	//console.log("it got here");
 		            	$(image).css('margin-left', '100px');
 		            }
 
@@ -335,10 +330,6 @@
 					if (data != '') 
 						$('.main').fadeIn("slow").append(data);
 					
-					
-
-		
-
 					//wait a second before the next ajax request
 					setTimeout(function() {
 						$loading = false;
@@ -418,7 +409,7 @@
 		}
 
 		function updateUserList() {
-			console.log("users = " + users);
+			//console.log("users = " + users);
 			$(".chat-list").empty();
 			for (var i = 0; i < users.length; i++) {
 				if (users[i].username != "<%= @user.displayname %>")
@@ -452,16 +443,15 @@
 			$('#pm-form-' + username).submit(function(e) {
 
 				e.preventDefault();
-				console.log('sending message to ' + username);
+				//console.log('sending message to ' + username);
 				
 				socket.emit('message', {
 					from: "<%= @user.displayname %>",
 					to: username,
 					content: $("#chat-text-" + username).val()
 				});
-				console.log($("#pm-" + username)[0].scrollHeight);
+				//console.log($("#pm-" + username)[0].scrollHeight);
 				if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {
-					console.log('test');
 					$("#pm-" + username).empty();
 				}
 
@@ -497,7 +487,12 @@
 		function openQuoteModal(pid) {
 			getPostContents(pid, function(data) {
 				//alert($("<div>").html(data).find("<iframe>"));
-				data = "<div class='block-quote-outer'><a href='/users/" + data.user.id + "/posts'>" + data.user.displayname + "</a><div class='block-quote'>" + data.content + "</div></div><p>";
+				if (data.images.length > 0 ) {
+					data = '<img src="' + data.images[0] + '"><p>Source: <a href="/users/' + data.user.id + '/posts">' + data.user.displayname + "</a></p>"
+				}
+				else {
+					data = "<div class='block-quote-outer'><a href='/users/" + data.user.id + "/posts/" + pid + "/comments'>" + data.user.displayname + "</a><div class='block-quote'>" + data.content + "</div></div><p>";
+				}
 
 				openModal();
 				initEditor();

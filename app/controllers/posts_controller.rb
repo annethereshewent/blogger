@@ -59,7 +59,7 @@ class PostsController < ApplicationController
 		@post = Post.find(params[:post_id])
 		user = @post.user
 		if @post
-			render plain: {
+			render json: {
 							status: true,
 							content: @post.post,
 							images: @post.images.map{ |image| image.file.url(:medium) },
@@ -68,11 +68,11 @@ class PostsController < ApplicationController
 									id: user.id
 						    },
 							tags: @post.tags.order('post_tags.created_at desc').map { |tag| tag.tag_name }
-				  		  }.to_json				
+				  		 }			
 		else
-			render plain: {
-							:status => false
-			  		  	  }.to_json
+			render json: {
+							status: false
+			  		  	 }
 		end
 	end
 
