@@ -1,6 +1,4 @@
-class PostsController < ApplicationController
-
-	
+class PostsController < ApplicationController	
 	def index
 		page = params[:page].present? ? params[:page].to_i : 1
 
@@ -10,6 +8,8 @@ class PostsController < ApplicationController
 	end
 
 	def create
+
+		# parse any urls in the post content and add <a> tags to them
 		content = params[:htmlContent].present? ? params[:htmlContent] : params[:youtube_content]
 
 		if @post = Post.create(post: content, user_id: params[:user_id])

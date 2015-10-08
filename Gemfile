@@ -50,6 +50,9 @@ gem 'will_paginate'
 # use postgres as the default database
 gem 'pg'
 
+# automatically add hyperlink to urls
+gem 'rails_autolink'
+
 # gem 'mysql2'
 
 

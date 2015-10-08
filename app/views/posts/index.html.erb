@@ -47,7 +47,7 @@
 					<p><img src="<%= image.file.url(:medium) %>"></p>
 				<% end %>
 				<div class="post"> 
-					<p><%= post.post.html_safe %></p>
+					<p><%= auto_link(post.post, sanitize: false).html_safe %></p>
 				</div>
 				<% if post.edited == 1 %>
 					<p class="post-date"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>

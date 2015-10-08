@@ -20,18 +20,19 @@
   	render plain: returnStr
   end
 
-def fetch_posts 
+  def fetch_posts 
 
-  @friends = User.where("id in (#{params[:friend_ids]})")
-  @user =  @friends[ @friends.index { |friend| friend.id == session[:userid] } ]
-  @posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc')
-          .paginate(page: params[:page], per_page: 15)
-          .includes(:tags)
-          .includes(:images)
-          .includes(:user)
+    @friends = User.where("id in (#{params[:friend_ids]})")
+    @user =  @friends[ @friends.index { |friend| friend.id == session[:userid] } ]
+    @posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc')
+            .paginate(page: params[:page], per_page: 15)
+            .includes(:tags)
+            .includes(:images)
+            .includes(:user)
 
-  render partial: 'dashPosts'
-end
+    render partial: 'dashPosts'
+  end
+
   def dashboard
     unless (session[:userid] && session[:userid] == params[:user_id].to_i)
       return redirect_to '/users'

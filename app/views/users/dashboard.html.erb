@@ -498,11 +498,15 @@
 				initEditor();
 				$("#editContents").editable("focus");
 				$("#editContents").editable("insertHTML",data);
+				
+
 				$("#newPost").attr("action", "/users/<%= @user.id %>/posts");
 
 				$("#blogSubmit").text("Quote");
 				$("#postModal").next().html("Quote");
-				$("#source").val("dashboard");
+				$("#source").val('dashboard');
+				$("#sourcePID").val(pid);
+				$("#editContents").editable('disable');
 			});
 			
 		}

@@ -199,5 +199,7 @@ body {
 	/*opacity: 1; */
 }
 .theme-color {
-	padding-left:10px;padding-right:10px;border:1px solid black
+	padding-left:10px;
+	padding-right:10px;
+	border:1px solid black
 }

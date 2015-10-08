@@ -77,9 +77,11 @@ function submitContents() {
 	}
 
 	//need to get youtube url and convert into an iframe object. This is for embedding youtube videos in posts
-	var youtube_match = parseYoutubeURL(content);
-	if (youtube_match != null) {
-		content = embedYoutube(youtube_match, content);
+	if (content.indexOf('<iframe') == -1) {
+		var youtube_match = parseYoutubeURL(content);
+		if (youtube_match != null) {
+			content = embedYoutube(youtube_match, content);
+		}
 	}
 	$("#htmlContent").val(content);
 	$("#newPost").submit();
