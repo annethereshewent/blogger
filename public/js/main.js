@@ -30,6 +30,34 @@ $(function(){
 
 });
 
+function deletePost(pID) {
+		var r = confirm("Are you sure you want to delete this post?");
+
+		if (r) {
+			$.ajax({
+				url: "/posts/" + pID + "/delete/",			
+				type: "post",
+				success: function(data) {
+					//console.log(data);
+					if (data == "success") {
+						$("#post_" + pID).fadeOut(1000).slideUp(1000, function() {
+							//this is setting the deleted post's content divider height to 0. otherwise it looks bad
+							$("#post_"+ pID).next().hide();
+						});
+
+						//if we are in the dashboard view, hide the avatar as well
+						if (location.href.indexOf('users') != -1) {
+							$("#avatar_" + pID).hide();
+						}
+					}
+					else {
+						alert("an error has occurred");
+					}
+				}
+			});
+		}
+	}
+
 function openRequests() {
 	num_requests = $("#num-requests").html() != '' ? $("#num-requests").html() : 0
 

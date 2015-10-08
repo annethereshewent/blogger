@@ -109,6 +109,8 @@
 			height:250px;
 			width:160px;
 			background: #C2C2D6;
+			font-size:12px;
+
 		}
 		.private-message-header {
 			margin:0;
@@ -134,9 +136,9 @@
 		.message-self {
 			background:#9191C8;
 			margin-left:10px;
+	
 		}
 		.message-from, .message-self {
-			font-size:12px;
 			margin-bottom:10px;
 			width:80px;
 			border-radius:20px;
@@ -198,7 +200,15 @@
 
 			socket.on('logout', function(user) {
 
-				users.splice(userIndex(user.username),1)
+				users.splice(userIndex(user),1)
+
+				//if the logged out user's message box is up, notify the user that the person has disconnected
+
+				console.debug(user);
+				if ($("#private-message-" + user).length) {
+					console.log("it should go here.....");
+					$("#pm-" + user).append('<i style="margin-left:10px;">' + user + ' has disconnected</i>');
+				}
 				updateUserList();
 			});
 

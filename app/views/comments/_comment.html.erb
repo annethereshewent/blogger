@@ -5,7 +5,7 @@
 		<i>Posted on:</i> <%= comment.created_at.strftime("%m-%d-%y %I:%M %P")  %> 
 	</div>
 	<div class="post">
-		<p><%= comment.comment %></p>
+		<p><%= auto_link(comment.comment, sanitize: false).html_safe %></p>
 	</div>
 	<p style="font-size:small;"><a href="#" onClick="$(<%= replySelector %>).show();return false;">Reply</a></p>
 </div>
