@@ -2,3 +2,5 @@
 server.pid
 /public/tmp*
 /log
+tmp*
+log*
