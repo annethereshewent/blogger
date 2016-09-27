@@ -1,3 +1,4 @@
 /public/system*
 server.pid
-/public/tmp/*
+/public/tmp*
+/log
