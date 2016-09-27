@@ -52,6 +52,9 @@
 		font-size:10px;
 		text-align:center;
 	}
+	#username, #pass {
+		border-top: 2px solid grey;
+	}
 	</style>	
 </head>
 <h1 class="logo"><span class="logo-bracket">[</span>blogger<span class="logo-bracket">].</span></h1>
@@ -61,11 +64,11 @@
 	<%= form_tag('/users/checkLogin', method: "post",  :id => "login", :name => "login") do  %>
 		<div class="inputs">
 			<label class="control-label">E-mail:</label>
-			<input type="text" name="username" class="control-text">
+			<input type="text" name="username" id="username" class="control-text">
 		</div>
 		<div class="inputs" style="margin-bottom:10px">
 			<label class="control-label">Password:</label>
-			<input type="password" name="pass" class="control-text">
+			<input type="password" name="pass" id="pass" class="control-text">
 		</div>
 		<div class="inputs">
 			<button type="submit">Log In</button>&nbsp;&nbsp;<a style="font-size: 12px" href="#" onClick="displayRegPanel()" >New Member?</a>
