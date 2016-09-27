@@ -26,6 +26,11 @@
 .post-date {
 	font-size: small;
 }
+#simplemodal-container a.modalCloseImg {
+	position: fixed;
+	top: 40px;
+	left: 120px;
+}
 body {
 	background:#7A7ACC;
 	margin: 60px 100px 60px 100px;

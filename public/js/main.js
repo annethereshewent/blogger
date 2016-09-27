@@ -72,8 +72,6 @@ function openRequests() {
 					resizable:false,
 					width:600,
 					height:350,
-					position: {at:"top"},
-
 				});
 			}
 		}
@@ -143,7 +141,6 @@ function openModal() {
 		resizable:false,
 		width:430,
 		height:"auto",
-		position: {at:"top"},
 		close: function() {
 			$("#editContents").editable("setHTML", "");
 			remove_tags($("#tags"));

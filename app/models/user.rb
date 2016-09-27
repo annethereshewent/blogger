@@ -21,4 +21,8 @@ class User < ActiveRecord::Base
 
 	has_many :friends, through: :friendships
 
+	def encrypted_password_changed?
+		false
+	end
+
 end

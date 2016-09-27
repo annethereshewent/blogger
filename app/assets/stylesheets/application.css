@@ -79,6 +79,7 @@ a.tlink {
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
+	border: 1px solid #FFFFFF; 
 	display:block;
 }
 .control-text.lg {
