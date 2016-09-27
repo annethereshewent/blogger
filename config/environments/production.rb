@@ -97,7 +97,7 @@ Rails.application.configure do
   :port                 => 587,  
   :domain               => "gmail.com",  
   :user_name            => "blogger243.bot@gmail.com",  
-  :password             => "FAKEPASSWORD123123",  
+  :password             => "NOTAREALPASSWORD123",  
   :authentication       => "plain",
   :enable_starttls_auto => true
 } 
