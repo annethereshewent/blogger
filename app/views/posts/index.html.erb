@@ -29,7 +29,9 @@
 </head>
 
 	<%= render partial: "sidebar" %>
+
 	<div class="main">
+	<%= "Environment: #{ENV['RAILS_ENV']}" %>
 		<% if params[:action] == 'tags' %>
 			<h3>Posts tagged '<%= params[:tag] %>':</h3>
 		<% end %>
@@ -127,8 +129,5 @@
 		
 	}
 	</script>
-
-	
-</body>
 <%= render partial: "postModal" %>
 <%= render partial: "requestModal" %>
