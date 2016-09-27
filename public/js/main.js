@@ -180,7 +180,7 @@ function embedYoutube(match, content) {
 
 
 	//replace youtube url with iframe object
-	var youtube_vid = getYoutubeVideo(match[7]);
+	var youtube_vid = getYoutubeVideo(youtube_id);
 
 	//only going to work with youtube.com and youtu.be urls for now
 	return content.replace(/http(s){0,1}:\/\/.*youtu(\.be|be\.com)\/.*/, youtube_vid);
