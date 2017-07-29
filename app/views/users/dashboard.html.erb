@@ -106,11 +106,10 @@
 		.private-message {
 			position:fixed;
 			bottom:0;
-			height:250px;
-			width:160px;
+			height:360px;
+			width:260px;
 			background: #C2C2D6;
 			font-size:12px;
-
 		}
 		.private-message-header {
 			margin:0;
@@ -126,8 +125,9 @@
 		}
 		.private-message-list {
 			border-radius:20px;
-			height:184px;
-			padding:0;
+			height:265px;
+			padding-bottom: 30px;
+			overflow: scroll;
 		}
 		.message-from {
 			background: grey;
@@ -207,7 +207,7 @@
 				console.debug(user);
 				if ($("#private-message-" + user).length) {
 					console.log("it should go here.....");
-					$("#pm-" + user).append('<i style="margin-left:10px;">' + user + ' has disconnected</i>');
+					$("#pm-" + user).append('<p><i style="margin-left:10px;">' + user + ' has disconnected</i></p>');
 				}
 				updateUserList();
 			});
@@ -220,15 +220,17 @@
 
 			socket.on('message', function(message) {
 				if (!$("#private-message-" + message.from).length) {
-					//console.log("should go here");
+					console.log("should go here");
 					privateMessageBox(message.from);
 				}
 				if ($("#pm-" + message.from)[0].scrollHeight > $("#pm-" + message.from).innerHeight()) {
-					$("#pm-" + message.from).empty();
+					console.log('overflow');
+					//$("#pm-" + message.from).empty();
+					$('#pm-' + message.from).scrollTop($('#pm-' + message.from)[0].scrollHeight+20);
 			
-				}
+				} 
 
-				//console.log("message received: " + message.from + ": " + message.content);
+				console.log("message received: " + message.from + ": " + message.content);
 				
 
 				$("#pm-" + message.from).append('<li class="message-from">' + message.content + '</li>');
@@ -252,7 +254,7 @@
 		 	var expanded = false;
 		 	$(".chat-header").click(function() {
 		 		if (!expanded) {
-		 			$(".chat").css('height', '200px');
+		 			$(".chat").css('height', '400px');
 		 			expanded = true;
 		 		}	
 		 		else {
@@ -260,6 +262,7 @@
 		 			expanded = false;
 		 		}
 		 	});
+
 
 
 
@@ -449,6 +452,11 @@
 
 			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><form method="" id="pm-form-' + username + '"><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '"><input type="submit" class="btn confirm chat-button" value="Ok"></form></div>');
 
+			$("#private-message-" + username).children(':first').click(function() {
+		 		$(this).parent().remove();
+		 		num_windows--;
+		 	})
+
 			//bind a submit event to the form
 			$('#pm-form-' + username).submit(function(e) {
 
@@ -462,7 +470,8 @@
 				});
 				//console.log($("#pm-" + username)[0].scrollHeight);
 				if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {
-					$("#pm-" + username).empty();
+					//$("#pm-" + username).empty();
+					$('#pm-' + username).scrollTop($('#pm-' + username)[0].scrollHeight+20);
 				}
 
 				$("#pm-" + username).append('<li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
