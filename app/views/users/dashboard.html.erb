@@ -125,8 +125,7 @@
 		}
 		.private-message-list {
 			border-radius:20px;
-			height:265px;
-			padding-bottom: 30px;
+			height:295px;
 			overflow: scroll;
 		}
 		.message-from {
@@ -135,12 +134,10 @@
 		}
 		.message-self {
 			background:#9191C8;
-			margin-left:10px;
-	
 		}
 		.message-from, .message-self {
 			margin-bottom:10px;
-			width:80px;
+			width:150px;
 			border-radius:20px;
 			padding: 5px 10px 5px 10px;
 		}
@@ -151,6 +148,17 @@
 		}
 		.chat-button {
 			width:16%;
+		}
+		.message-label-self, .message-label-from {
+			font-size: 10px;
+			font-style: italic;
+			margin-bottom:5px;
+		}
+		.message-label-self {
+			margin-left:15px;
+		}
+		.message-label-from {
+			margin-left:75px;
 		}
 	</style>
 </head>
@@ -223,17 +231,19 @@
 					console.log("should go here");
 					privateMessageBox(message.from);
 				}
+				
+
+				console.log("message received: " + message.from + ": " + message.content);
+				
+
+				$("#pm-" + message.from).append('<label class="message-label-from">' + message.from +'</label><li class="message-from">' + message.content + '</li>');
+
 				if ($("#pm-" + message.from)[0].scrollHeight > $("#pm-" + message.from).innerHeight()) {
 					console.log('overflow');
 					//$("#pm-" + message.from).empty();
 					$('#pm-' + message.from).scrollTop($('#pm-' + message.from)[0].scrollHeight+20);
 			
 				} 
-
-				console.log("message received: " + message.from + ": " + message.content);
-				
-
-				$("#pm-" + message.from).append('<li class="message-from">' + message.content + '</li>');
 			
 
 			});
@@ -469,13 +479,14 @@
 					content: $("#chat-text-" + username).val()
 				});
 				//console.log($("#pm-" + username)[0].scrollHeight);
+				
+				$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
+				$("#chat-text-" + username).val("");
+
 				if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {
 					//$("#pm-" + username).empty();
-					$('#pm-' + username).scrollTop($('#pm-' + username)[0].scrollHeight+20);
+					$('#pm-' + username).scrollTop($('#pm-' + username)[0].scrollHeight);
 				}
-
-				$("#pm-" + username).append('<li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
-				$("#chat-text-" + username).val("");
 
 
 
