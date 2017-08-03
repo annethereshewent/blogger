@@ -143,7 +143,7 @@
 		}
 		
 		.chat-text {
-			width: 80%;
+			width: 96%;
 			height:12px;
 		}
 		.chat-button {
@@ -196,6 +196,9 @@
 			$page = 2; //since we've already loaded the first "page"
 			$loading = false;
 			socket = new io('<%= ENV['CHAT_SERVER'] %>');
+
+			console.log('socket information: ');
+			console.log(socket);
 
 			logIn();
 
@@ -460,7 +463,7 @@
 
 			
 
-			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><form method="" id="pm-form-' + username + '"><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '"><input type="submit" class="btn confirm chat-button" value="Ok"></form></div>');
+			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"></div>');
 
 			$("#private-message-" + username).children(':first').click(function() {
 		 		$(this).parent().remove();
@@ -468,24 +471,22 @@
 		 	})
 
 			//bind a submit event to the form
-			$('#pm-form-' + username).submit(function(e) {
+			$('#chat-text-' + username).keypress(function(e) {
+				if (e.which == 13) {
+					socket.emit('message', {
+						from: "<%= @user.displayname %>",
+						to: username,
+						content: $("#chat-text-" + username).val()
+					});
+					//console.log($("#pm-" + username)[0].scrollHeight);
+					
+					$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
+					$("#chat-text-" + username).val("");
 
-				e.preventDefault();
-				//console.log('sending message to ' + username);
-				
-				socket.emit('message', {
-					from: "<%= @user.displayname %>",
-					to: username,
-					content: $("#chat-text-" + username).val()
-				});
-				//console.log($("#pm-" + username)[0].scrollHeight);
-				
-				$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
-				$("#chat-text-" + username).val("");
-
-				if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {
-					//$("#pm-" + username).empty();
-					$('#pm-' + username).scrollTop($('#pm-' + username)[0].scrollHeight);
+					if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {
+						//$("#pm-" + username).empty();
+						$('#pm-' + username).scrollTop($('#pm-' + username)[0].scrollHeight);
+					}
 				}
 
 
