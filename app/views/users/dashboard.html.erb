@@ -219,7 +219,6 @@
 
 				console.debug(user);
 				if ($("#private-message-" + user).length) {
-					console.log("it should go here.....");
 					$("#pm-" + user).append('<p><i style="margin-left:10px;">' + user + ' has disconnected</i></p>');
 				}
 				updateUserList();
@@ -240,8 +239,8 @@
 				console.log('chat history received for user ' + message.to)
 				//console.log(message.chat_logs);
 				message.chat_logs.forEach(function(chat_log) {
-					if (chat_log.from != '<%= @user.displayname %>') {
-						$("#pm-" + message.to).append('<label class="message-label-from">' + chat_log.from +'</label><li class="message-from">' + chat_log.message + '</li>');
+					if (chat_log.from != '<%= @user.id %>') {
+						$("#pm-" + message.to).append('<label class="message-label-from">' + message.to +'</label><li class="message-from">' + chat_log.message + '</li>');
 					}
 					else {
 						$("#pm-" + message.to).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + chat_log.message + "</li>" );
@@ -358,10 +357,10 @@
 		            $(image).fadeIn("slow").show();
 
 		  
-		            if ($(image).width() < 200) {
-		            	//console.log("it got here");
-		            	$(image).css('margin-left', '100px');
-		            }
+		            // if ($(image).width() < 200) {
+		            // 	//console.log("it got here");
+		            // 	//$(image).css('margin-left', '100px');
+		            // }
 
 
 		            $("#image-upload").hide();
@@ -485,20 +484,31 @@
 		}
 
 		function privateMessageBox(username) {
+			//if the box exists already do nothing
+			if ($("#private-message-" + username).length) 
+				return;
+
 			//send request for chat logs
 			console.log("sending request for logs...");
-			socket.emit('history_request', {
-				to: username,
-				from: '<%= @user.displayname %>',
-			})
 
+			get_user_id(username, function(to_id) {
+				console.log('sending history request. toid = ' + to_id)
+				socket.emit('history_request', {
+					to: username,
+					toid: to_id,
+					from: '<%= @user.displayname %>',
+					fromid: <%= @user.id %>,
+				})
+	
+			})
+			
 			//if the box exists already do nothing
 			if ($("#private-message-" + username).length) 
 				return;
 			
 			num_windows++;
 
-			var position = 'right: ' + (num_windows*205) + "px"
+			var position = 'right: ' + (num_windows*290) + "px"
 
 
 			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"></div>');
@@ -515,21 +525,29 @@
 				if (e.which == 13) {
 					var audio = new Audio('/sounds/imsend.wav');
 					audio.play();
-					socket.emit('message', {
-						from: "<%= @user.displayname %>",
-						to: username,
-						content: $("#chat-text-" + username).val()
+
+					console.log($("#chat-text-" + username).val());
+					get_user_id(username, function(to_id) {
+						socket.emit('message', {
+							from: "<%= @user.displayname %>",
+							fromid: <%= @user.id %>,
+							to: username,
+							toid: parseInt(to_id),
+							content: $("#chat-text-" + username).val()
+						});
+						//console.log($("#pm-" + username)[0].scrollHeight);
+
+						
+						$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
+						$("#chat-text-" + username).val("");
+
+						if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {
+							//$("#pm-" + username).empty();
+							$('#pm-' + username).scrollTop($('#pm-' + username)[0].scrollHeight);
+						}	
 					});
-					//console.log($("#pm-" + username)[0].scrollHeight);
 
 					
-					$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
-					$("#chat-text-" + username).val("");
-
-					if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {
-						//$("#pm-" + username).empty();
-						$('#pm-' + username).scrollTop($('#pm-' + username)[0].scrollHeight);
-					}
 				}
 
 
@@ -584,6 +602,19 @@
 			});
 			
 		}
+
+		function get_user_id(username, callback) {
+			$.get(
+				'/users/get_user_id/',
+				{ username: username},
+				function(data) {
+					if (data != 'error') {
+						callback(data);
+					}
+				}
+			)
+		}
+
 
 	</script>
 	<div class="chat">

@@ -33,6 +33,20 @@
     render partial: 'dashPosts'
   end
 
+  def get_user_id 
+    unless params[:username]
+      render plain: 'error'
+    end
+
+    user = User.where('displayname = ?', params[:username])
+
+    if user.count == 1
+      render plain: user[0].id
+    else
+      render plain: 'error'
+    end
+  end
+
   def dashboard
     unless (session[:userid] && session[:userid] == params[:user_id].to_i)
       return redirect_to '/users'

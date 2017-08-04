@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   post '/users/:user_id/switch_theme' => 'users#switch_theme', as: 'switch_theme'
   get '/users/tags/:tag' => 'users#tags', as: 'dashboard_tags'
   get '/users/:user_id/isFriends' => 'users#isFriends'
+  get 'users/get_user_id' => 'users#get_user_id'
 
   resources :users do
     resources :posts do
