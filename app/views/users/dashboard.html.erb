@@ -252,15 +252,15 @@
 			});
 
 			socket.on('message', function(message) {
+				console.log("message received: " + message.from + ": " + message.content);
+
 				if (!$("#private-message-" + message.from).length) {
 					console.log("should go here");
 					privateMessageBox(message.from);
+					return; //don't do anything, since by opening the privateMessageBox it will automatically get the chat history which includes this new message.
 				}
 				
-
-				console.log("message received: " + message.from + ": " + message.content);
-
-
+				//append like normal if message box is open
 
 				$("#pm-" + message.from).append('<label class="message-label-from">' + message.from +'</label><li class="message-from">' + message.content + '</li>');
 
@@ -482,7 +482,6 @@
 				to: username,
 				from: '<%= @user.displayname %>',
 			})
-			$loading_history = true;
 
 			//if the box exists already do nothing
 			if ($("#private-message-" + username).length) 
