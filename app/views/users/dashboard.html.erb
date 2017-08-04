@@ -195,6 +195,7 @@
 		$(function() {
 			$page = 2; //since we've already loaded the first "page"
 			$loading = false;
+
 			socket = new io('<%= ENV['CHAT_SERVER'] %>');
 
 			console.log('socket information: ');
@@ -229,6 +230,27 @@
 				isFriends(user);
 			});
 
+			socket.on('chat_history', function(message) {
+				console.log('chat history received for user ' + message.to)
+				//console.log(message.chat_logs);
+				message.chat_logs.forEach(function(chat_log) {
+					if (chat_log.from != '<%= @user.displayname %>') {
+						$("#pm-" + message.to).append('<label class="message-label-from">' + chat_log.from +'</label><li class="message-from">' + chat_log.message + '</li>');
+					}
+					else {
+						$("#pm-" + message.to).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + chat_log.message + "</li>" );
+					}
+				})
+
+				if ($("#pm-" + message.to)[0].scrollHeight > $("#pm-" + message.to).innerHeight()) {
+					//$("#pm-" + message.from).empty();
+					$('#pm-' + message.to).scrollTop($('#pm-' + message.to)[0].scrollHeight+20);
+			
+				} 
+
+				$loading_history = false;
+			});
+
 			socket.on('message', function(message) {
 				if (!$("#private-message-" + message.from).length) {
 					console.log("should go here");
@@ -237,7 +259,8 @@
 				
 
 				console.log("message received: " + message.from + ": " + message.content);
-				
+
+
 
 				$("#pm-" + message.from).append('<label class="message-label-from">' + message.from +'</label><li class="message-from">' + message.content + '</li>');
 
@@ -453,6 +476,14 @@
 		}
 
 		function privateMessageBox(username) {
+			//send request for chat logs
+			console.log("sending request for logs...");
+			socket.emit('history_request', {
+				to: username,
+				from: '<%= @user.displayname %>',
+			})
+			$loading_history = true;
+
 			//if the box exists already do nothing
 			if ($("#private-message-" + username).length) 
 				return;
@@ -461,7 +492,6 @@
 
 			var position = 'right: ' + (num_windows*205) + "px"
 
-			
 
 			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"></div>');
 
@@ -479,6 +509,7 @@
 						content: $("#chat-text-" + username).val()
 					});
 					//console.log($("#pm-" + username)[0].scrollHeight);
+
 					
 					$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
 					$("#chat-text-" + username).val("");
