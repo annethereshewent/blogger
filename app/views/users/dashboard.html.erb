@@ -499,6 +499,8 @@
 
 			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"></div>');
 
+			$("#chat-text-" + username).focus();
+
 			$("#private-message-" + username).children(':first').click(function() {
 		 		$(this).parent().remove();
 		 		num_windows--;
