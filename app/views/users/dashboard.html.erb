@@ -517,16 +517,17 @@
 			$("#chat-text-" + username).focus();
 
 			$("#private-message-" + username).children(':first').click(function() {
+				var removed_window_position = parseInt($(this).parent().css('right'))
 		 		$(this).parent().remove();
 		 		num_windows--;
 
 		 		//shift windows to the right if needed
 		 		$('.private-message').each(function() {
-
-		 			if ($(this).css('right') != '290px') {
+		 			if (parseInt($(this).css('right')) > removed_window_position) {
 		 				$(this).css('right', (parseInt($(this).css('right')) - 290) + "px");
 		 			}
 		 		})
+		 		
 		 	})
 
 			//bind a submit event to the form
