@@ -231,6 +231,11 @@
 			});
 
 			socket.on('chat_history', function(message) {
+				//don't do anything if the private message box isn't up already
+				if (!$("#private-message-" + message.to).length) {
+					return;
+				}
+
 				console.log('chat history received for user ' + message.to)
 				//console.log(message.chat_logs);
 				message.chat_logs.forEach(function(chat_log) {
