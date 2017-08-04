@@ -1,3 +1,4 @@
+require 'socket'
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -49,4 +50,4 @@ ActionMailer::Base.smtp_settings = {
 
 end
 
-ENV['CHAT_SERVER'] = 'http://localhost:3001'
+ENV['CHAT_SERVER'] = "http://#{Socket.ip_address_list.detect(&:ipv4_private?).try(:ip_addre‌​ss)}:3001"

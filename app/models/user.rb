@@ -18,7 +18,6 @@ class User < ActiveRecord::Base
 	has_many :posts
 	has_many :comments
 	has_many :friendships
-	has_many :logs
 
 	has_many :friends, through: :friendships
 

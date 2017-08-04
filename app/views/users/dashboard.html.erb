@@ -107,7 +107,7 @@
 			position:fixed;
 			bottom:0;
 			height:360px;
-			width:260px;
+			width:280px;
 			background: #C2C2D6;
 			font-size:12px;
 		}
@@ -126,7 +126,8 @@
 		.private-message-list {
 			border-radius:20px;
 			height:295px;
-			overflow: scroll;
+			overflow-y: scroll;
+			word-wrap: break-word;
 		}
 		.message-from {
 			background: grey;
@@ -258,6 +259,9 @@
 
 			socket.on('message', function(message) {
 				console.log("message received: " + message.from + ": " + message.content);
+				var im_sound = new Audio('/sounds/imrcv.wav');
+
+				im_sound.play();
 
 				if (!$("#private-message-" + message.from).length) {
 					console.log("should go here");
@@ -509,6 +513,8 @@
 			//bind a submit event to the form
 			$('#chat-text-' + username).keypress(function(e) {
 				if (e.which == 13) {
+					var audio = new Audio('/sounds/imsend.wav');
+					audio.play();
 					socket.emit('message', {
 						from: "<%= @user.displayname %>",
 						to: username,
