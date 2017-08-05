@@ -535,7 +535,8 @@
 				if (e.which == 13) {
 					var audio = new Audio('/sounds/imsend.wav');
 					audio.play();
-
+					
+					var contents = escapeHtml($("#chat-text-" + username).val())
 					console.log($("#chat-text-" + username).val());
 					get_user_id(username, function(to_id) {
 						socket.emit('message', {
@@ -543,12 +544,12 @@
 							fromid: <%= @user.id %>,
 							to: username,
 							toid: parseInt(to_id),
-							content: $("#chat-text-" + username).val()
+							content: contents
 						});
 						//console.log($("#pm-" + username)[0].scrollHeight);
 
 						
-						$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + $("#chat-text-" + username).val() + "</li>" );
+						$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + contents + "</li>" );
 						$("#chat-text-" + username).val("");
 
 						if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {

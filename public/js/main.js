@@ -1,3 +1,14 @@
+var entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;',
+  '`': '&#x60;',
+  '=': '&#x3D;'
+};
+
 $(function(){
 
 	
@@ -148,6 +159,12 @@ function openModal() {
 	});
 }
 
+function escapeHtml(string) {
+  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
+}
+
 function getPostContents(pid, callback) {
 	$.ajax({
 		type: "GET",
@@ -159,8 +176,9 @@ function getPostContents(pid, callback) {
 			} 
 		}
 	});
-
 }
+
+
 
 //returns array of matches from the regex. These can be used to embed the video or whatever
 function parseYoutubeURL(content) {
