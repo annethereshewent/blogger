@@ -522,7 +522,7 @@
 			var position = 'right: ' + (num_windows*290) + "px"
 
 
-			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"><input type="file" id="chat-upload-' + username + '" style="display:none" accept="img/*"><img src="/images/camera_icon.png" class="chat-image" id="chat-image-' + username + '"></div>');
+			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"><input type="file" id="chat-upload-' + username + '" style="display:none" accept="image/*"><img src="/images/camera_icon.png" class="chat-image" id="chat-image-' + username + '"></div>');
 
 			$("#chat-text-" + username).focus();
 
@@ -538,7 +538,9 @@
 
 
 				//make sure the file is an image first
+				console.log(img_file.type);
 				if (!$.inArray(img_file.type, ["image/gif", "image/jpeg", "image/png"])) {
+					alert("Invalid file specified");
 					return;
 				}
 				console.log(img_file);
@@ -579,7 +581,7 @@
 				preview_reader.onload = function(e) {
 					audio.play();
 
-					$('#pm-' + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self"><img src="' + e.target.result + '" class="chat-image-file"></li>');
+					$('#pm-' + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self"><a href="' + e.target.result + '"><img src="' + e.target.result + '" class="chat-image-file"></a></li>');
 
 					$('img').load(function() {
 						chat_scroll_to_bottom(username);
