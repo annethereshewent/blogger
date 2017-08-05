@@ -259,13 +259,14 @@
 				})
 
 				//if images exist in the chat
-				if ($("#pm-" + message.to).children('img') > 0) {
-					$('img').load(function() {
-						chat_scroll_to_bottom(message.to);
+				if ($("#pm-" + message.to + ' img').length > 0) {
+					console.log('images found inside chat');
+					$('#pm-' + message.to + ' img').load(function() {
+						chat_scroll_to_bottom(message.to)
 					})
 				}
 				else {
-					chat_scroll_to_bottom();
+					chat_scroll_to_bottom(message.to);
 				}
 
 				$loading_history = false;
