@@ -25,6 +25,7 @@ Things to do:
 - <b>Picture upload through chat</b>
 - <b>Some kind of API so that mobile devices can use this</b>
 - <b>Realistic chat buttons (like close, minimize, etc.)</b>
+- <b>Load older chat transcripts when you scroll to the top of a chat box.</b>
 
 (Stuff in bold is important or new)
 
