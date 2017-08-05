@@ -259,8 +259,8 @@
 				})
 
 				//if images exist in the chat
-				if ($("#pm-" + message.to + ' img').length > 0) {
-					$('#pm-' + message.to + ' img').load(function() {
+				if ($("#pm-" + message.to).children('img') > 0) {
+					$('img').load(function() {
 						chat_scroll_to_bottom(message.to);
 					})
 				}
