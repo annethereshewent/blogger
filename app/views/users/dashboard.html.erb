@@ -257,9 +257,16 @@
 						$("#pm-" + message.to).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + chat_log.message + "</li>" );
 					}
 				})
-				$('img').load(function() {
-					chat_scroll_to_bottom(message.to);
-				})
+
+				//if images exist in the chat
+				if ($("#pm-" + message.to + ' img').length > 0) {
+					$('#pm-' + message.to + ' img').load(function() {
+						chat_scroll_to_bottom(message.to);
+					})
+				}
+				else {
+					chat_scroll_to_bottom();
+				}
 
 				$loading_history = false;
 			});
