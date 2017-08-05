@@ -3,7 +3,7 @@
     <p class="sub-heading">Avatar will be resized to 125x125 pixels.</p>
     <%= form_for @user, name:"upd_profpic", id: "upd_profpic", method: :patch, url: update_user_path(@user.id) do |f| %>
         <div class="modal-upload">
-            <img style="margin-left:20px" class="profile-pic" src="<%= @user.avatar.url(:thumb) %>">
+            <img style="margin-left:20px" class="profile-pic" id="profile-pic-modal" src="<%= @user.avatar.url(:thumb) %>">
             <input type="text" id="uploadTxt" disabled="true" placeholder="Choose File..">            
             <div class="fileUpload btn warn" id="fileupload-btn" style="margin-left:20px">
                 <span>Select</span>

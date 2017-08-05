@@ -10,9 +10,6 @@ var entityMap = {
 };
 
 $(function(){
-
-	//remove that unlicensed thing
-	$("#editContents:nth-child(4)").remove();
 	
 	initEditor();
 	$('.tag-input').each(function() {
