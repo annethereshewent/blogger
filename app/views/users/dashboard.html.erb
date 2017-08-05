@@ -204,6 +204,11 @@
 		var users = [];
 		var num_windows = 0;
 		$(function() {
+			//remove that watermark
+			if ($('.fr-wrapper').next().children(':first').text() == 'Unlicensed Froala Editor') {
+				$('.fr-wrapper').next().remove(); //bye felicia
+			}
+
 			$page = 2; //since we've already loaded the first "page"
 			$loading = false;
 
