@@ -13,7 +13,10 @@
 			border-radius: 20px;
 
 		}
-
+		.chat-image-file {
+			max-width: 90%;
+			height: auto;
+		}
 		.list-buttons, .private-message-list, .chat-list {
 			list-style-type: none
 
@@ -125,7 +128,7 @@
 		}
 		.private-message-list {
 			border-radius:20px;
-			height:295px;
+			height:280px;
 			overflow-y: scroll;
 			word-wrap: break-word;
 		}
@@ -146,6 +149,13 @@
 		.chat-text {
 			width: 96%;
 			height:12px;
+		}
+		.chat-image {
+			margin-top:5px;
+			width: 20px;
+			height: 20px;
+			cursor:hand;
+			cursor:pointer;
 		}
 		.chat-button {
 			width:16%;
@@ -247,12 +257,9 @@
 						$("#pm-" + message.to).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + chat_log.message + "</li>" );
 					}
 				})
-
-				if ($("#pm-" + message.to)[0].scrollHeight > $("#pm-" + message.to).innerHeight()) {
-					//$("#pm-" + message.from).empty();
-					$('#pm-' + message.to).scrollTop($('#pm-' + message.to)[0].scrollHeight+20);
-			
-				} 
+				$('img').load(function() {
+					chat_scroll_to_bottom(message.to);
+				})
 
 				$loading_history = false;
 			});
@@ -273,14 +280,15 @@
 
 				$("#pm-" + message.from).append('<label class="message-label-from">' + message.from +'</label><li class="message-from">' + message.content + '</li>');
 
-				if ($("#pm-" + message.from)[0].scrollHeight > $("#pm-" + message.from).innerHeight()) {
-					console.log('overflow');
-					//$("#pm-" + message.from).empty();
-					$('#pm-' + message.from).scrollTop($('#pm-' + message.from)[0].scrollHeight+20);
-			
-				} 
-			
-
+				if (message.type == 'text') {
+					chat_scroll_to_bottom(message.from);
+				}	
+				else {
+					//it's an image
+					$('img').load(function() {
+						chat_scroll_to_bottom(message.from);
+					})
+				}
 			});
 
 		 	$("#image-upload").dropzone({
@@ -485,6 +493,8 @@
 		}
 
 		function privateMessageBox(username) {
+			var audio = new Audio('/sounds/imsend.wav');
+
 			//if the box exists already do nothing
 			if ($("#private-message-" + username).length) 
 				return;
@@ -512,9 +522,79 @@
 			var position = 'right: ' + (num_windows*290) + "px"
 
 
-			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"></div>');
+			$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"><input type="file" id="chat-upload-' + username + '" style="display:none" accept="img/*"><img src="/images/camera_icon.png" class="chat-image" id="chat-image-' + username + '"></div>');
 
 			$("#chat-text-" + username).focus();
+
+			//add click event to the chat-image which triggers the file upload dialog to open
+			$("#chat-image-" + username).click(function() {
+				$(this).prev().trigger('click');
+			})
+
+			//finally on change of the file input check if the file in question is an image and if so then send it.
+			$("#chat-upload-" + username).change(function() {
+				console.log("file input updated");
+				var img_file = this.files[0];
+
+
+				//make sure the file is an image first
+				if (!$.inArray(img_file.type, ["image/gif", "image/jpeg", "image/png"])) {
+					return;
+				}
+				console.log(img_file);
+
+				file_reader = null;
+
+				try {
+					file_reader = new FileReader();
+				}
+				catch(e) {
+					console.log(e);
+				}
+				file_reader.onload = function(e) {
+					//console.log(img_file);
+					var extension = img_file.name.split('.');
+					extension = extension[extension.length-1];
+
+
+					get_user_id(username, function(to_id) {
+						socket.emit('message', {
+							from: "<%= @user.displayname %>",
+							fromid: <%= @user.id %>,
+							to: username,
+							toid: parseInt(to_id),
+							content: e.target.result,
+							type: 'image',
+							extension: extension
+						});
+					})
+					
+				};
+
+				file_reader.readAsBinaryString(img_file);
+
+				var preview_reader = new FileReader();
+
+				//next post the image to the message list
+				preview_reader.onload = function(e) {
+					audio.play();
+
+					$('#pm-' + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self"><img src="' + e.target.result + '" class="chat-image-file"></li>');
+
+					$('img').load(function() {
+						chat_scroll_to_bottom(username);
+					})
+				}
+				preview_reader.readAsDataURL(img_file);
+
+				
+
+
+
+
+			}) 
+
+			
 
 			$("#private-message-" + username).children(':first').click(function() {
 				var removed_window_position = parseInt($(this).parent().css('right'))
@@ -533,9 +613,9 @@
 			//bind a submit event to the form
 			$('#chat-text-' + username).keypress(function(e) {
 				if (e.which == 13) {
-					var audio = new Audio('/sounds/imsend.wav');
-					audio.play();
 					
+					audio.play();
+
 					var contents = escapeHtml($("#chat-text-" + username).val())
 					console.log($("#chat-text-" + username).val());
 					get_user_id(username, function(to_id) {
@@ -544,7 +624,8 @@
 							fromid: <%= @user.id %>,
 							to: username,
 							toid: parseInt(to_id),
-							content: contents
+							content: contents,
+							type: 'text'
 						});
 						//console.log($("#pm-" + username)[0].scrollHeight);
 
@@ -552,10 +633,9 @@
 						$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + contents + "</li>" );
 						$("#chat-text-" + username).val("");
 
-						if ($("#pm-" + username)[0].scrollHeight > $("#pm-" + username).innerHeight()) {
-							//$("#pm-" + username).empty();
-							$('#pm-' + username).scrollTop($('#pm-' + username)[0].scrollHeight);
-						}	
+						console.log('passing ' + username + ' to scroll_to_bottom');
+						chat_scroll_to_bottom(username);
+							
 					});
 
 					
@@ -624,6 +704,14 @@
 					}
 				}
 			)
+		}
+
+		function chat_scroll_to_bottom(recipient) {
+			if ($("#pm-" + recipient)[0].scrollHeight > $("#pm-" + recipient).innerHeight()) {
+				//$("#pm-" + message.from).empty();
+				$('#pm-' + recipient).scrollTop($('#pm-' + recipient)[0].scrollHeight+20);
+		
+			} 
 		}
 
 
