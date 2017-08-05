@@ -1,4 +1,6 @@
 class PostsController < ApplicationController	
+	protect_from_forgery :except => [:upload_image]
+
 	def index
 		page = params[:page].present? ? params[:page].to_i : 1
 
@@ -89,6 +91,19 @@ class PostsController < ApplicationController
 		)
 
 		render 'index'
+	end
+
+	def upload_image
+		file = params[:file]
+
+
+		image = Image.create({
+			file: params[:file]
+		})
+
+		render json: {
+			link: image.file.url
+		}
 	end
 
 	def upload_images

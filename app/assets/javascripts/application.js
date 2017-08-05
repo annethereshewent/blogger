@@ -12,6 +12,7 @@
 //
 //= require jquery-2.1.3.min.js
 //= require jquery_ujs
-//= require_tree .
 //= require dropzone
 //= require socket.io
+//= require froala_editor.min.js
+//= require_tree .

@@ -13,7 +13,11 @@
  *= require font-awesome
  *= require_tree .
  *= require_self
+ *= require froala_editor
+ *= require froala_style
+ *= require themes/dark.min.css
  */
+
 h2 {
 	font-family:"Calibri";
 	//color:#EBD6FF;

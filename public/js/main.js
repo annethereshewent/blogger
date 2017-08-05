@@ -94,19 +94,23 @@ function remove_tags(selector) {
 }
 
 function initEditor() {
-	$('#editContents').editable({
-		inlineMode: false,
-		paragraphy: true,
-		placeholder:"",
+	$('#editContents').froalaEditor({
+		// inlineMode: false,
+		// paragraphy: true,
+		// placeholder:"",
 		width: "350px",
 		height: "250px",
-		buttons: ["indent", "outdent", "strikeThrough", "bold", "italic", "underline", "insertImage", "insertUnorderedList"],
-		inverseSkin: true,
+		//toolbarButtons: ["indent", "outdent", "strikeThrough", "bold", "italic", "underline", "insertImage", "insertUnorderedList"],
+		toolbarButtons: ['indent', 'outdent', 'quote', '|', 'strikeThrough', 'bold', 'italic', 'underline', '|', 'formatUL', 'formatOL', '|', 'insertImage' ],
+		// inverseSkin: true,
+		theme: 'dark',
+		imageUploadURL: '/posts/upload_image',
+		imageUploadMethod: 'Post'
 	});
 }
 
 function submitContents() {
-	var content = $("#editContents").editable("getHTML").toString();
+	var content = $("#editContents").froalaEditor("html.get");
 
 	if (isEmpty(content)) {
 		alert("Your post is empty!");
@@ -153,7 +157,7 @@ function openModal() {
 		width:430,
 		height:"auto",
 		close: function() {
-			$("#editContents").editable("setHTML", "");
+			$("#editContents").froalaEditor("html.set", "");
 			remove_tags($("#tags"));
 		}
 	});
