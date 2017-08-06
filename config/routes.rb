@@ -31,6 +31,8 @@ Rails.application.routes.draw do
   get '/users/:user_id/isFriends' => 'users#isFriends'
   get '/users/get_user_id' => 'users#get_user_id'
   post '/posts/upload_image' => 'posts#upload_image', as: 'upload_image'
+  post '/users/search' => 'users#search', as: 'search'
+  
 
   resources :users do
     resources :posts do

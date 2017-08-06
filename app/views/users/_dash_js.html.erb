@@ -1,0 +1,518 @@
+<script src="/js/main.js"></script>
+<script>
+	var socket = '';
+	var users = [];
+	var num_windows = 0;
+	$(function() {
+		//remove that watermark
+		if ($('.fr-wrapper').next().children(':first').text() == 'Unlicensed Froala Editor') {
+			$('.fr-wrapper').next().remove(); //bye felicia
+		}
+
+		//add event listener to search
+		$("#search").keypress(function(e) {
+			if (e.which == 13) {
+				$("#search-form").submit();
+			}
+		})
+
+
+		$page = 2; //since we've already loaded the first "page"
+		$loading = false;
+
+		socket = new io('<%= ENV['CHAT_SERVER'] %>');
+
+		console.log('socket information: ');
+		console.log(socket);
+
+		logIn();
+
+		socket.emit('list');
+
+		socket.on('list', function() {
+			//console.log('sending user info back')
+			sendUserInfo();
+		});
+
+		socket.on('logout', function(user) {
+
+			users.splice(userIndex(user),1)
+
+			//if the logged out user's message box is up, notify the user that the person has disconnected
+
+			console.debug(user);
+			// if ($("#private-message-" + user).length) {
+			// 	$("#pm-" + user).append('<p><i style="margin-left:10px;">' + user + ' has disconnected</i></p>');
+			// }
+			updateUserList();
+		});
+
+		socket.on('user-list', function(user) {
+			//console.log("user " + user.username + " has sent their info");
+			//checks whether a user is a friend and adds them to the user list
+			isFriends(user);
+		});
+
+		socket.on('chat_history', function(message) {
+			//don't do anything if the private message box isn't up already
+			if (!$("#private-message-" + message.to).length) {
+				return;
+			}
+
+
+			console.log('chat history received for user ' + message.to)
+			//console.log(message.chat_logs);
+			message.chat_logs.forEach(function(chat_log) {
+				if (chat_log.from != '<%= @user.id %>') {
+					$("#pm-" + message.to).append('<label class="message-label-from">' + message.to +'</label><li class="message-from">' + chat_log.message + '</li>');
+				}
+				else {
+					$("#pm-" + message.to).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + chat_log.message + "</li>" );
+				}
+			})
+
+			//if images exist in the chat
+			if ($("#pm-" + message.to + ' img').length > 0) {
+				console.log('images found inside chat');
+				$('#pm-' + message.to + ' img').load(function() {
+					chat_scroll_to_bottom(message.to)
+				})
+			}
+			else {
+				chat_scroll_to_bottom(message.to);
+			}
+
+			$loading_history = false;
+		});
+
+		socket.on('message', function(message) {
+			console.log("message received: " + message.from + ": " + message.content);
+			var im_sound = new Audio('/sounds/imrcv.wav');
+
+			im_sound.play();
+
+			if (!$("#private-message-" + message.from).length) {
+				console.log("should go here");
+				privateMessageBox(message.from);
+				return; //don't do anything, since by opening the privateMessageBox it will automatically get the chat history which includes this new message.
+			}
+			
+			//append like normal if message box is open
+
+			$("#pm-" + message.from).append('<label class="message-label-from">' + message.from +'</label><li class="message-from">' + message.content + '</li>');
+
+			if (message.type == 'text') {
+				chat_scroll_to_bottom(message.from);
+			}	
+			else {
+				//it's an image
+				$('img').load(function() {
+					chat_scroll_to_bottom(message.from);
+				})
+			}
+		});
+
+	 	$("#image-upload").dropzone({
+	 		url: '<%= image_upload_path %>',
+	 		paramName: 'post[file]',
+	 		headers: {
+		    	'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+		    },
+		    init: function() {
+		    	this.on("success", function(file) { 
+		    		window.location.href = '<%= user_dashboard_path @user %>';
+		    	});
+		    	$('#image-upload')[0].removeEventListener('click', this.listeners[1].events.click);
+			}
+	 	});
+	 	var expanded = false;
+	 	$(".chat-header").click(function() {
+	 		if (!expanded) {
+	 			$(".chat").css('height', '400px');
+	 			expanded = true;
+	 		}	
+	 		else {
+	 			$(".chat").css('height', '15px');
+	 			expanded = false;
+	 		}
+	 	});
+
+
+
+
+		if (window.location.href.indexOf('dashboard') > -1) {
+			$(window).scroll(function() {
+				//only append a loading gif if it doesn't exist already
+				if (!$(".loading-dash").is(':visible'))
+						$(".main").append('<div class="loading-dash"><img src="/images/loading.gif"></div>').show();
+
+				if ($loading)
+					return;
+		
+			
+				if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+					load_posts($page++);
+				}
+				
+			});
+		}
+
+
+		$("#youtube-url").on("input propertychange paste", function() {
+
+			var youtube_id = parseYoutubeURL($("#youtube-url").val())[7];
+
+			if (youtube_id == null) {
+				$("#youtube-video").html("");
+				return;
+			}
+			
+			var youtube_vid = getYoutubeVideo(youtube_id);
+			$("#youtube-video").html(youtube_vid).hide().fadeIn("slow");
+
+		});
+
+		$("#image-upload").click(function() {
+			$("#image").click();
+		});
+
+		$("#image").change(function() {
+			var reader = new FileReader();
+
+			reader.onload = function (e) {
+				image = $("#image-file");
+
+
+	            $(image).attr('src', e.target.result);
+	            $(image).fadeIn("slow").show();
+
+	  
+	            // if ($(image).width() < 200) {
+	            // 	//console.log("it got here");
+	            // 	//$(image).css('margin-left', '100px');
+	            // }
+
+
+	            $("#image-upload").hide();
+	        }
+
+			reader.readAsDataURL(this.files[0])
+		});
+
+	});
+
+	function openNewDashModal(userID) {
+		openNewModal(userID);
+		$("#source").val("dashboard");
+	}
+
+	function openYoutubeModal() {
+		$("#youtubeModal").fadeIn(500).dialog({
+			autoOpen:true,
+			closeOnEscape:true,
+			modal:true,
+			resizable:false,
+			width:480,
+			height:520,
+			position: {at:"top"},
+			close: function() {
+				$("#youtube-video").html("");
+				remove_tags($("#youtube-tags"));
+			}
+		});
+	}
+
+	function openImageModal() {
+		$("#imageModal").fadeIn(500).dialog({
+			autoOpen:true,
+			closeOnEscape:true,
+			modal:true,
+			resizable:false,
+			width: 600,
+			height:'auto',
+			position: {at:"top"},
+			close: function() {
+				$("#image-file").attr("src", '');
+				$("#image-upload").show();
+				$("#image-file").hide();
+				remove_tags($("#image-tags"));
+			}
+		});
+	}
+
+	function submitYoutube(user_id) {
+		var match = parseYoutubeURL($("#youtube-url").val());
+		if (match == null) {
+			alert("Please enter a valid youtube URL");
+			return;
+		}
+
+		var youtube_vid = getYoutubeVideo(match[7]);
+
+		$("#youtube_content").val(youtube_vid);
+		
+		$("#newYoutubePost").attr("action", "<%= user_posts_path session[:userid] %>")
+		$("#newYoutubePost").submit();
+	}
+
+	function sendUserInfo() {
+		socket.emit('user-list', {
+			username: "<%= @user.displayname %>",
+			avatar: "<%= @user.avatar.url(:thumb) %>"
+		});
+	}
+	function logIn() {
+		socket.emit('login', {
+			username: "<%= @user.displayname %>",
+			avatar: "<%= @user.avatar.url(:thumb) %>"
+		});
+	}
+
+	function updateUserList() {
+		//console.log("users = " + users);
+		$(".chat-list").empty();
+		for (var i = 0; i < users.length; i++) {
+			if (users[i].username != "<%= @user.displayname %>")
+				$(".chat-list").append("<li><a href='#' onclick='privateMessageBox(\"" + users[i].username + "\");return false;'><img class='chat-avatar' src='" + users[i].avatar + " '>" + '</a><span class="chat-username">' + users[i].username + "</span></li>");
+		}
+	}
+	function userIndex(username) {
+		for (var i = 0; i < users.length; i++) {
+			if (users[i].username == username) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	function privateMessageBox(username) {
+		var audio = new Audio('/sounds/imsend.wav');
+
+		//if the box exists already do nothing
+		if ($("#private-message-" + username).length) 
+			return;
+
+		//send request for chat logs
+		console.log("sending request for logs...");
+
+		get_user_id(username, function(to_id) {
+			console.log('sending history request. toid = ' + to_id)
+			socket.emit('history_request', {
+				to: username,
+				toid: to_id,
+				from: '<%= @user.displayname %>',
+				fromid: <%= @user.id %>,
+			})
+
+		})
+		
+		//if the box exists already do nothing
+		if ($("#private-message-" + username).length) 
+			return;
+		
+		num_windows++;
+
+		var position = 'right: ' + (num_windows*290) + "px"
+
+
+		$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"><input type="file" id="chat-upload-' + username + '" style="display:none" accept="image/*"><img src="/images/camera_icon.png" class="chat-image" id="chat-image-' + username + '"></div>');
+
+		$("#chat-text-" + username).focus();
+
+		//add click event to the chat-image which triggers the file upload dialog to open
+		$("#chat-image-" + username).click(function() {
+			$(this).prev().trigger('click');
+		})
+
+		//finally on change of the file input check if the file in question is an image and if so then send it.
+		$("#chat-upload-" + username).change(function() {
+			console.log("file input updated");
+			var img_file = this.files[0];
+
+
+			//make sure the file is an image first
+			console.log(img_file.type);
+			if (!$.inArray(img_file.type, ["image/gif", "image/jpeg", "image/png"])) {
+				alert("Invalid file specified");
+				return;
+			}
+			console.log(img_file);
+
+			file_reader = null;
+
+			try {
+				file_reader = new FileReader();
+			}
+			catch(e) {
+				console.log(e);
+			}
+			file_reader.onload = function(e) {
+				//console.log(img_file);
+				var extension = img_file.name.split('.');
+				extension = extension[extension.length-1];
+
+
+				get_user_id(username, function(to_id) {
+					socket.emit('message', {
+						from: "<%= @user.displayname %>",
+						fromid: <%= @user.id %>,
+						to: username,
+						toid: parseInt(to_id),
+						content: e.target.result,
+						type: 'image',
+						extension: extension
+					});
+				})
+				
+			};
+
+			file_reader.readAsBinaryString(img_file);
+
+			var preview_reader = new FileReader();
+
+			//next post the image to the message list
+			preview_reader.onload = function(e) {
+				audio.play();
+
+				$('#pm-' + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self"><a href="' + e.target.result + '"><img src="' + e.target.result + '" class="chat-image-file"></a></li>');
+
+				$('img').load(function() {
+					chat_scroll_to_bottom(username);
+				})
+			}
+			preview_reader.readAsDataURL(img_file);
+
+			
+
+
+
+
+		}) 
+
+		
+
+		$("#private-message-" + username).children(':first').click(function() {
+			var removed_window_position = parseInt($(this).parent().css('right'))
+	 		$(this).parent().remove();
+	 		num_windows--;
+
+	 		//shift windows to the right if needed
+	 		$('.private-message').each(function() {
+	 			if (parseInt($(this).css('right')) > removed_window_position) {
+	 				$(this).css('right', (parseInt($(this).css('right')) - 290) + "px");
+	 			}
+	 		})
+	 		
+	 	})
+
+		//bind a submit event to the form
+		$('#chat-text-' + username).keypress(function(e) {
+			if (e.which == 13) {
+				var contents = escapeHtml($("#chat-text-" + username).val())
+
+				if (contents == '') {
+					return;
+				}
+
+				audio.play();
+
+				console.log($("#chat-text-" + username).val());
+				get_user_id(username, function(to_id) {
+					socket.emit('message', {
+						from: "<%= @user.displayname %>",
+						fromid: <%= @user.id %>,
+						to: username,
+						toid: parseInt(to_id),
+						content: contents,
+						type: 'text'
+					});
+					//console.log($("#pm-" + username)[0].scrollHeight);
+
+					
+					$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + contents + "</li>" );
+					$("#chat-text-" + username).val("");
+
+					console.log('passing ' + username + ' to scroll_to_bottom');
+					chat_scroll_to_bottom(username);
+						
+				});
+
+				
+			}
+
+
+
+		});
+	}
+
+	function isFriends(user) {
+		$.get(
+			'/users/<%= @user.id %>/isFriends',
+			{ username: user.username },
+			function(data) {
+				if (data == 'true') {
+					
+					if (userIndex(user.username) == -1) {
+						console.log('friend found, adding to users list');
+						users.push(user);
+					}
+
+					updateUserList();
+				}
+				console.log('friend not found');
+				return false;
+			}
+		);
+
+	}
+
+	function openQuoteModal(pid) {
+		getPostContents(pid, function(data) {
+			//alert($("<div>").html(data).find("<iframe>"));
+			if (data.images.length > 0 ) {
+				data = '<img src="' + data.images[0] + '"><p>Source: <a href="/users/' + data.user.id + '/posts">' + data.user.displayname + "</a></p>"
+			}
+			else {
+				data = "<div class='block-quote-outer'><a href='/users/" + data.user.id + "/posts/" + pid + "/comments'>" + data.user.displayname + "</a><div class='block-quote'>" + data.content + "</div></div><p>";
+			}
+
+			openModal();
+			initEditor();
+			$("#editContents").editable("focus");
+			$("#editContents").editable("insertHTML",data);
+			
+
+			$("#newPost").attr("action", "/users/<%= @user.id %>/posts");
+
+			$("#blogSubmit").text("Quote");
+			$("#postModal").next().html("Quote");
+			$("#source").val('dashboard');
+			$("#sourcePID").val(pid);
+			$("#editContents").editable('disable');
+		});
+		
+	}
+
+	function get_user_id(username, callback) {
+		$.get(
+			'/users/get_user_id/',
+			{ username: username},
+			function(data) {
+				if (data != 'error') {
+					callback(data);
+				}
+			}
+		)
+	}
+
+	function chat_scroll_to_bottom(recipient) {
+		if ($("#pm-" + recipient)[0].scrollHeight > $("#pm-" + recipient).innerHeight()) {
+			//$("#pm-" + message.from).empty();
+			$('#pm-' + recipient).scrollTop($('#pm-' + recipient)[0].scrollHeight+20);
+	
+		} 
+	}
+
+
+</script>

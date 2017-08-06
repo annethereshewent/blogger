@@ -51,7 +51,7 @@ module PostsHelper
 	end
 
 	def getStylesheet
-		if params[:action] == 'dashboard' || !@user.present? || (params[:controller] == 'users' && params['action'] == 'tags')
+		if params[:action] == 'dashboard' || params[:action] == 'search' || !@user.present? || (params[:controller] == 'users' && params['action'] == 'tags')
 			'/stylesheets/default.css'
 		else
 			if @user.theme.present?

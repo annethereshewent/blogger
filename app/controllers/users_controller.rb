@@ -68,6 +68,18 @@
     end
   end
 
+  def search
+    @user = User.find(session[:userid])
+
+    search_params = params[:search].split(' ').map{ |token| "%#{token}%" }.join(' ')
+
+    @posts = Post.where('post LIKE ?', search_params).order('id desc')
+
+    render 'dash_search'
+  end
+
+  
+
   
   def create
     @user = User.new(user_params)
@@ -189,7 +201,7 @@
                                   )
               ', params[:tag])
 
-    render 'dash_tags'
+    render 'dash_search'
   end
 
   private

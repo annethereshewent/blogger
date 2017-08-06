@@ -1,0 +1,13 @@
+<%= render partial: 'dash_heading' %>
+	<div class="main">
+		<h2>Dashboard Search</h2>
+		<% if @posts.empty? %>
+			<div class="dash content" style="color:grey">
+				<h3>No Posts to Show</h3>
+			</div>
+			<div class="content-divider"></div>
+		<% end %>
+		<%= render partial: 'dashPosts' %>
+	</div>
+	<%= render partial: 'dash_js' %>
+</body>
