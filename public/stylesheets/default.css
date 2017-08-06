@@ -13,6 +13,7 @@
 	padding-bottom:20px;
 	padding-right:20px;
 	width: 440px;
+	word-wrap: break-word;
 }
 .form-heading {
     color:#6200A3;

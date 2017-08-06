@@ -479,8 +479,8 @@
 
 			openModal();
 			initEditor();
-			$("#editContents").editable("focus");
-			$("#editContents").editable("insertHTML",data);
+			$("#editContents").froalaEditor("events.focus");
+			$("#editContents").froalaEditor("html.insert",data);
 			
 
 			$("#newPost").attr("action", "/users/<%= @user.id %>/posts");
@@ -489,7 +489,7 @@
 			$("#postModal").next().html("Quote");
 			$("#source").val('dashboard');
 			$("#sourcePID").val(pid);
-			$("#editContents").editable('disable');
+			//$("#editContents").froalaEditor('disable');
 		});
 		
 	}
