@@ -100,7 +100,6 @@ GEM
       bundler (>= 1.3.0, < 2.0)
       railties (= 4.1.5)
       sprockets-rails (~> 2.0)
-    rails-simple-search (1.1.5)
     rails_12factor (0.0.3)
       rails_serve_static_assets
       rails_stdout_logging
@@ -171,7 +170,6 @@ DEPENDENCIES
   paperclip
   pg
   rails (= 4.1.5)
-  rails-simple-search
   rails_12factor
   rails_autolink
   sass-rails (~> 4.0.3)
