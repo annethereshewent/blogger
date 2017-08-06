@@ -16,12 +16,13 @@ This is a port of my php blog project, rewritten entirely for ruby on rails. New
 
 - WYSIWYG editor now supports image uploads
 
+- Added a very simple but good enough search 
+
 
 
 Things to do:
 
 - <b>Archive Search</b>
-- <b>General Search</b>
 - Post security options (friends only, public, private)
 - Make E-mail confirmations actually do something. Currently only an e-mail is sent
 - Fix several small issues such as the request modal not showing in control panel
