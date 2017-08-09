@@ -12,7 +12,7 @@
 		//add event listener to search
 		$("#search").keypress(function(e) {
 			if (e.which == 13) {
-				$("#search-form").submit();
+				location.href = '/users/search/' + $('#search').val();			
 			}
 		})
 

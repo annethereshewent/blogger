@@ -177,10 +177,7 @@
 
 	<h1 class="logo"><a href="<%= user_dashboard_path @user %>"><span class="logo-bracket">[</span>blogger<span class="logo-bracket">].</span></a></h1>
 	<div class="search-row">
-		<form method="POST" action="/users/search" id="search-form">
-			<i class="fa fa-search" style="margin-right:10px;"></i><input type="text" class="control-text" name="search" id="search">
-			<%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-		</form>
+		<i class="fa fa-search" style="margin-right:10px;"></i><input type="text" class="control-text" name="search" id="search">
 	</div>
 	<div class="chat">
 		<h3 class="chat-header">Chat</h3>
