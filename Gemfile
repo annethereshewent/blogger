@@ -1,8 +1,8 @@
 source 'http://rubygems.org'
-ruby "2.3.0"
+ruby "2.4.1"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.5'
+gem 'rails', '<= 5.1.3'
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 
@@ -10,11 +10,11 @@ gem 'rails', '4.1.5'
 gem "wysiwyg-rails"
 
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 4.0.3'
+gem 'sass-rails'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .js.coffee assets and views
-gem 'coffee-rails', '~> 4.0.0'
+gem 'coffee-rails'
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 # gem 'therubyracer',  platforms: :ruby
 
@@ -23,12 +23,12 @@ gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 # gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.0'
+gem 'jbuilder'
 # bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0',          group: :doc
+gem 'sdoc',         group: :doc
 
 # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-gem 'spring', '1.2.0',        group: :development
+gem 'spring',    group: :development
 # used for password authentication
 gem 'bcrypt'
 
@@ -42,13 +42,15 @@ gem 'paperclip'
 gem 'nokogiri'
 
 # for uploading to aws s3 service
-gem 'aws-sdk', '< 2.0'
+gem 'aws-sdk', '<= 2.0'
 
 #authentication gem
 gem 'devise'
 
 # for pagination
 gem 'will_paginate'
+
+gem 'listen'
 
 # use postgres as the default database
 gem 'pg'

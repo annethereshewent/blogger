@@ -80,8 +80,8 @@
 		getPostContents(pid, function(data) {
 			openModal();
 			initEditor();
-			$("#editContents").editable("focus");
-			$("#editContents").editable("setHTML",data.content);
+			$("#editContents").froalaEditor("events.focus");
+			$("#editContents").froalaEditor("html.insert",data.content);
 			$("#newPost").attr("action", "/users/" + <%= @user.id %> + "/posts/" + pid);
 			$("#blogSubmit").text("Edit");
 			$("#_method").val("patch");
@@ -118,8 +118,8 @@
 
 			openModal();
 			initEditor();
-			$("#editContents").editable("focus");
-			$("#editContents").editable("insertHTML",data);
+			$("#editContents").froalaEditor("events.focus");
+			$("#editContents").froalaEditor("html.insert",data);
 			$("#newPost").attr("action", "/users/<%= @user.id %>/posts");
 
 			$("#blogSubmit").text("Quote");

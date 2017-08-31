@@ -29,7 +29,7 @@
 		$.get(
 			'/posts/' + page + '/fetch_posts',
 			{ 
-				friend_ids: "<%= @friends.push(@user).map{ |friend| friend.id }.join(',') %>",
+				friend_ids: "<%= @friends.to_a.push(@user).map{ |friend| friend.id }.join(',') %>",
 
 			} ,
 			function(data) {
