@@ -42,7 +42,7 @@ gem 'paperclip'
 gem 'nokogiri'
 
 # for uploading to aws s3 service
-gem 'aws-sdk', '<= 2.0'
+gem 'aws-sdk', '< 2.0'
 
 #authentication gem
 gem 'devise'
