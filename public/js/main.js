@@ -10,6 +10,11 @@ var entityMap = {
 };
 
 $(function(){
+
+	//remove that watermark
+	if ($('.fr-wrapper').children(':first').text() == 'Unlicensed copy of the Froala Editor. Use it legally by purchasing a license.') {
+		$('.fr-wrapper').children(':first').remove(); //bye felicia
+	}
 	
 	initEditor();
 	$('.tag-input').each(function() {

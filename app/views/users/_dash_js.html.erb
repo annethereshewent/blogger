@@ -4,11 +4,6 @@
 	var users = [];
 	var num_windows = 0;
 	$(function() {
-		//remove that watermark
-		if ($('.fr-wrapper').next().children(':first').text() == 'Unlicensed Froala Editor') {
-			$('.fr-wrapper').next().remove(); //bye felicia
-		}
-
 		//add event listener to search
 		$("#search").keypress(function(e) {
 			if (e.which == 13) {
