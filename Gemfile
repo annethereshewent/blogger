@@ -7,7 +7,7 @@ gem 'rails', '<= 5.1.3'
 # gem 'sqlite3'
 
 #Froala wysiwyg editor 
-gem "wysiwyg-rails"
+gem "wysiwyg-rails", "= 2.6.5"
 
 # Use SCSS for stylesheets
 gem 'sass-rails'
