@@ -1,12 +1,12 @@
 var entityMap = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;',
-  '/': '&#x2F;',
-  '`': '&#x60;',
-  '=': '&#x3D;'
+	'&': '&amp;',
+	'<': '&lt;',
+	'>': '&gt;',
+	'"': '&quot;',
+	"'": '&#39;',
+	'/': '&#x2F;',
+	'`': '&#x60;',
+	'=': '&#x3D;'
 };
 
 $(function(){
@@ -167,9 +167,9 @@ function openModal() {
 }
 
 function escapeHtml(string) {
-  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
-    return entityMap[s];
-  });
+  	return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    	return entityMap[s];
+  	});
 }
 
 function getPostContents(pid, callback) {

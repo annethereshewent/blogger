@@ -4,6 +4,9 @@
 	var users = [];
 	var num_windows = 0;
 	$(function() {
+		//remove that watermark
+		$('.fr-wrapper').children(':first').remove(); //bye felicia
+
 		//add event listener to search
 		$("#search").keypress(function(e) {
 			if (e.which == 13) {
