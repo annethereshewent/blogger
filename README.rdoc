@@ -34,4 +34,4 @@ Things to do:
 (Stuff in bold is important or new)
 
 
-This app uses Rails 4 with Ruby version 2.1.2. It is available for testing at blogger-243.herokuapp.com. 
+This app uses Rails 5 with Ruby version 2.4.1. It is available for testing at blogger-243.herokuapp.com. 
