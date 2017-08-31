@@ -12,8 +12,7 @@ var entityMap = {
 $(function(){
 
 	//remove that watermark
-	console.log($('.fr-wrapper').children(':first').text());
-	if ($('.fr-wrapper').children(':first').text() == 'Unlicensed copy of the Froala Editor. Use it legally by purchasing a license.') {
+	if ($('.fr-wrapper').children(':first').children(':first').text() == 'Unlicensed copy of the Froala Editor. Use it legally by purchasing a license.') {
 		$('.fr-wrapper').children(':first').remove(); //bye felicia
 	}
 
