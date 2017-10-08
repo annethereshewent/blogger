@@ -5,7 +5,7 @@
 	var num_windows = 0;
 	$(function() {
 		//remove that watermark
-		$('.fr-wrapper').children(':first').remove(); //bye felicia
+		$('.fr-wrapper').children(':first').children('first').remove(); //bye felicia
 
 		//add event listener to search
 		$("#search").keypress(function(e) {
@@ -317,6 +317,10 @@
 		$('body').append('<div class="private-message" id="private-message-' + username + '" style="' + position + '"><h3 class="private-message-header">Messages: ' + username + '</h3><ul class="private-message-list" id="pm-' + username + '" ></ul><input type="text" name="chat-text" class="chat-text" id="chat-text-' + username + '" autocomplete="off"><input type="file" id="chat-upload-' + username + '" style="display:none" accept="image/*"><img src="/images/camera_icon.png" class="chat-image" id="chat-image-' + username + '"></div>');
 
 		$("#chat-text-" + username).focus();
+
+		$('#pm-' + username).scroll(function() {
+			$("#pm-" + username).focus();
+		})
 
 		//add click event to the chat-image which triggers the file upload dialog to open
 		$("#chat-image-" + username).click(function() {

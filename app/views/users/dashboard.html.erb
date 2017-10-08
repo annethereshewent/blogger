@@ -4,7 +4,7 @@
 			<li><a href="#" onclick="openNewDashModal(<%= params[:user_id] %>);return false;"><img src="/images/write-document-icon.png" class="icon"></a></li>
 			<li><a href="#" onclick="openYoutubeModal()" ><img src="/images/video_icon.png" class="icon"></a></li>
 			<li><a href="#" onclick="openImageModal()" ><img src="/images/photo_upload.png" class="icon"></a></li>
-			<li><a href="<%= user_account_path session[:userid] %>"><img src="/images/control_panel copy.png" class="icon"></li></a>
+			<li><a href="<%= user_account_path %>"><img src="/images/control_panel copy.png" class="icon"></li></a>
 			<li><a href="/users/logout"><img src="/images/logout.png" class="icon"></a></li>
 		</ul>
 	</div>
@@ -37,10 +37,7 @@
 				if (data != '') 
 					$('.main').fadeIn("slow").append(data);
 				
-				//wait a second before the next ajax request
-				setTimeout(function() {
-					$loading = false;
-				}, 500);
+				$loading = false;
 
 			}
 		);

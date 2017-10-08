@@ -35,7 +35,7 @@
         <% end %>
         <% if session[:userid] %>
             <li id="Logout"><a href="/users/logout"><i class="fa fa-sign-out"></i>Logout</a></li>
-            <li id="Dashboard"><a href="<%= user_dashboard_path @user.id %>"><i class="fa fa-tachometer"></i>Dashboard</a></li>
+            <li id="Dashboard"><a href="<%= user_dashboard_path %>"><i class="fa fa-tachometer"></i>Dashboard</a></li>
         <% end %>
         
     </ul>

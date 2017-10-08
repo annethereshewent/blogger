@@ -12,15 +12,14 @@ Rails.application.routes.draw do
   post '/posts/:post_id/delete/' => "posts#delete", as: "delete_post"
   get '/posts/:post_id/fetch' => "posts#fetch", as: "fetch_post"
   patch '/users/:id/update' => "users#update", as: "update_user"
-  get '/users/:id/account' => 'users#account', as: 'user_account'
+  get '/users/account' => 'users#account', as: 'user_account'
   root 'users#login'
   post '/users/verify'  => 'users#verify'
   post '/comments/:comment_id/reply' => 'comments#reply', as: 'comments_reply'
-  get '/users/:id/account' => 'users#account', as: 'account'
   get '/users/:id/tags/:tag' => 'posts#tags', as: 'user_tags'
   get '/users/:user_id/posts/:page' => 'posts#index', as: 'user_posts_page'
   post '/users/:user_id/friend' => 'users#add_friend', as: 'add_friend'
-  get '/users/:user_id/dashboard' => 'users#dashboard', as: 'user_dashboard'
+  get '/users/dashboard' => 'users#dashboard', as: 'user_dashboard'
   get '/users/checkRequests' => 'users#check_requests'
   get '/users/getRequests/:num' => 'users#get_requests'
   post '/users/:id/confirmFriend/:user_id' => 'users#confirm_friend'

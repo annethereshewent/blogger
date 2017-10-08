@@ -83,6 +83,7 @@
 	function openEditModal(pid) {
 		//need ajax to get contents
 		getPostContents(pid, function(data) {
+			console.log(data.content);
 			openModal();
 			initEditor();
 			$("#editContents").froalaEditor("events.focus");

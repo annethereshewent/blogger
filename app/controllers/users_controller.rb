@@ -1,7 +1,7 @@
  class UsersController < ApplicationController
   def login
     if session[:userid]
-      redirect_to user_dashboard_path session[:userid] 
+      redirect_to user_dashboard_path 
     end
   end
   
@@ -48,7 +48,7 @@
   end
 
   def dashboard
-    unless (session[:userid] && session[:userid] == params[:user_id].to_i)
+    unless (session[:userid])
       return redirect_to '/users'
     end
 
@@ -86,7 +86,7 @@
     if @user.save
       session[:username] = @user.email
       session[:userid]   = @user.id
-      redirect_to user_dashboard_path @user.id
+      redirect_to user_dashboard_path
     else
       redirect_to '/users', notice: "Username already exists"
     end
@@ -97,7 +97,7 @@
   	if @user and @user.authenticate(params[:pass])
       session[:username] = @user.email
       session[:userid] = @user.id
-  		redirect_to user_dashboard_path @user
+  		redirect_to user_dashboard_path
   	else
       flash[:notice] = "Error logging in: Wrong username or password"
   		redirect_to '/users'
@@ -119,8 +119,8 @@
   end
 
   def account
-    if session[:userid].present? && session[:userid].to_i == params[:id].to_i
-      @user = User.find(params[:id])
+    if session[:userid].present?
+      @user = User.find(session[:userid])
       # @profile_pic = @user.profile_pic ? @user.profile_pic : '/images/user_icon.png'
     else
       # redirect_to '/users', notice: "Account"
@@ -131,10 +131,10 @@
   
   def update
     if User.update(params[:id], user_params)
-      redirect_to user_account_path params[:id]
+      redirect_to user_account_path 
     else
       flash[:notice] = "Error updating account information"
-      redirect_to user_account_path params[:id]
+      redirect_to user_account_path
     end
   end
 
@@ -163,10 +163,16 @@
     end
   end
 
+  def archive
+    # params[:user_id] tells you who to get the archive for, initially load the posts for current month
+
+    
+  end
+
   def confirm_friend
     Friendship.where('(user_id = ? and friend_id = ?) or (user_id = ? and friend_id=?)', params[:id], params[:user_id], params[:user_id], params[:id]).update_all(:accepted => true)
 
-    redirect_to user_dashboard_path params[:id]
+    redirect_to user_dashboard_path
   end
 
   def switch_theme

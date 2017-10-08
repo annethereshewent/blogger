@@ -17,7 +17,7 @@ module PostsHelper
 
 	def get_account_path
 		if params['action'] == 'account' || params['action'] == 'tags' 
-			return user_account_path(params[:id])
+			return user_account_path
 		end
 			
 		user_account_path(params[:user_id])
