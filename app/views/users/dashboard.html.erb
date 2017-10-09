@@ -1,7 +1,7 @@
 <%= render partial: 'dash_heading' %>
 	<div class="buttons">
 		<ul class="list-buttons">
-			<li><a href="#" onclick="openNewDashModal(<%= params[:user_id] %>);return false;"><img src="/images/write-document-icon.png" class="icon"></a></li>
+			<li><a href="#" onclick="openNewDashModal(<%= session[:userid] %>);return false;"><img src="/images/write-document-icon.png" class="icon"></a></li>
 			<li><a href="#" onclick="openYoutubeModal()" ><img src="/images/video_icon.png" class="icon"></a></li>
 			<li><a href="#" onclick="openImageModal()" ><img src="/images/photo_upload.png" class="icon"></a></li>
 			<li><a href="<%= user_account_path %>"><img src="/images/control_panel copy.png" class="icon"></li></a>

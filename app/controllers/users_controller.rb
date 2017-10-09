@@ -49,7 +49,7 @@
 
   def dashboard
     unless (session[:userid])
-      return redirect_to '/users'
+      return redirect_to '/users', notice: "Please log in to continue"
     end
 
     if @user = User.find(session[:userid])
@@ -77,9 +77,6 @@
 
     render 'dash_search'
   end
-
-
-
   
   def create
     @user = User.new(user_params)
@@ -163,8 +160,42 @@
     end
   end
 
+  def fetch_archive_posts 
+    unless params[:user_id] && params[:month] && params[:year]
+      render plain: 'false'
+    end
+    @user = User.find(params[:user_id])
+
+    date = Date.parse("#{params[:month]} #{params[:year]}")
+
+    @posts = @user.posts.where('created_at between ? and ?', date.beginning_of_month.beginning_of_day, date.end_of_month.end_of_day)
+      .order('id desc')
+      .includes(:tags)
+      .includes(:images)
+      .includes(:user)
+
+    render partial: 'archive_posts'
+  end
+
   def archive
     # params[:user_id] tells you who to get the archive for, initially load the posts for current month
+    unless params[:user_id]
+      return redirect_to '/users', notice: 'Please log in to continue'
+    end
+
+    @user = User.find(params[:user_id])
+
+    @first_post_date = Date.parse(@user.posts.limit(1).order('id')[0].created_at.to_s)
+   
+    @last_post_date = Date.parse(@user.posts.limit(1).order('id desc')[0].created_at.to_s)
+
+    
+    @posts = @user.posts.where('created_at BETWEEN ? and ?', @last_post_date.beginning_of_month.beginning_of_day, @last_post_date.end_of_month.end_of_day)
+      .order('id desc')
+      .includes(:tags)
+      .includes(:images)
+      .includes(:user)
+
 
     
   end

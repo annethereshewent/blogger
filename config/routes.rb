@@ -31,7 +31,8 @@ Rails.application.routes.draw do
   get '/users/get_user_id' => 'users#get_user_id'
   post '/posts/upload_image' => 'posts#upload_image', as: 'upload_image'
   get '/users/search/:search' => 'users#search', as: 'search'
-  
+  get '/users/:user_id/archive' => 'users#archive', as: 'user_archive'
+  get '/users/:user_id/fetchArchivePosts' => 'users#fetch_archive_posts', as: 'archive_posts'
 
   resources :users do
     resources :posts do

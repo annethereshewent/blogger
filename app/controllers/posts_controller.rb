@@ -10,14 +10,13 @@ class PostsController < ApplicationController
 	end
 
 	def create
-
 		# parse any urls in the post content and add <a> tags to them
 		content = params[:htmlContent].present? ? params[:htmlContent] : params[:youtube_content]
 
 		if @post = Post.create(post: content, user_id: params[:user_id])
 			parse_tags(params[:tags])
 			if params[:source] == 'dashboard' || params[:youtube_content].present?
-				redirect_to user_dashboard_path session[:userid]
+				redirect_to user_dashboard_path
 			else
 				redirect_to user_posts_page_path(params[:user_id], 1)
 			end

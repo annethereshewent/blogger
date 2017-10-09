@@ -39,8 +39,9 @@ $(function(){
 	})
 
 
-	if (parseInt($("#num-requests").html()) > 0)
+	if (parseInt($("#num-requests").html()) > 0) {
 		$("#num-requests").css('display', 'inline');
+	}
 
 });
 

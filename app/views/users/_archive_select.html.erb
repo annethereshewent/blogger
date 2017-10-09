@@ -1,0 +1,10 @@
+<select class="archive-year-select">
+	<% (start_year..end_year).each do |year| %>
+		<option value="<%= year %>" <%= year == end_year ? 'selected' : '' %>><%= year %></option>
+	<% end %>
+</select>
+<select class="archive-month-select">
+	<% months.each_with_index do |month, index| %>
+		<option value="<%= month %>" <%= index == end_month ? 'selected' : ''  %>><%= month %></option>
+	<% end %>
+</select>
