@@ -11,9 +11,6 @@ var entityMap = {
 
 $(function(){
 
-	//remove that watermark
-	$('.fr-wrapper').children(':first').remove(); //bye felicia
-	
 
 	initEditor();
 	$('.tag-input').each(function() {

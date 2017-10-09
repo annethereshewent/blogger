@@ -1,6 +1,6 @@
 <div class="content modal" id="postModal" style="display:none">
 	<img src="/images/loading.gif" style="display:none" id="loading-post" style="margin-left:100px">
-	<p style="color:#7A7ACC;margin-left:10px">Create a New Post</p>
+	<p style="color:#7A7ACC;margin-left:10px" id="post-action">Create a New Post</p>
 	<%= form_tag('/', method: "post",  :id => "newPost", :name => "newPost") do  %>
 		<div style="margin-bottom:10px">
 			<label class="control-label">Security:</label>

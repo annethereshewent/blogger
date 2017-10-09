@@ -76,8 +76,7 @@
 	<script src="/js/main.js"></script>
 	<script>
 	$(function() {
-		//remove that watermark
-		$('.fr-wrapper').children(':first').remove(); //bye felicia
+
 	});
 
 	function openEditModal(pid) {
@@ -99,7 +98,7 @@
 			for (var i = 0; i < data.tags.length; i++)
 				$("#tags").addTag(data.tags[i]);
 
-			$("#postModal").next().html("Edit Post");
+			$("#post-action").html("Edit Post");
 		});
 	}
 
@@ -129,7 +128,7 @@
 			$("#newPost").attr("action", "/users/<%= @user.id %>/posts");
 
 			$("#blogSubmit").text("Quote");
-			$("#postModal").next().html("Quote");
+			$("#post-action").html("Quote");
 		});
 		
 	}
