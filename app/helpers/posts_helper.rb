@@ -54,7 +54,7 @@ module PostsHelper
 		#if params[:action] == 'dashboard' || params[:action] == 'search' || params[:action] == 'archive' || !@user.present? || (params[:controller] == 'users' && params['action'] == 'tags')
 		# if params[:action] != 'posts' || params[:action] != 'comments'
 		puts "current controller: #{params[:controller]}" 
-		if params[:controller] != 'posts' && params[:controller] != 'comments'
+		if params[:controller] != 'posts' && params[:controller] != 'comments' && params[:action] != 'account'
 			'/stylesheets/default.css'
 		else
 			if @user.theme.present?
