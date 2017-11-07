@@ -540,7 +540,6 @@
             emit_sword_event();
         }
         if (map[LEFT] && map[UP]) {
-            console.log('moving northwest');
             move_link('northwest');
         }
         else if (map[RIGHT] && map[UP]) {
@@ -563,11 +562,6 @@
         }
         else if (map[RIGHT]) {
             move_link('right');
-            if (e.type == 'keyup') {
-                while (map[RIGHT]) {
-                    move_link('right');
-                }
-            }
         }
         //we may be able to rework this where the position is calculated here and link moves here and then that information is sent to the server to check for collisions. it will simplify the code a lot
     }
