@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   get '/users/search/:search' => 'users#search', as: 'search'
   get '/users/:user_id/archive' => 'users#archive', as: 'user_archive'
   get '/users/:user_id/fetchArchivePosts' => 'users#fetch_archive_posts', as: 'archive_posts'
+  get '/users/play_game' => 'users#play_game', as: 'play_game'
 
   resources :users do
     resources :posts do

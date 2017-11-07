@@ -20,6 +20,15 @@
   	render plain: returnStr
   end
 
+  def play_game 
+    unless (session[:userid])
+      return redirect_to '/users', notice: "Please log in to continue"
+    end
+
+    @username = User.find(session[:userid]).displayname
+
+  end
+
   def fetch_posts 
 
     @friends = User.where("id in (#{params[:friend_ids]})")
@@ -73,7 +82,14 @@
 
     search_params = params[:search].split(' ').map{ |token| "%#{token}%" }.join('')
 
-    @posts = Post.where('post LIKE ?', search_params).order('id desc')
+
+
+    @posts = Post.where('post LIKE ? or id in (
+        select post_tags.post_id
+        from post_tags, tags
+        where post_tags.tag_id = tags.id and tags.tag_name LIKE ? 
+      )', 
+      search_params, search_params).order('id desc')
 
     render 'dash_search'
   end
@@ -161,18 +177,16 @@
   end
 
   def fetch_archive_posts 
-    unless params[:user_id] && params[:month] && params[:year]
+    unless params[:user_id] && params[:date]
       render plain: 'false'
     end
     @user = User.find(params[:user_id])
 
-    date = Date.parse("#{params[:month]} #{params[:year]}")
+    date = Date.parse(params[:date])
 
     @posts = @user.posts.where('created_at between ? and ?', date.beginning_of_month.beginning_of_day, date.end_of_month.end_of_day)
       .order('id desc')
-      .includes(:tags)
       .includes(:images)
-      .includes(:user)
 
     render partial: 'archive_posts'
   end
@@ -189,15 +203,56 @@
    
     @last_post_date = Date.parse(@user.posts.limit(1).order('id desc')[0].created_at.to_s)
 
+
+    months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ]
     
     @posts = @user.posts.where('created_at BETWEEN ? and ?', @last_post_date.beginning_of_month.beginning_of_day, @last_post_date.end_of_month.end_of_day)
       .order('id desc')
-      .includes(:tags)
       .includes(:images)
-      .includes(:user)
 
 
-    
+    @select = {}
+
+    first_year = @first_post_date.year
+    last_year = @last_post_date.year
+
+    (@first_post_date.year..@last_post_date.year).each do |year|
+      @select[year] = []
+      if year == @first_post_date.year
+        i = @first_post_date.month-1
+        
+        last_index = @first_post_date.year == @last_post_date.year ? @last_post_date.month : months.length
+
+        while i <  last_index
+          @select[year].push(months[i])
+          i = i+1
+        end
+      elsif year == @last_post_date.year
+        months.each_with_index do |month, index|
+          if index == @last_post_date.month
+            break
+          end
+
+          @select[year].push(month) 
+        end
+      else
+        @select[year] = months
+      end
+    end
+    @select = @select.to_json
   end
 
   def confirm_friend

@@ -1,6 +1,6 @@
 <% @posts.each do |post| %>
 		<div class="content">
-			<a href="<%= user_post_comments_path @user.id, post.id %>">
+			<a href="<%= user_post_comments_path @user.id, post.id %>" target="_blank">
 				<div class="date-overlay">
 					<h2 class="date-overlay-date"><%= post.created_at.strftime("%B %e, %Y") %></h2>
 					<p class="date-overlay-comments"><%= post.num_comments %> Comments</p>
@@ -11,9 +11,6 @@
 					<% end %>
 					<p><%= auto_link(post.post, sanitize: false).html_safe %></p>
 				</div>
-				<% if post.tags.length > 0 %> 
-					<p class="print-tags"><i>Tags: <%= render partial: 'posts/tag', collection: post.tags %></i></p>
-				<% end %>
 			</a>
 		</div>
 	

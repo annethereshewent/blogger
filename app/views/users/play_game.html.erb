@@ -1,0 +1,601 @@
+<head>
+    <style>
+        body {
+            background: white;
+        }
+        #link {
+            width: 30px;
+            height: 38px;
+            display: none;
+            position: absolute;
+        }
+        canvas {
+            position: absolute;
+            top:0;
+            left: 0;
+        }
+        .asset {
+            display: none;
+        }
+        .chat-message {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="link-map"></canvas>
+    <img src="/images/lttp_spritesheet2.png" class="asset" id="link_sprites">
+    <img src="/images/sprites/hud/hearts.png" class="asset" id="link_hearts">
+
+<script>
+    var canvas, ctx; 
+    var player_dead = false;
+    var background = new Image(),
+        socket = new io('<%= ENV['GAME_SERVER'] %>'),
+        is_typing = false,
+        sounds = { 
+            link_hurt: new Audio('/sounds/link_hurt.wav'),
+            sword: new Audio('/sounds/lttp_sword.wav'),
+            overworld: new Audio('/sounds/lttp_overworld.mp3'),
+        },
+        map = {}, 
+        players = {};
+
+    const LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40, SPACE = 32 ,ENTER = 13;
+
+    //initial positions in sprite sheet, all you have to do is add status*30 to sprite to get the next one
+    const link_sprites = {
+        up: {
+            x: 0,
+            y: 120
+        },
+        left: {
+            x: 240,
+            y: 30
+        },
+        down: {
+            x: 0,
+            y: 30
+        },
+        right: {
+            x: 240,
+            y: 120
+        }
+    }
+    const heart_sprites = {
+        whole: {
+            x: 0,
+            y: 0
+        },
+        half: {
+            x: 8,
+            y:0
+        },
+        empty: {
+            x: 16,
+            y: 0
+        }
+    }
+
+    const sword_sprites = {
+        up: [
+            { 
+                x:-1,
+                y:180,
+                width: 30,
+                height: 33
+            },
+            {
+                x: 28,
+                y: 182,
+                width: 30,
+                height: 33
+            },
+            {
+                x: 57,
+                y: 175,
+                width: 30,
+                height:30
+            },
+            {
+                x: 89,
+                y: 178,
+                width: 27,
+                height: 30
+            },
+            {
+                x: 125,
+                y: 175,
+                width: 55,
+                height: 35
+            }
+        ],
+        left: [
+            {
+                x: 237,
+                y: 90,
+                width: 30,
+                height: 30
+            },
+            {  
+                x: 265,
+                y: 90,
+                width: 30,
+                height: 30
+            },
+            {
+                x: 295,
+                y: 90,
+                width: 31,
+                height: 30
+            },
+            {
+                x: 328,
+                y: 90,
+                width: 30,
+                height: 30
+            },
+            {
+                x: 360,
+                y: 90,
+                width: 30,
+                height: 30
+            }
+        ],
+        right: [
+            {
+                x: 238,
+                y: 180,
+                width: 30,
+                height: 28
+            },
+            {
+                x: 263,
+                y: 180,
+                width: 30,
+                height: 28
+            },
+            {
+                x: 295,
+                y: 180,
+                width: 30,
+                height: 30 
+            },
+            {
+                x: 325,
+                y: 180,
+                width: 30,
+                height: 30 
+            },
+            {
+                x: 355,
+                y: 177,
+                width: 30,
+                height: 30 
+            }
+        ],
+        down: [
+            {
+                x: 0,
+                y: 85,
+                width: 30,
+                height: 30
+            },
+            {
+                x: 30,
+                y: 85,
+                width: 30,
+                height:30
+            },
+            {
+                x: 60,
+                y: 85,
+                width: 30,
+                height: 30
+            },
+            {
+                x: 85,
+                y: 85,
+                width: 30,
+                height: 30
+            },
+            {
+                x: 115 ,
+                y: 85,
+                width: 30,
+                height: 30
+            }
+        ]
+    }
+
+
+    background.src = '/images/lttp_map.jpg';
+
+    $(() => {
+        sounds.overworld.ontimeupdate = function() {
+            //20.5 is a good place to stop, 7 is a good place to begin
+            if (sounds.overworld.currentTime >= 20.7) {
+                console.log('relooping sound');
+                sounds.overworld.pause();
+                sounds.overworld.currentTime = 7;
+                sounds.overworld.play();
+            }
+        }
+
+        //sounds.overworld.play();
+
+        canvas = document.getElementById('link-map');
+
+        ctx = canvas.getContext('2d');
+        
+        background.onload = function() {
+            canvas.width = 1920;
+            canvas.height = 1080;
+
+            ctx.drawImage(background, 0, 0);
+        }
+ 
+        socket.emit('game-start', '<%= @username %>');
+
+        socket.on('position', (data) => {
+            if (data.collision) {
+                sounds.link_hurt.play();
+
+                delete data.collision;
+            }
+
+            players[data.player] = data;
+
+            render();  
+        })
+
+
+        socket.on('collision', function(data) {
+            sounds.link_hurt.play();
+            //sounds.link_hurt.play();
+
+            players[data.username] = data.player;
+
+            render();
+        })
+
+
+        socket.on('disconnect', function(player) {
+            delete players[player];
+
+            render();
+        })
+
+        socket.on('add-player', function(_players) {
+
+            players = _players;
+
+            //now redraw the canvas with the new players
+            render();
+        })
+
+        socket.on('use-sword', function(player) {
+            sounds.sword.play();
+            players[player].sword_index = 0;
+            use_sword(player);
+        })
+
+        socket.on('player_death', function(player) {
+            //remove the player from the hash
+            console.log('player ' + player + " is dead, removing from list of players");
+            console.log(players[player] ? 'true' : 'false');
+            delete players[player];
+
+            console.log('player death event for ' + player);
+
+            if (player == '<%= @username %>') {
+                //show game over screen and give option to restart
+                show_game_over();
+            }
+            else {
+                //later add death animation here
+                console.log("don't show game over screen, render like normal");
+                render();
+            }
+        })
+
+        
+
+        //$(document).keyup(check_keys);
+        //$(document).keydown(check_keys);
+
+        document.addEventListener('keydown', check_keys);
+        document.addEventListener('keyup', check_keys);
+
+        //handleInput();
+
+    })
+    
+    function handleInput() {
+        if (map[SPACE]) {
+            emit_sword_event();
+        }
+        if (map[LEFT] && map[UP]) {
+            move_link('northwest');
+        }
+        else if (map[RIGHT] && map[UP]) {
+            move_link('northeast');
+        }
+        else if (map[RIGHT] && map[DOWN]) {
+            move_link('southeast');
+        }
+        else if (map[LEFT] && map[DOWN]) {
+            move_link('southwest');
+        }
+        else if (map[UP]) {
+            move_link('up');
+        }
+        else if (map[DOWN]) {
+            move_link('down');
+        }
+        else if (map[LEFT]) {
+            move_link('left');
+        }
+        else if (map[RIGHT]) {
+            move_link('right');
+        }
+
+        requestAnimationFrame(handleInput);
+    }
+
+    function emit_sword_event() {
+        var username = "<%= @username %>"
+
+        if (!player_dead) {
+            socket.emit('use-sword', username);
+
+            players[username].sword_index = 0;
+
+            sounds.sword.play();
+            use_sword(username);
+        }
+        else {
+            player_dead = false;
+            socket.emit('game-start', username);
+        }
+        
+    }
+    function move_link(direction) {
+        var username = "<%= @username %>"
+        if (!player_dead) {
+            socket.emit('move-link', {
+                player: username,
+                direction: direction
+            });
+        }
+        else {
+            player_dead = false;
+            socket.emit('game-start', username);
+        }
+    }
+
+    function show_game_over() {
+        player_dead = true;
+
+        ctx.fillStyle = 'red';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+        ctx.font = "30px Georgia";
+
+        ctx.strokeStyle = 'gold';
+        ctx.strokeText("GAME OVER", canvas.width/3.2, canvas.height/3);
+
+        var sprite = {
+            x: 87,
+            y: 207,
+            width: 30,
+            height: 30
+        };
+
+        ctx.drawImage(document.getElementById('link_sprites'), 
+            sprite.x, sprite.y,
+            sprite.width, sprite.height,
+            canvas.width/3, canvas.height/2.5,
+            sprite.width, sprite.height
+        );
+    }
+    function use_sword(username) {
+        if (!player_dead) {
+            if (!players[username].sword_index) {
+                players[username].sword_index = 0;
+            }
+
+            if (players[username].sword_index == 5) {
+                render();
+                return;
+            }
+            //render everything but the current player, they will be rendered here
+            render(username);
+
+            var sprite = getSwordSprite(players[username].direction, players[username].sword_index);
+
+            render_sword_frame(sprite, players[username].position);
+
+            players[username].sword_index++;    
+            requestAnimationFrame(function() {
+                use_sword(username);
+            });   
+        }
+        else {
+            //re-render the game over screen if it got to this point just in case
+            show_game_over();
+        }
+        
+    }
+    function render_sword_frame(sprite, position) {
+        ctx.save();
+        var size = { w: 30, h: 30};
+
+        ctx.drawImage(document.getElementById('link_sprites'), 
+            sprite.x, sprite.y,
+            sprite.width, sprite.height,
+            position.x, position.y,
+            sprite.width, sprite.height
+        );
+
+        ctx.restore();
+    }
+
+    function render(player) {
+        if (!player_dead) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(background, 0, 0);
+
+            render_heart_sprites();
+
+            for (var prop in players) {
+                if (players.hasOwnProperty(prop) && (player && player != prop || !player)) {
+                    //image is already loaded, just render it
+                    renderPlayer(players[prop]);              
+                }
+            }
+
+        }
+    }
+
+    function renderPlayer(player) {
+        ctx.save();
+
+        //ctx.translate();
+
+        var size = { w: 30, h: 30};
+        var sprite = {};
+
+        sprite = getLinkSprite(player.direction, player.status);
+
+        ctx.drawImage(document.getElementById('link_sprites'), 
+            sprite.x, sprite.y,
+            size.w, size.h,
+            player.position.x, player.position.y,
+            size.w, size.h
+        );
+
+        ctx.restore();
+    }
+
+    function getLinkSprite(direction, status) {
+        if (direction.substring(0,5) == 'north') {
+            direction = 'up';
+        }
+        else if (direction.substring(0,5) == 'south') {
+            direction = 'down';
+        }
+        var sprite = {
+            x: link_sprites[direction].x,
+            y: link_sprites[direction].y
+        }
+        
+        sprite.x += 30*status
+
+        return sprite;
+    }
+    function render_heart_sprites() {
+        var player = '<%= @username %>';
+        var current_health = players[player].health;
+        var max_health = players[player].max_health;
+
+
+        var render_half_heart = false;
+
+        if (Math.ceil(current_health) - current_health >= 0.5) {
+            render_half_heart = true;
+        }
+
+        var full_hearts = Math.floor(current_health);
+        var empty_hearts = Math.floor(max_health-current_health);
+
+        for (var i = 0; i < full_hearts; i++) {
+            render_heart(i, 'whole');
+        };
+
+        if (render_half_heart) {
+            render_heart(full_hearts, 'half');
+        }
+        //finally render empty hearts
+        for (var i = 0; i < empty_hearts; i++) {
+            var index = render_half_heart ? i+full_hearts+1 : i+full_hearts;
+            render_heart(index, 'empty');
+        }
+    }
+    function check_keys(e){
+        console.log(e.type + ' event being fired');
+        e = e || event; // to deal with IE
+        map[e.keyCode] = e.type == 'keydown'
+
+        console.log(map);
+        e.preventDefault();
+
+        //can be a combination of diagonal movements (2 arrow keys) or diagonal movements + spacebar
+        if (map[SPACE]) {
+            emit_sword_event();
+        }
+        if (map[LEFT] && map[UP]) {
+            console.log('moving northwest');
+            move_link('northwest');
+        }
+        else if (map[RIGHT] && map[UP]) {
+            move_link('northeast');
+        }
+        else if (map[RIGHT] && map[DOWN]) {
+            move_link('southeast');
+        }
+        else if (map[LEFT] && map[DOWN]) {
+            move_link('southwest');
+        }
+        else if (map[UP]) {
+            move_link('up'); 
+        }
+        else if (map[DOWN]) {
+            move_link('down');
+        }
+        else if (map[LEFT]) {
+            move_link('left');
+        }
+        else if (map[RIGHT]) {
+            move_link('right');
+            if (e.type == 'keyup') {
+                while (map[RIGHT]) {
+                    move_link('right');
+                }
+            }
+        }
+        //we may be able to rework this where the position is calculated here and link moves here and then that information is sent to the server to check for collisions. it will simplify the code a lot
+    }
+
+    function render_heart(index, type) {
+        var sprite = heart_sprites[type];
+
+        var size = {
+            w: 8,
+            h: 8
+        }
+
+        ctx.drawImage(document.getElementById('link_hearts'),
+            sprite.x, sprite.y,
+            size.w, size.h,
+            20 + (8 * index), 10,
+            size.w, size.h
+        )
+    }
+
+    function getSwordSprite(direction, frame) {
+        if (direction.substring(0,5) == 'north') {
+            direction = 'up'
+        }
+        else if (direction.substring(0,5) == 'south') {
+            direction = 'down';
+        }
+        return sword_sprites[direction][frame];
+    }
+</script>
+</body>

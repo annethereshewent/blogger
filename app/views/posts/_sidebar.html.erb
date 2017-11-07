@@ -27,7 +27,7 @@
 </aside>
 <div class="navigation-content">
     <ul class="nav-buttons">
-        <% if !is_friends? %>
+        <% if !is_friends? && @user.id != session[:userid] %>
             <li id="addFriend"><a href="#" onclick="addFriend()"><i class="fa fa-user-plus"></i>Add Friend</a></li>
         <% end %>
         <% if show_requests? %>

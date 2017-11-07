@@ -50,4 +50,5 @@ ActionMailer::Base.smtp_settings = {
 
 end
 
-ENV['CHAT_SERVER'] = "http://#{Socket.ip_address_list.detect(&:ipv4_private?).try(:ip_addre‌​ss)}:3001"
+ENV['CHAT_SERVER'] = "http://localhost:3001"
+ENV['GAME_SERVER'] = "http://localhost:3005";

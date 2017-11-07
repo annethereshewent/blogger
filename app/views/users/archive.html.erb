@@ -1,4 +1,5 @@
 <head>
+	<link rel="stylesheet" href="/stylesheets/selectivity-jquery.min.css">
 	<style>
 		body {
 			background: #f4f4f4;
@@ -9,11 +10,11 @@
 			left: 0;
 			padding-top: 10px;
 			padding-left:10px;
-			height: 40px;
+			height: 50px;
 			border-bottom: 1px solid grey;
 			width: 100%;
-			background: #3333cc;
-			color: white;
+			/*background: #3333cc*/
+			background: #666699;
 		}
 		.control-label {
 			font-size: 12px;
@@ -25,7 +26,6 @@
 			border: none;
 			width: 225px;
 			height: 150px;
-			font-size: 12px !important;
 			margin-bottom: 20px;
 			overflow: hidden;
 			padding: 0;
@@ -34,11 +34,11 @@
 			color: black;
 		}
 		.main {
-			margin: 0;
+			margin: 70px 0 0 0;
 			width: 101%;
 		}
 		.post {
-			font-size: 12px;
+			font-size: 10px;
 		}
 		.date-overlay {
 			display: none;
@@ -71,19 +71,25 @@
 			background: gold;
 			border-radius: 25px;
 		}
+		.archive-select {
+			width: 125px;
+			height: 20px;
+		}
 	</style>
 </head>
 <body>
+
 	<div class="archive-settings">
-		<%= getSelectBoxes(@first_post_date, @last_post_date) %>
+		<div class="archive-select"></div>
 	</div>
 
 	<div class="main">
 		<%= render partial: 'archive_posts' %>
 	</div>
+	<script src="/js/selectivity-jquery.min.js"></script>
 	<script src="/js/masonry.pkgd.min.js"></script>
 	<script>
-
+		
 		var months = [
 			'January',
 			'February',
@@ -101,9 +107,46 @@
 
 
 		$(function() {
-			$(".archive-year-select").change(function() {
-				console.log('the year changed');
+			var select = <%= @select.html_safe %>
+			var items = [];
+			for (year in select) {
+				if (select.hasOwnProperty(year)) {
+					var object = {
+						id: year,
+						text: year,
+						submenu: {
+							showSearchInput: select[year].length == 12 ? true : false,
+							items: []
+						}
+					};
 
+					for (var i = 0; i < select[year].length; i++) {
+						object.submenu.items.push({
+							id: select[year][i] + ' ' + year,
+							text: select[year][i]
+						})
+					}
+
+					items.push(object)
+				}
+			}
+
+			console.log(items)
+			//now that the items have been built, create the select box
+			$('.archive-select').selectivity({
+				placeholder: 'Year',
+				showSearchInputInDropdown: Object.keys(select).length > 6 ? true : false,
+				items: items
+			});
+
+			$('.content').has('img').each(function() {
+				console.log('found a post with images');
+				$(this).css({
+					height: '275px'
+				})
+			})
+
+			$(".archive-year-select").change(function() {
 				var selected_year = $(".archive-year-select").val();
 				var html = '';
 
@@ -126,16 +169,16 @@
 				$('.archive-month-select').html(html);
 			});
 
-			$(".archive-month-select").change(function() {
-				console.log('the month changed');
+			$(".archive-select").on("change", function() {
+				console.log($('.archive-select').selectivity('val'));
 				$.get(
 					'/users/<%= @user.id %>/fetchArchivePosts', 
-					{ month: $(".archive-month-select").val(), year: $(".archive-year-select").val()},
+					{ date: $(".archive-select").selectivity('val') },
 					function(data) {
 						if (data != 'false') {
 							$('.main').masonry('remove', $('.content')).masonry('layout');
 							var posts = $('<div>').append(data).find('.content');
-							console.log(posts);
+				
 							$('.main').append(posts).masonry('appended', posts);
 
 							bind_hover();
@@ -145,7 +188,6 @@
 				)
 			});
 
-			console.log('test');
 			masonry_init();
 
 			bind_hover();
