@@ -347,17 +347,17 @@
             else {
                 block_input_now = Date.now();
 
-                if (block_input_now - block_input_start > 420) {
-                    block_input = false;
+                if (block_input_now - block_input_start > 200) {
+                    if (!players[player].use_sword && players[player].sword_index != 5) {
+                        players[player].use_sword = true;
+                    }
                     block_input_start = null;
                 }
             }
 
             console.log(players[player].use_sword + " <--- using_sword? , sword_index ---->" + players[player].sword_index);
 
-            if (!players[player].use_sword && players[player].sword_index) {
-                players[player].use_sword = true;
-            }
+            
 
             console.log('currently blocking input');
         }
