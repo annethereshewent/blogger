@@ -518,10 +518,14 @@
 
                 for (var prop in players) {
                     if (players.hasOwnProperty(prop)) {
-                        if (players[prop].use_sword) {                        
+                        if (players[prop].use_sword) {
+                            if (!players[prop].sword_index) {
+                                players[prop].sword_index = 0;
+                            }          
+                                        
                             if (players[prop].sword_index == 5) {
                                 delete players[prop].use_sword;
-                                players[prop].sword_index = 0;
+                                delete players[prop].sword_index
                                 
                                 
                                 renderPlayer(players[prop]);
