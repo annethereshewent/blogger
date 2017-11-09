@@ -422,15 +422,13 @@
         }
 
         if (!player_dead) {
-            if (players[username].use_sword) {
-
-            }
-            if (!block_input) {
+            
+            if (!block_input && !players[player].use_sword) {
                 socket.emit('move-link', {
                     player: username,
                     direction: direction,
                     charging_sword: players[username].charging_sword,
-                    using_sword: players
+                    use_sword: players[username].use_sword
                 });
             }
         }
