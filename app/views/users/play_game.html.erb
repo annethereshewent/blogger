@@ -31,6 +31,7 @@
     <img src="/images/lttp_spritesheet2.png" class="asset" id="link_sprites">
     <img src="/images/sprites/hud/hearts.png" class="asset" id="link_hearts">
     <img src="/images/sprites/hero/miscellaneous.png" class="asset" id="link_hurt">
+    <img src="/images/sprites/hero/dying.png" class="asset" id="link_dying">
 
 <script>
     var canvas, ctx; 
@@ -48,7 +49,8 @@
         map = {},
         then = Date.now(),
         fps = 20,
-        players = {};
+        players = {},
+        death_frame = 0;
 
     var now;
 
@@ -417,10 +419,7 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 
-        ctx.font = "30px Georgia";
-
-        ctx.strokeStyle = 'gold';
-        ctx.strokeText("GAME OVER", canvas.width/3.2, canvas.height/3);
+        
 
         var sprite = {
             x: 87,
@@ -429,15 +428,60 @@
             height: 30
         };
 
-        ctx.drawImage(document.getElementById('link_sprites'), 
-            sprite.x, sprite.y,
-            sprite.width, sprite.height,
-            canvas.width/3, canvas.height/2.5,
-            sprite.width, sprite.height
-        );
+        show_death_animation();
+
+        // ctx.drawImage(document.getElementById('link_sprites'), 
+        //     sprite.x, sprite.y,
+        //     sprite.width, sprite.height,
+        //     canvas.width/3, canvas.height/2.5,
+        //     sprite.width, sprite.height
+        // );
 
         handleInput();
     }
+
+    function show_death_animation() {
+
+        now = Date.now();
+
+        delta = now - then;
+        if (delta > (1000/5)) {
+            if (death_frame == 10) {
+                death_frame = 0;
+
+                ctx.font = "30px Georgia";
+
+                ctx.strokeStyle = 'gold';
+                ctx.strokeText("GAME OVER", canvas.width/3.2, canvas.height/3);
+
+                return;
+            }
+            else {
+                ctx.fillStyle = 'red';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            }
+            console.log(death_frame);
+            var sprite = {
+                x: 0 + (24 * death_frame),
+                y: 0,
+                width: 24,
+                height: 24,
+
+            };
+
+            ctx.drawImage(document.getElementById('link_dying'),
+                sprite.x, sprite.y,
+                sprite.width, sprite.height,
+                canvas.width/3, canvas.height/2.5,
+                sprite.width, sprite.height
+            );
+
+            death_frame++;   
+        }
+        requestAnimationFrame(show_death_animation)
+    }
+
     function render_sword_frame(sprite, position) {
         ctx.save();
         var size = { w: 30, h: 30};
