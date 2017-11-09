@@ -273,7 +273,7 @@
             player = "<%= @username %>"
             console.log(player);
             //don't move link if he's currently using his sword
-            if (data.player == player && !players[player].use_sword) {
+            if (!players[data.player].use_sword) {
                 if (data.collision) {
                     sounds.link_hurt.play();
                 }
