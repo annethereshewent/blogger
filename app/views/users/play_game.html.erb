@@ -44,11 +44,13 @@
             link_hurt: new Audio('/sounds/link_hurt.wav'),
             sword: new Audio('/sounds/lttp_sword.wav'),
             overworld: new Audio('/sounds/lttp_overworld_full.wav'),
-            overworld_loop: new Audio('/sounds/lttp_overworld_loop.wav')
+            overworld_loop: new Audio('/sounds/lttp_overworld_loop.wav'),
+            link_dying: new Audio('/sounds/hero_dying.ogg')
         },
         map = {},
         then = Date.now(),
         fps = 20,
+        fps_interval = 1000 / fps,
         players = {},
         death_frame = 0;
 
@@ -234,7 +236,7 @@
             y: 24
         },
         down: {
-            x: 64,
+            x: 72,
             y: 24
         }
     }
@@ -312,12 +314,14 @@
         });
 
         socket.on('player_death', function(player) {
-            //remove the player from the hash
-            delete players[player];
-
             if (player == '<%= @username %>') {
                 //show game over screen and give option to restart
                 show_game_over();
+            }
+            else {
+                //show opponent dying, which is just one frame
+                players[player].dying = true;
+                players[player].death_index = 0;
             }
         })
 
@@ -413,31 +417,21 @@
     }
 
     function show_game_over() {
-        player_dead = true;
+        if (!player_dead) {
+            sounds.link_dying.play();
+            player_dead = true;
 
-        ctx.fillStyle = 'red';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+            var sprite = {
+                x: 87,
+                y: 207,
+                width: 30,
+                height: 30
+            };
 
+            show_death_animation();
 
-        
-
-        var sprite = {
-            x: 87,
-            y: 207,
-            width: 30,
-            height: 30
-        };
-
-        show_death_animation();
-
-        // ctx.drawImage(document.getElementById('link_sprites'), 
-        //     sprite.x, sprite.y,
-        //     sprite.width, sprite.height,
-        //     canvas.width/3, canvas.height/2.5,
-        //     sprite.width, sprite.height
-        // );
-
-        handleInput();
+            handleInput();
+        }
     }
 
     function show_death_animation() {
@@ -445,7 +439,7 @@
         now = Date.now();
 
         delta = now - then;
-        if (delta > (1000/5)) {
+        if (delta > (1000/10)) {
             if (death_frame == 10) {
                 death_frame = 0;
 
@@ -461,7 +455,6 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             }
-            console.log(death_frame);
             var sprite = {
                 x: 0 + (24 * death_frame),
                 y: 0,
@@ -477,7 +470,8 @@
                 sprite.width, sprite.height
             );
 
-            death_frame++;   
+            death_frame++;  
+            then = now - (delta % (1000/10)); 
         }
         requestAnimationFrame(show_death_animation)
     }
@@ -501,7 +495,7 @@
         var delta = now - then;
         handleInput(); 
         if (!player_dead) {
-            if (delta > (1000/fps)) {
+            if (delta > fps_interval) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(background, 0, 0);
 
@@ -516,7 +510,6 @@
                 
 
                 for (var prop in players) {
-                    console.log(prop + " is charging sword? " + players[prop].charging_sword);
                     if (players.hasOwnProperty(prop)) {
                         if (players[prop].use_sword) {                        
                             if (players[prop].sword_index == 5) {
@@ -535,14 +528,12 @@
                             players[prop].sword_index++;
                         }
                         else if (players[prop].charging_sword) {
-                            console.log("it's going in here");
                             var status = players[prop].direction == 'down' ? 3 : 2;
                             var sprite = getSwordSprite(players[prop].direction, status);
 
                             render_sword_frame(sprite, players[prop].position);
                         }
                         else if (players[prop].collision) {
-                            console.log('test, collision occurred, rendering collision')
                             if (!players[prop].collision_frame) {
                                 players[prop].collision_frame = 0;
                             }
@@ -550,9 +541,24 @@
                                 delete players[prop].collision;
                                 delete players[prop].collision_frame;
                             }
+                            else {
+                                renderHurtPlayer(prop);
+                                players[prop].collision_frame++;
+                            }
+                            
+                        }
+                        else if (players[prop].dying) {
+                            if (players[prop].death_index == 20) {
+                                delete players[prop].dying;
+                                delete players[prop].death_index;
 
-                            renderHurtPlayer(prop);
-                            players[prop].collision_frame++;
+                                delete players[prop];
+                            }
+                            else {
+                                renderDeadPlayer(prop);
+                                players[prop].death_index++;   
+                            }
+                            
                         }
                         else {
                             renderPlayer(players[prop]);              
@@ -567,8 +573,26 @@
 
     }
 
+    function renderDeadPlayer(player) {
+        ctx.save();
+        var sprite = {
+            x: 90,
+            y: 215,
+            width: 24,
+            height: 16
+        }
+
+        ctx.drawImage(document.getElementById('link_sprites'),
+            sprite.x, sprite.y,
+            sprite.width, sprite.height,
+            players[player].position.x, players[player].position.y,
+            sprite.width, sprite.height
+        );
+
+        ctx.restore();
+    }
+
     function renderHurtPlayer(player) {
-        console.log('should be going here');
         ctx.save();
         let direction = players[player].direction;
         let position = players[player].position;
@@ -580,7 +604,7 @@
             direction = 'down';
         }
 
-        var sprite = link_hurt_sprites[players[player].direction];
+        var sprite = link_hurt_sprites[direction];
 
         var size = {
             w: 24,
