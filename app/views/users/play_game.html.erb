@@ -269,9 +269,11 @@
         socket.emit('game-start', '<%= @username %>');
 
         socket.on('position', (data) => {
+            console.log(players);
             player = "<%= @username %>"
+            console.log(player);
             //don't move link if he's currently using his sword
-            if (!player[data.player].use_sword) {
+            if (data.player == player && !players[player].use_sword) {
                 if (data.collision) {
                     sounds.link_hurt.play();
                 }
@@ -303,7 +305,10 @@
         })
 
         socket.on('add-player', function(_players) {
+            console.log('got an add-player event');
             players = _players;
+
+            console.log(players);
         })
 
         socket.on('use-sword', function(player) {
