@@ -337,8 +337,12 @@
     
     function handleInput() {
         var player = "<%= @username %>"
-
+        
         if (block_input) {
+            if (!players[player].using_sword && players[player].sword_index !=5) {
+                players[player].using_sword = true;
+            }
+
             console.log('currently blocking input');
         }
         if (!block_input && players[player]) {
@@ -412,7 +416,8 @@
                 socket.emit('move-link', {
                     player: username,
                     direction: direction,
-                    charging_sword: players[username].charging_sword
+                    charging_sword: players[username].charging_sword,
+                    using_sword: players
                 });
             }
         }
