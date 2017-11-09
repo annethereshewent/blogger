@@ -370,7 +370,7 @@
             else if (map[RIGHT]) {
                 move_link('right');
             }
-            if (!map[SPACE]) {
+            else if (!map[SPACE]) {
                 players[player].charging_sword = false;
                 socket.emit('stop-charging', player); 
             } 
@@ -408,11 +408,13 @@
             if (players[username].use_sword) {
 
             }
-            socket.emit('move-link', {
-                player: username,
-                direction: direction,
-                charging_sword: players[username].charging_sword
-            });
+            if (!block_input) {
+                socket.emit('move-link', {
+                    player: username,
+                    direction: direction,
+                    charging_sword: players[username].charging_sword
+                });
+            }
         }
     }
 
