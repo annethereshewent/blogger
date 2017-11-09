@@ -350,6 +350,7 @@
                 if (block_input_now - block_input_start > 200) {
                     if (!players[player].use_sword && players[player].sword_index != 5) {
                         players[player].use_sword = true;
+                        players[player].sword_index = 0;
                     }
                     block_input_start = null;
                 }
