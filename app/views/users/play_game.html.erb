@@ -347,28 +347,8 @@
     
     function handleInput() {
         var player = "<%= @username %>"
-        
-        
+           
         if (block_input) {
-            //if (!block_input_start) {
-                //block_input_start = Date.now();
-            //}
-            //else {
-                //block_input_now = Date.now();
-
-                // if (block_input_now - block_input_start > 420) {
-                //     if (!players[player].use_sword && players[player].sword_index && players[player].sword_index != 5) {
-                //         players[player].use_sword = true;
-                //         players[player].sword_index = 0;
-                //     }
-                //     block_input_start = null;
-                // }
-            //}
-
-            // console.log(players[player].use_sword + " <--- using_sword?, sword_index ---->" + players[player].sword_index);
-
-            
-
             console.log('currently blocking input');
         }
         if (!block_input && players[player]) {
@@ -406,10 +386,6 @@
             } 
 
         }
-        // else if (players[player].use_sword) {
-        //     var sprite = getSwordSprite(players[player].direction, players[player].sword_index) //do this tomorrow
-        //     render_sword_frame(sprite, players[player].position);
-        // }
     }
 
     function emit_sword_event() {
@@ -551,8 +527,8 @@
                                 renderPlayer(players[prop]);
                                 setTimeout(() => { 
                                     block_input = false;
-                                    block_input_start = null;
-                                }, 250);
+                                    socket.emit('stop-sword', prop);
+                                }, 200);
                             }
 
                             var sprite = getSwordSprite(players[prop].direction, players[prop].sword_index);
