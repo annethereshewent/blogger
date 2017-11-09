@@ -54,7 +54,8 @@
         players = {},
         death_frame = 0;
 
-    var now;
+
+    var now, block_input_start, block_input_now;
 
     const LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40, SPACE = 32 ,ENTER = 13;
 
@@ -338,8 +339,20 @@
     function handleInput() {
         var player = "<%= @username %>"
         
+        
         if (block_input) {
-            if (!players[player].using_sword && players[player].sword_index !=5) {
+            if (!block_input_start) {
+                block_input_start = Date.now();
+            }
+            else {
+                block_input_now = Date.now();
+
+                if (block_input_now - block_input_start > 420) {
+                    block_input = false;
+                    block_input_start = null;
+                }
+            }
+            if (!players[player].using_sword && players[player].sword_index) {
                 players[player].using_sword = true;
             }
 
@@ -525,7 +538,10 @@
                                 
                                 
                                 renderPlayer(players[prop]);
-                                setTimeout(() => block_input = false, 250);
+                                setTimeout(() => { 
+                                    block_input = false;
+                                    block_input_start = null;
+                                }, 250);
                             }
 
                             var sprite = getSwordSprite(players[prop].direction, players[prop].sword_index);
