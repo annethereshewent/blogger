@@ -269,11 +269,15 @@
         socket.emit('game-start', '<%= @username %>');
 
         socket.on('position', (data) => {
-            if (data.collision) {
-                sounds.link_hurt.play();
-            }
+            player = "<%= @username %>"
+            //don't move link if he's currently using his sword
+            if (!player[data.player].use_sword) {
+                if (data.collision) {
+                    sounds.link_hurt.play();
+                }
 
-            players[data.player] = data;
+                players[data.player] = data;
+            }
 
         })
 
@@ -341,22 +345,22 @@
         
         
         if (block_input) {
-            if (!block_input_start) {
-                block_input_start = Date.now();
-            }
-            else {
-                block_input_now = Date.now();
+            //if (!block_input_start) {
+                //block_input_start = Date.now();
+            //}
+            //else {
+                //block_input_now = Date.now();
 
-                if (block_input_now - block_input_start > 200) {
-                    if (!players[player].use_sword && players[player].sword_index != 5) {
-                        players[player].use_sword = true;
-                        players[player].sword_index = 0;
-                    }
-                    block_input_start = null;
-                }
-            }
+                // if (block_input_now - block_input_start > 420) {
+                //     if (!players[player].use_sword && players[player].sword_index && players[player].sword_index != 5) {
+                //         players[player].use_sword = true;
+                //         players[player].sword_index = 0;
+                //     }
+                //     block_input_start = null;
+                // }
+            //}
 
-            console.log(players[player].use_sword + " <--- using_sword? , sword_index ---->" + players[player].sword_index);
+            // console.log(players[player].use_sword + " <--- using_sword?, sword_index ---->" + players[player].sword_index);
 
             
 
