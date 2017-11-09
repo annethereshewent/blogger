@@ -352,8 +352,11 @@
                     block_input_start = null;
                 }
             }
-            if (!players[player].using_sword && players[player].sword_index) {
-                players[player].using_sword = true;
+
+            console.log(players[player].use_sword + " <--- using_sword? , sword_index ---->" + players[player].sword_index);
+
+            if (!players[player].use_sword && players[player].sword_index) {
+                players[player].use_sword = true;
             }
 
             console.log('currently blocking input');
