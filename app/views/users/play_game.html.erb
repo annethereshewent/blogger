@@ -30,20 +30,27 @@
     <canvas id="link-map"></canvas>
     <img src="/images/lttp_spritesheet2.png" class="asset" id="link_sprites">
     <img src="/images/sprites/hud/hearts.png" class="asset" id="link_hearts">
+    <img src="/images/sprites/hero/miscellaneous.png" class="asset" id="link_hurt">
 
 <script>
     var canvas, ctx; 
-    var player_dead = false;
-    var background = new Image(),
+    var player_dead = false,
+        background = new Image(),
         socket = new io('<%= ENV['GAME_SERVER'] %>'),
         is_typing = false,
+        block_input = false;
         sounds = { 
             link_hurt: new Audio('/sounds/link_hurt.wav'),
             sword: new Audio('/sounds/lttp_sword.wav'),
-            overworld: new Audio('/sounds/lttp_overworld.mp3'),
+            overworld: new Audio('/sounds/lttp_overworld_full.wav'),
+            overworld_loop: new Audio('/sounds/lttp_overworld_loop.wav')
         },
-        map = {}, 
+        map = {},
+        then = Date.now(),
+        fps = 20,
         players = {};
+
+    var now;
 
     const LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40, SPACE = 32 ,ENTER = 13;
 
@@ -211,20 +218,33 @@
             }
         ]
     }
-
+    const link_hurt_sprites = {
+        right: {
+            x: 0,
+            y: 24
+        },
+        up: {
+            x: 24,
+            y: 24
+        },
+        left: {
+            x: 48,
+            y: 24
+        },
+        down: {
+            x: 64,
+            y: 24
+        }
+    }
 
     background.src = '/images/lttp_map.jpg';
 
     $(() => {
-        sounds.overworld.ontimeupdate = function() {
-            //20.5 is a good place to stop, 7 is a good place to begin
-            if (sounds.overworld.currentTime >= 20.7) {
-                console.log('relooping sound');
-                sounds.overworld.pause();
-                sounds.overworld.currentTime = 7;
-                sounds.overworld.play();
-            }
+        sounds.overworld.onended = sounds.overworld_loop.onended = function() {
+            console.log('relooping sound');
+            sounds.overworld_loop.play();    
         }
+
 
         //sounds.overworld.play();
 
@@ -238,19 +258,18 @@
 
             ctx.drawImage(background, 0, 0);
         }
+
+        render();
  
         socket.emit('game-start', '<%= @username %>');
 
         socket.on('position', (data) => {
             if (data.collision) {
                 sounds.link_hurt.play();
-
-                delete data.collision;
             }
 
             players[data.player] = data;
 
-            render();  
         })
 
 
@@ -259,47 +278,44 @@
             //sounds.link_hurt.play();
 
             players[data.username] = data.player;
+            players[data.username].collision = true;
+        })
 
-            render();
+        socket.on('stop-charging', function(player) {
+            if (players[player]) {
+                players[player].charging_sword = false;    
+            }
+            
         })
 
 
         socket.on('disconnect', function(player) {
             delete players[player];
-
-            render();
         })
 
         socket.on('add-player', function(_players) {
-
             players = _players;
-
-            //now redraw the canvas with the new players
-            render();
         })
 
         socket.on('use-sword', function(player) {
             sounds.sword.play();
             players[player].sword_index = 0;
-            use_sword(player);
-        })
+            players[player].charging_sword = true;
+            players[player].use_sword = true;
+            
+
+            console.log(players[player].charging_sword);
+
+            //use_sword(player);
+        });
 
         socket.on('player_death', function(player) {
             //remove the player from the hash
-            console.log('player ' + player + " is dead, removing from list of players");
-            console.log(players[player] ? 'true' : 'false');
             delete players[player];
-
-            console.log('player death event for ' + player);
 
             if (player == '<%= @username %>') {
                 //show game over screen and give option to restart
                 show_game_over();
-            }
-            else {
-                //later add death animation here
-                console.log("don't show game over screen, render like normal");
-                render();
             }
         })
 
@@ -311,40 +327,53 @@
         document.addEventListener('keydown', check_keys);
         document.addEventListener('keyup', check_keys);
 
-        //handleInput();
-
     })
     
     function handleInput() {
-        if (map[SPACE]) {
-            emit_sword_event();
-        }
-        if (map[LEFT] && map[UP]) {
-            move_link('northwest');
-        }
-        else if (map[RIGHT] && map[UP]) {
-            move_link('northeast');
-        }
-        else if (map[RIGHT] && map[DOWN]) {
-            move_link('southeast');
-        }
-        else if (map[LEFT] && map[DOWN]) {
-            move_link('southwest');
-        }
-        else if (map[UP]) {
-            move_link('up');
-        }
-        else if (map[DOWN]) {
-            move_link('down');
-        }
-        else if (map[LEFT]) {
-            move_link('left');
-        }
-        else if (map[RIGHT]) {
-            move_link('right');
-        }
+        var player = "<%= @username %>"
 
-        requestAnimationFrame(handleInput);
+        if (block_input) {
+            console.log('currently blocking input');
+        }
+        if (!block_input && players[player]) {
+            if (map[SPACE] && !players[player].charging_sword) {
+                players[player].charging_sword = true;
+                emit_sword_event();
+            } 
+            else if (map[LEFT] && map[UP]) {
+                move_link('northwest');
+            }
+            else if (map[RIGHT] && map[UP]) {
+                move_link('northeast');
+            }
+            else if (map[RIGHT] && map[DOWN]) {
+                move_link('southeast');
+            }
+            else if (map[LEFT] && map[DOWN]) {
+                move_link('southwest');
+            }
+            else if (map[UP]) {
+                move_link('up');
+            }
+            else if (map[DOWN]) {
+                move_link('down');
+            }
+            else if (map[LEFT]) {
+                move_link('left');
+            }
+            else if (map[RIGHT]) {
+                move_link('right');
+            }
+            if (!map[SPACE]) {
+                players[player].charging_sword = false;
+                socket.emit('stop-charging', player); 
+            } 
+
+        }
+        // else if (players[player].use_sword) {
+        //     var sprite = getSwordSprite(players[player].direction, players[player].sword_index) //do this tomorrow
+        //     render_sword_frame(sprite, players[player].position);
+        // }
     }
 
     function emit_sword_event() {
@@ -356,25 +385,28 @@
             players[username].sword_index = 0;
 
             sounds.sword.play();
-            use_sword(username);
-        }
-        else {
-            player_dead = false;
-            socket.emit('game-start', username);
+            //use_sword(username);
+            block_input = true;
+            players[username].use_sword = true;
         }
         
     }
     function move_link(direction) {
         var username = "<%= @username %>"
+        if (!map[SPACE]) {
+            players[username].charging_sword = false;
+            socket.emit('stop-charging', username); 
+        }
+
         if (!player_dead) {
+            if (players[username].use_sword) {
+
+            }
             socket.emit('move-link', {
                 player: username,
-                direction: direction
+                direction: direction,
+                charging_sword: players[username].charging_sword
             });
-        }
-        else {
-            player_dead = false;
-            socket.emit('game-start', username);
         }
     }
 
@@ -403,34 +435,8 @@
             canvas.width/3, canvas.height/2.5,
             sprite.width, sprite.height
         );
-    }
-    function use_sword(username) {
-        if (!player_dead) {
-            if (!players[username].sword_index) {
-                players[username].sword_index = 0;
-            }
 
-            if (players[username].sword_index == 5) {
-                render();
-                return;
-            }
-            //render everything but the current player, they will be rendered here
-            render(username);
-
-            var sprite = getSwordSprite(players[username].direction, players[username].sword_index);
-
-            render_sword_frame(sprite, players[username].position);
-
-            players[username].sword_index++;    
-            requestAnimationFrame(function() {
-                use_sword(username);
-            });   
-        }
-        else {
-            //re-render the game over screen if it got to this point just in case
-            show_game_over();
-        }
-        
+        handleInput();
     }
     function render_sword_frame(sprite, position) {
         ctx.save();
@@ -446,21 +452,105 @@
         ctx.restore();
     }
 
-    function render(player) {
+    function render() {
+        now = Date.now();
+        var delta = now - then;
+        handleInput(); 
         if (!player_dead) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(background, 0, 0);
+            if (delta > (1000/fps)) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(background, 0, 0);
 
-            render_heart_sprites();
-
-            for (var prop in players) {
-                if (players.hasOwnProperty(prop) && (player && player != prop || !player)) {
-                    //image is already loaded, just render it
-                    renderPlayer(players[prop]);              
+                if (players["<%= @username %>"]) {
+                    render_heart_sprites();
+                    if (!map[SPACE]) {
+                        players["<%= @username %>"].charging_sword = false;
+                        socket.emit('stop-charging', "<%= @username %>"); 
+                    }
                 }
-            }
 
+                
+
+                for (var prop in players) {
+                    console.log(prop + " is charging sword? " + players[prop].charging_sword);
+                    if (players.hasOwnProperty(prop)) {
+                        if (players[prop].use_sword) {                        
+                            if (players[prop].sword_index == 5) {
+                                delete players[prop].use_sword;
+                                players[prop].sword_index = 0;
+                                
+                                
+                                renderPlayer(players[prop]);
+                                setTimeout(() => block_input = false, 250);
+                            }
+
+                            var sprite = getSwordSprite(players[prop].direction, players[prop].sword_index);
+
+                            render_sword_frame(sprite, players[prop].position);
+
+                            players[prop].sword_index++;
+                        }
+                        else if (players[prop].charging_sword) {
+                            console.log("it's going in here");
+                            var status = players[prop].direction == 'down' ? 3 : 2;
+                            var sprite = getSwordSprite(players[prop].direction, status);
+
+                            render_sword_frame(sprite, players[prop].position);
+                        }
+                        else if (players[prop].collision) {
+                            console.log('test, collision occurred, rendering collision')
+                            if (!players[prop].collision_frame) {
+                                players[prop].collision_frame = 0;
+                            }
+                            if (players[prop].collision_frame == 5) {
+                                delete players[prop].collision;
+                                delete players[prop].collision_frame;
+                            }
+
+                            renderHurtPlayer(prop);
+                            players[prop].collision_frame++;
+                        }
+                        else {
+                            renderPlayer(players[prop]);              
+                        }
+
+                    }
+                }
+                then = now - (delta % (1000/30));
+            }    
+            requestAnimationFrame(render);
         }
+
+    }
+
+    function renderHurtPlayer(player) {
+        console.log('should be going here');
+        ctx.save();
+        let direction = players[player].direction;
+        let position = players[player].position;
+
+        if (direction.substring(0,5) == 'north') {
+            direction = 'up';
+        }
+        else if (direction.substring(0,5) == 'south') {
+            direction = 'down';
+        }
+
+        var sprite = link_hurt_sprites[players[player].direction];
+
+        var size = {
+            w: 24,
+            h: 24
+        }
+
+        ctx.drawImage(document.getElementById('link_hurt'),
+            sprite.x, sprite.y,
+            size.w, size.h,
+            position.x, position.y,
+            size.w, size.h
+        );
+
+        ctx.restore();
     }
 
     function renderPlayer(player) {
@@ -528,41 +618,21 @@
         }
     }
     function check_keys(e){
-        console.log(e.type + ' event being fired');
+        //console.log(e.type + ' event being fired');
         e = e || event; // to deal with IE
         map[e.keyCode] = e.type == 'keydown'
 
-        console.log(map);
+        //console.log(map);
         e.preventDefault();
 
-        //can be a combination of diagonal movements (2 arrow keys) or diagonal movements + spacebar
-        if (map[SPACE]) {
-            emit_sword_event();
+        if (player_dead && (map[SPACE] || map[UP] || map[LEFT] || map[RIGHT] || map[DOWN])) {
+            console.log('emiting a game start event');
+            player_dead = false;
+            socket.emit('game-start', '<%= @username %>');
+
+            render();
         }
-        if (map[LEFT] && map[UP]) {
-            move_link('northwest');
-        }
-        else if (map[RIGHT] && map[UP]) {
-            move_link('northeast');
-        }
-        else if (map[RIGHT] && map[DOWN]) {
-            move_link('southeast');
-        }
-        else if (map[LEFT] && map[DOWN]) {
-            move_link('southwest');
-        }
-        else if (map[UP]) {
-            move_link('up'); 
-        }
-        else if (map[DOWN]) {
-            move_link('down');
-        }
-        else if (map[LEFT]) {
-            move_link('left');
-        }
-        else if (map[RIGHT]) {
-            move_link('right');
-        }
+
         //we may be able to rework this where the position is calculated here and link moves here and then that information is sent to the server to check for collisions. it will simplify the code a lot
     }
 
