@@ -1,8 +1,6 @@
 <head>
     <style>
-        body {
-            background: white;
-        }
+
         #link {
             width: 30px;
             height: 38px;
@@ -11,8 +9,8 @@
         }
         canvas {
             position: absolute;
-            top:0;
-            left: 0;
+            top: 25%;
+            left: 25%;
         }
         .asset {
             display: none;
@@ -24,19 +22,26 @@
             left: 0;
             display: none;
         }
+        h1 {
+            text-align: center;
+            color: silver;
+        }
     </style>
 </head>
 <body>
+    <h1>THE LEGEND OF ZELDO: A LERNK TO THE PERST</h1>
     <canvas id="link-map"></canvas>
     <img src="/images/lttp_spritesheet2.png" class="asset" id="link_sprites">
     <img src="/images/sprites/hud/hearts.png" class="asset" id="link_hearts">
     <img src="/images/sprites/hero/miscellaneous.png" class="asset" id="link_hurt">
     <img src="/images/sprites/hero/dying.png" class="asset" id="link_dying">
-
+    <img src="/images/tilesets/light_world.tiles.png" class="asset" id="overworld_sprites">
+    <img src="/images/lttp_tiles.png" class="asset" id="other_tiles">
+<script src="/js/sprites.js"></script>
 <script>
     var canvas, ctx; 
     var player_dead = false,
-        background = new Image(),
+        //background = new Image(),
         socket = new io('<%= ENV['GAME_SERVER'] %>'),
         is_typing = false,
         block_input = false;
@@ -55,7 +60,9 @@
         block_frame = 0,
         gamepad = null,
         gp = null,
-        death_frame = 0;
+        death_frame = 0,
+        map_tiles = [],
+        map_objects = [];
 
 
     var now, block_input_start, block_input_now, gamepads, gp;
@@ -249,9 +256,48 @@
             x: 72,
             y: 24
         }
-    }
+    };
 
-    background.src = '/images/lttp_map.jpg';
+    const map_sprites = {
+        green_tree: {
+            x: 176,
+            y: 40,
+            width: 64,
+            height: 80,
+        },
+        grass1: {
+            x: 48,
+            y: 24,
+            width: 32,
+            height: 32
+        },
+        cliff_front: {
+            x: 130,
+            y: 32,
+            width:18,
+            height: 40
+        },
+        cliff_left: {
+            x:113,
+            y:26,
+            width: 18,
+            height: 46
+        },
+        cliff_right: {
+            x: 147,
+            y: 26,
+            width: 15,
+            height: 46
+        },
+        pink_stump: {
+            x: 48,
+            y: 168,
+            width: 32,
+            height: 32
+        }
+    };
+
+    //background.src = '/images/lttp_map.jpg';
 
     $(() => {
 
@@ -274,21 +320,28 @@
 
         ctx = canvas.getContext('2d');
         
-        background.onload = function() {
-            canvas.width = 1920;
-            canvas.height = 1080;
+        // background.onload = function() {
+        //     canvas.width = 1920;
+        //     canvas.height = 1080;
 
-            ctx.drawImage(background, 0, 0);
-        }
+        //     ctx.drawImage(background, 0, 0);
+        // }
+        canvas.width = 640;
+        canvas.height = 480;
 
-        render();
+        socket.on('load-map', (map_obj) => {
+           map_tiles = map_obj.map_tiles;
+           map_objects = map_obj.map_objects;
+
+            render();
+        })
+
+        
  
         socket.emit('game-start', '<%= @username %>');
 
         socket.on('position', (data) => {
-            console.log(players);
             player = "<%= @username %>"
-            console.log(player);
             //don't move link if he's currently using his sword
             if (!players[data.player].use_sword) {
                 if (data.collision) {
@@ -333,9 +386,6 @@
             players[player].sword_index = 0;
             players[player].charging_sword = true;
             players[player].use_sword = true;
-            
-
-            console.log(players[player].charging_sword);
 
             //use_sword(player);
         });
@@ -383,11 +433,9 @@
         }
 
         if (!block_input && players[player]) {
-            console.log(players[player].charging_sword);
             if ((map[SPACE] && !players[player].charging_sword)  || (gp && gp.buttons[JOYPAD_B].pressed && !players[player].charging_sword )) {
                 players[player].charging_sword = true;
                 emit_sword_event();
-                console.log(players[player].charging_sword);
             } 
             else if ((map[LEFT] && map[UP] || (gp && gp.buttons[JOYPAD_LEFT].pressed && gp.buttons[JOYPAD_UP].pressed)))  {
                 move_link('northwest');
@@ -414,7 +462,6 @@
                 move_link('right');
             }
             else if (!map[SPACE] && !(gp && gp.buttons[JOYPAD_B].pressed)) {
-                console.log("it's going here");
                 players[player].charging_sword = false;
                 socket.emit('stop-charging', player); 
             } 
@@ -531,14 +578,74 @@
         ctx.restore();
     }
 
+    function render_map_entities() {
+        var image = document.getElementById('overworld_sprites');
+        map_objects.forEach((map_object) => {
+            var sprite = map_sprites[map_object.sprite];
+
+            var repeat_x = map_object.repeat_x ? map_object.repeat_x : 1;
+            var repeat_y = map_object.repeat_y ? map_object.repeat_y : 1;
+
+            for (var i = 0; i < repeat_x; i++) {
+                for (var j = 0; j < repeat_y; j++) {
+                    ctx.drawImage(image,
+                        sprite.x, sprite.y,
+                        sprite.width, sprite.height,
+                        map_object.x+(i*map_object.width), map_object.y+(j*map_object.height),
+                        sprite.width, sprite.height
+                    );    
+                }
+            }
+
+            // for (var i = 0; i < repeat_y; i++) {
+            //     ctx.drawImage(image,
+            //         sprite.x, sprite.y,
+            //         sprite.width, sprite.height,
+            //         map_object.x, map_object.y+(i*map_object.height),
+            //         sprite.width, sprite.height
+            //     );   
+            // }
+
+            
+        });
+
+        map_tiles.forEach((map_tile) => {
+            var sprite = map_sprites[map_tile.sprite];
+
+            var repeat_x = map_tile.repeat_x ? map_tile.repeat_x : 1;
+            var repeat_y = map_tile.repeat_y ? map_tile.repeat_y : 1;
+
+            for (var i = 0; i < repeat_x; i++) {
+                for (var j = 0; j < repeat_y; j++) {
+                    ctx.drawImage(image,
+                        sprite.x, sprite.y,
+                        sprite.width, sprite.height,
+                        map_tile.x+(i*sprite.width), map_tile.y+(j*sprite.height),
+                        sprite.width, sprite.height
+                    );   
+                }
+            }
+            // for (var i = 0; i < repeat_y; i++) {
+            //     ctx.drawImage(image,
+            //         sprite.x, sprite.y,
+            //         sprite.width, sprite.height,
+            //         map_tile.x, map_tile.y+(i*sprite.height),
+            //         sprite.width, sprite.height
+            //     );   
+            // }
+            
+        })
+    }
     function render() {
         now = Date.now();
         var delta = now - then;
         if (!player_dead) {
             if (delta > fps_interval) {
                 handleInput();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(background, 0, 0);
+                ctx.fillStyle = '#68b868';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                render_map_entities();
+
 
                 if (players["<%= @username %>"]) {
                     render_heart_sprites();
@@ -746,6 +853,18 @@
 
         //console.log(map);
         e.preventDefault();
+
+        var game_start = false;
+
+        if (gp) {
+            for (var i = 0; i < gp.buttons.length; i++) {
+                if (gp.buttons[i].pressed) {
+                    game_start = true;
+                    socket.emit('game-start', '<%= @username %>')
+                    break;
+                }
+            }
+        }
 
         if (player_dead && (map[SPACE] || map[UP] || map[LEFT] || map[RIGHT] || map[DOWN])) {
             console.log('emiting a game start event');
