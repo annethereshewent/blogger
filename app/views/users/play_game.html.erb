@@ -53,12 +53,20 @@
         fps_interval = 1000 / fps,
         players = {},
         block_frame = 0,
+        gamepad = null,
+        gp = null,
         death_frame = 0;
 
 
-    var now, block_input_start, block_input_now;
+    var now, block_input_start, block_input_now, gamepads, gp;
 
     const LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40, SPACE = 32 ,ENTER = 13;
+
+    const JOYPAD_UP = 12;
+        JOYPAD_DOWN = 13;
+        JOYPAD_LEFT = 14;
+        JOYPAD_RIGHT = 15;
+        JOYPAD_B = 0;
 
     //initial positions in sprite sheet, all you have to do is add status*30 to sprite to get the next one
     const link_sprites = {
@@ -246,6 +254,14 @@
     background.src = '/images/lttp_map.jpg';
 
     $(() => {
+
+        $(window).on('gamepaddisconnected', () => {
+            gamepads = null;
+            gp = null;
+
+            console.log('gamepad has disconnected');
+        })
+
         sounds.overworld.onended = sounds.overworld_loop.onended = function() {
             console.log('relooping sound');
             sounds.overworld_loop.play();    
@@ -347,6 +363,13 @@
     })
     
     function handleInput() {
+        gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+        
+        
+        if (gamepads.length) {
+            gp = gamepads[0];
+        }
+        
         var player = "<%= @username %>"
            
         if (block_input) {
@@ -354,40 +377,44 @@
                 block_input = false;
                 block_frame = 0;
             }
-            console.log('currently blocking input');
+            //console.log('currently blocking input');
 
             block_frame++;
         }
+
         if (!block_input && players[player]) {
-            if (map[SPACE] && !players[player].charging_sword) {
+            console.log(players[player].charging_sword);
+            if ((map[SPACE] && !players[player].charging_sword)  || (gp && gp.buttons[JOYPAD_B].pressed && !players[player].charging_sword )) {
                 players[player].charging_sword = true;
                 emit_sword_event();
+                console.log(players[player].charging_sword);
             } 
-            else if (map[LEFT] && map[UP]) {
+            else if ((map[LEFT] && map[UP] || (gp && gp.buttons[JOYPAD_LEFT].pressed && gp.buttons[JOYPAD_UP].pressed)))  {
                 move_link('northwest');
             }
-            else if (map[RIGHT] && map[UP]) {
+            else if (map[RIGHT] && map[UP] || (gp && gp.buttons[JOYPAD_RIGHT].pressed && gp.buttons[JOYPAD_UP].pressed)) {
                 move_link('northeast');
             }
-            else if (map[RIGHT] && map[DOWN]) {
+            else if (map[RIGHT] && map[DOWN] || (gp && gp.buttons[JOYPAD_RIGHT].pressed && gp.buttons[JOYPAD_DOWN].pressed)) {
                 move_link('southeast');
             }
-            else if (map[LEFT] && map[DOWN]) {
+            else if (map[LEFT] && map[DOWN] || (gp && gp.buttons[JOYPAD_LEFT].pressed && gp.buttons[JOYPAD_DOWN].pressed)) {
                 move_link('southwest');
             }
-            else if (map[UP]) {
+            else if (map[UP] || (gp && gp.buttons[JOYPAD_UP].pressed)) {
                 move_link('up');
             }
-            else if (map[DOWN]) {
+            else if (map[DOWN] || (gp && gp.buttons[JOYPAD_DOWN].pressed )) {
                 move_link('down');
             }
-            else if (map[LEFT]) {
+            else if (map[LEFT] || (gp && gp.buttons[JOYPAD_LEFT].pressed)) {
                 move_link('left');
             }
-            else if (map[RIGHT]) {
+            else if (map[RIGHT] || (gp && gp.buttons[JOYPAD_RIGHT].pressed)) {
                 move_link('right');
             }
-            else if (!map[SPACE]) {
+            else if (!map[SPACE] && !(gp && gp.buttons[JOYPAD_B].pressed)) {
+                console.log("it's going here");
                 players[player].charging_sword = false;
                 socket.emit('stop-charging', player); 
             } 
@@ -412,7 +439,7 @@
     }
     function move_link(direction) {
         var username = "<%= @username %>"
-        if (!map[SPACE]) {
+        if (!map[SPACE] && !(gp && gp.buttons[JOYPAD_B].pressed)) {
             players[username].charging_sword = false;
             socket.emit('stop-charging', username); 
         }
@@ -515,7 +542,7 @@
 
                 if (players["<%= @username %>"]) {
                     render_heart_sprites();
-                    if (!map[SPACE]) {
+                    if (!map[SPACE] && !(gp && gp.buttons[JOYPAD_B].pressed)) {
                         players["<%= @username %>"].charging_sword = false;
                         socket.emit('stop-charging', "<%= @username %>"); 
                     }
@@ -538,7 +565,7 @@
                                 renderPlayer(players[prop]);
                                 setTimeout(() => { 
                                     block_input = false;
-                                    console.log('emitting stop-sword for ' + prop);
+                                    //console.log('emitting stop-sword for ' + prop);
                                     socket.emit('stop-sword', prop);
                                 }, 200);
                             }
