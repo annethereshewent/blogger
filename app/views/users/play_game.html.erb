@@ -563,10 +563,12 @@
                                 
                                 
                                 renderPlayer(players[prop]);
+
+                                var sword_player = prop;
                                 setTimeout(() => { 
                                     block_input = false;
                                     //console.log('emitting stop-sword for ' + prop);
-                                    socket.emit('stop-sword', prop);
+                                    socket.emit('stop-sword', sword_player);
                                 }, 200);
                             }
                             else {
