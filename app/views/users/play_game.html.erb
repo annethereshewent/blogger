@@ -52,6 +52,7 @@
         fps = 30,
         fps_interval = 1000 / fps,
         players = {},
+        block_frame = 0,
         death_frame = 0;
 
 
@@ -349,7 +350,13 @@
         var player = "<%= @username %>"
            
         if (block_input) {
+            if (block_frame == 10) {
+                block_input = false;
+                block_frame = 0;
+            }
             console.log('currently blocking input');
+
+            block_frame++;
         }
         if (!block_input && players[player]) {
             if (map[SPACE] && !players[player].charging_sword) {
@@ -531,6 +538,7 @@
                                 renderPlayer(players[prop]);
                                 setTimeout(() => { 
                                     block_input = false;
+                                    console.log('emitting stop-sword for ' + prop);
                                     socket.emit('stop-sword', prop);
                                 }, 200);
                             }
