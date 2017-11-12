@@ -35,8 +35,8 @@
     <img src="/images/sprites/hud/hearts.png" class="asset" id="link_hearts">
     <img src="/images/sprites/hero/miscellaneous.png" class="asset" id="link_hurt">
     <img src="/images/sprites/hero/dying.png" class="asset" id="link_dying">
-    <img src="/images/tilesets/light_world.tiles.png" class="asset" id="overworld_sprites">
-    <img src="/images/lttp_tiles.png" class="asset" id="other_tiles">
+    <img src="/images/tilesets/light_world.tiles.png" class="asset" id="light_world_tiles">
+    <img src="/images/tilesets/light_world.entities.png" class="asset" id="light_world_entities">
 <script src="/js/sprites.js"></script>
 <script>
     var canvas, ctx; 
@@ -53,7 +53,6 @@
             link_dying: new Audio('/sounds/hero_dying.ogg'),
             danger: new Audio('/sounds/danger.ogg')
         },
-        map = {},
         then = Date.now(),
         fps = 30,
         fps_interval = 1000 / fps,
@@ -61,16 +60,21 @@
         block_frame = 0,
         gamepad = null,
         gp = null,
-        death_frame = 0,
-        map_tiles = [],
-        map_objects = [];
+        death_frame = 0;
 
 
-    var now, block_input_start, block_input_now, gamepads, gp;
+    var now, block_input_start, block_input_now, gamepads, gp, map;
 
-    const LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40, SPACE = 32 ,ENTER = 13;
+    const 
+        LEFT = 37, 
+        UP = 38, 
+        RIGHT = 39, 
+        DOWN = 40, 
+        SPACE = 32 ,
+        ENTER = 13;
 
-    const JOYPAD_UP = 12;
+    const 
+        JOYPAD_UP = 12;
         JOYPAD_DOWN = 13;
         JOYPAD_LEFT = 14;
         JOYPAD_RIGHT = 15;
@@ -331,8 +335,7 @@
         canvas.height = 480;
 
         socket.on('load-map', (map_obj) => {
-           map_tiles = map_obj.map_tiles;
-           map_objects = map_obj.map_objects;
+            map = map_obj;
 
             render();
         })
@@ -578,42 +581,57 @@
         ctx.restore();
     }
 
-    function render_map_entities() {
-        var image = document.getElementById('overworld_sprites');
-        map_objects.forEach((map_object) => {
-            var sprite = map_sprites[map_object.sprite];
+    function getTilesetIndex(tile) {
+        for (var i = map.tilesets.length-1; i >= 0; i--) {
+            if (tile >=  map.tilesets[i].firstgid) {
+                return i;
+            }
+            if (i == 0) {
+                return 0;
+            }
+        }
+    }
 
-            var repeat_x = map_object.repeat_x ? map_object.repeat_x : 1;
-            var repeat_y = map_object.repeat_y ? map_object.repeat_y : 1;
-
-            for (var i = 0; i < repeat_x; i++) {
-                for (var j = 0; j < repeat_y; j++) {
-                    ctx.drawImage(image,
-                        sprite.x, sprite.y,
-                        sprite.width, sprite.height,
-                        map_object.x+(i*map_object.width), map_object.y+(j*map_object.height),
-                        sprite.width, sprite.height
-                    );    
+    function render_map() {
+        console.log(map);
+        map.layers.forEach((layer, i) => {
+            //parse each layer here
+            for (var j = 0; j < layer.data.length; j++) {
+                tile = layer.data[j];
+                if (tile == 0) {
+                    continue;
                 }
-            }            
-        });
+                //figure out which tileset we need to use
+                var tileset_index = getTilesetIndex(tile);
 
-        map_tiles.forEach((map_tile) => {
-            var sprite = map_sprites[map_tile.sprite];
+                var current_tile = tile-map.tilesets[tileset_index].firstgid;
 
-            var repeat_x = map_tile.repeat_x ? map_tile.repeat_x : 1;
-            var repeat_y = map_tile.repeat_y ? map_tile.repeat_y : 1;
+                var x_index = 0;
+                var y_index = 0;
 
-            for (var i = 0; i < repeat_x; i++) {
-                for (var j = 0; j < repeat_y; j++) {
-                    ctx.drawImage(image,
-                        sprite.x, sprite.y,
-                        sprite.width, sprite.height,
-                        map_tile.x+(i*sprite.width), map_tile.y+(j*sprite.height),
-                        sprite.width, sprite.height
-                    );   
+                //now we need to get the coordinates in the tileset
+                while (current_tile >= map.tilesets[tileset_index].tiles_per_row) {
+                    current_tile -= map.tilesets[tileset_index].tiles_per_row;
+                    y_index++;
                 }
-            }            
+                x_index = current_tile;
+
+                var canvas_x = j;
+                var canvas_y = 0; 
+
+                while (canvas_x >= map.width) {
+                    canvas_x -= map.width;
+                    canvas_y++;
+                }
+
+
+                ctx.drawImage(document.getElementById(map.tilesets[tileset_index].id),
+                    x_index*8, y_index*8,
+                    map.tilewidth, map.tileheight,
+                    canvas_x*8, canvas_y*8,
+                    map.tilewidth, map.tileheight
+                )
+            }
         })
     }
     function render() {
@@ -622,9 +640,8 @@
         if (!player_dead) {
             if (delta > fps_interval) {
                 handleInput();
-                ctx.fillStyle = '#68b868';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                render_map_entities();
+
+                render_map();
 
 
                 if (players["<%= @username %>"]) {
