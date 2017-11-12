@@ -50,7 +50,8 @@
             sword: new Audio('/sounds/lttp_sword.wav'),
             overworld: new Audio('/sounds/lttp_overworld_full.wav'),
             overworld_loop: new Audio('/sounds/lttp_overworld_loop.wav'),
-            link_dying: new Audio('/sounds/hero_dying.ogg')
+            link_dying: new Audio('/sounds/hero_dying.ogg'),
+            danger: new Audio('/sounds/danger.ogg')
         },
         map = {},
         then = Date.now(),
@@ -356,7 +357,6 @@
 
         socket.on('collision', function(data) {
             sounds.link_hurt.play();
-            //sounds.link_hurt.play();
 
             players[data.username] = data.player;
             players[data.username].collision = true;
@@ -595,18 +595,7 @@
                         sprite.width, sprite.height
                     );    
                 }
-            }
-
-            // for (var i = 0; i < repeat_y; i++) {
-            //     ctx.drawImage(image,
-            //         sprite.x, sprite.y,
-            //         sprite.width, sprite.height,
-            //         map_object.x, map_object.y+(i*map_object.height),
-            //         sprite.width, sprite.height
-            //     );   
-            // }
-
-            
+            }            
         });
 
         map_tiles.forEach((map_tile) => {
@@ -624,16 +613,7 @@
                         sprite.width, sprite.height
                     );   
                 }
-            }
-            // for (var i = 0; i < repeat_y; i++) {
-            //     ctx.drawImage(image,
-            //         sprite.x, sprite.y,
-            //         sprite.width, sprite.height,
-            //         map_tile.x, map_tile.y+(i*sprite.height),
-            //         sprite.width, sprite.height
-            //     );   
-            // }
-            
+            }            
         })
     }
     function render() {
