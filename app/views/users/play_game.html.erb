@@ -435,33 +435,38 @@
             block_frame++;
         }
 
+        var stick_x = Math.round(gp.axes[0]);
+        var stick_y = Math.round(gp.axes[1]);
+
+        console.log(stick_x + ", " + stick_y);
+
         if (!block_input && players[player]) {
             if ((map[SPACE] && !players[player].charging_sword)  || (gp && gp.buttons[JOYPAD_B].pressed && !players[player].charging_sword )) {
                 players[player].charging_sword = true;
                 emit_sword_event();
             } 
-            else if ((map[LEFT] && map[UP] || (gp && gp.buttons[JOYPAD_LEFT].pressed && gp.buttons[JOYPAD_UP].pressed)))  {
+            else if ((map[LEFT] && map[UP] || (gp && ( (gp.buttons[JOYPAD_LEFT].pressed && gp.buttons[JOYPAD_UP].pressed || (stick_x == -1 && stick_y == -1) )))))  {
                 move_link('northwest');
             }
-            else if (map[RIGHT] && map[UP] || (gp && gp.buttons[JOYPAD_RIGHT].pressed && gp.buttons[JOYPAD_UP].pressed)) {
+            else if (map[RIGHT] && map[UP] || (gp && ( (gp.buttons[JOYPAD_RIGHT].pressed && gp.buttons[JOYPAD_UP].pressed) || stick_x == 1 && stick_y == -1 ) ) ) {
                 move_link('northeast');
             }
-            else if (map[RIGHT] && map[DOWN] || (gp && gp.buttons[JOYPAD_RIGHT].pressed && gp.buttons[JOYPAD_DOWN].pressed)) {
+            else if (map[RIGHT] && map[DOWN] || ( (gp && ((gp.buttons[JOYPAD_RIGHT].pressed && gp.buttons[JOYPAD_DOWN].pressed) || (stick_x == 1 && stick_y == 1) )))) {
                 move_link('southeast');
             }
-            else if (map[LEFT] && map[DOWN] || (gp && gp.buttons[JOYPAD_LEFT].pressed && gp.buttons[JOYPAD_DOWN].pressed)) {
+            else if (map[LEFT] && map[DOWN] || (gp && ( (gp.buttons[JOYPAD_LEFT].pressed && gp.buttons[JOYPAD_DOWN].pressed) || (stick_x == -1 && stick_y == 1) ) )) {
                 move_link('southwest');
             }
-            else if (map[UP] || (gp && gp.buttons[JOYPAD_UP].pressed)) {
+            else if (map[UP] || (gp && (gp.buttons[JOYPAD_UP].pressed || stick_y == -1))) {
                 move_link('up');
             }
-            else if (map[DOWN] || (gp && gp.buttons[JOYPAD_DOWN].pressed )) {
+            else if (map[DOWN] || (gp && (gp.buttons[JOYPAD_DOWN].pressed || stick_y == 1))) {
                 move_link('down');
             }
-            else if (map[LEFT] || (gp && gp.buttons[JOYPAD_LEFT].pressed)) {
+            else if (map[LEFT] || (gp && (gp.buttons[JOYPAD_LEFT].pressed || stick_x == -1))) {
                 move_link('left');
             }
-            else if (map[RIGHT] || (gp && gp.buttons[JOYPAD_RIGHT].pressed)) {
+            else if (map[RIGHT] || (gp && (gp.buttons[JOYPAD_RIGHT].pressed || stick_x == 1))) {
                 move_link('right');
             }
             else if (!map[SPACE] && !(gp && gp.buttons[JOYPAD_B].pressed)) {
@@ -538,7 +543,7 @@
                 ctx.font = "30px Georgia";
 
                 ctx.strokeStyle = 'gold';
-                ctx.strokeText("GAME OVER", canvas.width/3.2, canvas.height/3);
+                ctx.strokeText("GAME OVER", canvas.width/2.8, canvas.height/3);
 
                 return;
             }
@@ -558,7 +563,7 @@
             ctx.drawImage(document.getElementById('link_dying'),
                 sprite.x, sprite.y,
                 sprite.width, sprite.height,
-                canvas.width/3, canvas.height/2.5,
+                canvas.width/2, canvas.height/2,
                 sprite.width, sprite.height
             );
 
@@ -692,7 +697,7 @@
                     }
                 }
                 then = now - (delta % (1000/30));
-            }    
+            }   
             requestAnimationFrame(render);
         }
 
