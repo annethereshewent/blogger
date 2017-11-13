@@ -582,16 +582,6 @@
         ctx.restore();
     }
 
-    function getTilesetIndex(tile) {
-        for (var i = map.tilesets.length-1; i >= 0; i--) {
-            if (tile >=  map.tilesets[i].firstgid) {
-                return i;
-            }
-            if (i == 0) {
-                return 0;
-            }
-        }
-    }
 
     function render_map() {
         var tileHeight = map.tileheight;
@@ -600,26 +590,13 @@
         map.layers.forEach((layer, i) => {
             //parse each layer here
             for (var j = 0; j < layer.data.length; j++) {
-                tile = layer.data[j];
-                if (tile == 0) {
-                    continue;
-                }
-                //figure out which tileset we need to use
-                var tileset_index = getTilesetIndex(tile);
+                data = layer.data[j];
+                tile = data.tile;
 
-                var current_tile = tile-map.tilesets[tileset_index].firstgid;
-
-                var sprite_y = Math.floor(current_tile / map.tilesets[tileset_index].columns);
-                var sprite_x = current_tile - (sprite_y * map.tilesets[tileset_index].columns);
-
-                var canvas_y = Math.floor(j / map.width);
-                var canvas_x = j - (canvas_y * map.width);
-
-
-                ctx.drawImage(document.getElementById(map.tilesets[tileset_index].id),
-                    sprite_x*tileWidth, sprite_y*tileHeight,
+                ctx.drawImage(document.getElementById(map.tilesets[data.tileset].id),
+                    data.sprite_x, data.sprite_y,
                     tileWidth, tileHeight,
-                    canvas_x*tileWidth, canvas_y*tileHeight,
+                    data.canvas_x, data.canvas_y,
                     tileWidth, tileHeight
                 )
             }
@@ -630,12 +607,10 @@
         now = Date.now();
         var delta = now - then;
         if (!player_dead) {
-            console.log('player not dead')
             if (delta > fps_interval) {
                 handleInput();
 
                 render_map();
-
                 if (players["<%= @username %>"]) {
                     render_heart_sprites();
                     if (!map[SPACE] && !(gp && gp.buttons[JOYPAD_B].pressed)) {
