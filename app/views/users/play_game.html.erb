@@ -37,14 +37,17 @@
     <img src="/images/sprites/hero/dying.png" class="asset" id="link_dying">
     <img src="/images/tilesets/light_world.tiles.png" class="asset" id="light_world_tiles">
     <img src="/images/tilesets/light_world.entities.png" class="asset" id="light_world_entities">
-<script src="/js/sprites.js"></script>
+<script src="/js/CanvasInput.min.js"></script>
 <script>
-    var canvas, ctx; 
-    var player_dead = false,
-        //background = new Image(),
+    'use_strict';
+    var 
+        player_dead = false,
         socket = new io('<%= ENV['GAME_SERVER'] %>'),
         is_typing = false,
-        block_input = false;
+        block_input = false,
+        show_text_input = false,
+        player_messages = [],
+        show_player_messages = false,
         sounds = { 
             link_hurt: new Audio('/sounds/link_hurt.wav'),
             sword: new Audio('/sounds/lttp_sword.wav'),
@@ -61,9 +64,10 @@
         gamepad = null,
         gp = null,
         death_frame = 0;
+        input_frame = 0;
 
 
-    var now, block_input_start, block_input_now, gamepads, gp, map;
+    var now, block_input_start, block_input_now, gamepads, gp, map, input, canvas, ctx;
 
     const 
         LEFT = 37, 
@@ -358,33 +362,44 @@
         })
 
 
-        socket.on('collision', function(data) {
+        socket.on('collision', (data) => {
             sounds.link_hurt.play();
 
             players[data.username] = data.player;
             players[data.username].collision = true;
         })
 
-        socket.on('stop-charging', function(player) {
+        socket.on('stop-charging', (player) => {
             if (players[player]) {
                 players[player].charging_sword = false;    
             }
             
         })
 
+        socket.on('player-message', (data) => {
+            
+            player_messages.push(data.message);
 
-        socket.on('disconnect', function(player) {
+            if (player_messages.length > 6) {
+                player_messages.splice(0,1);
+            }
+
+            show_player_messages = true;
+        })
+
+
+        socket.on('disconnect', (player) => {
             delete players[player];
         })
 
-        socket.on('add-player', function(_players) {
+        socket.on('add-player', (_players) => {
             console.log('got an add-player event');
             players = _players;
 
             console.log(players);
         })
 
-        socket.on('use-sword', function(player) {
+        socket.on('use-sword', (player) => {
             sounds.sword.play();
             players[player].sword_index = 0;
             players[player].charging_sword = true;
@@ -417,15 +432,21 @@
     
     function handleInput() {
         gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-        
+        var stick_y, stick_x;
         
         if (gamepads.length) {
             gp = gamepads[0];
+            
+        }
+        if (gp) {
+            stick_x = Math.round(gp.axes[0]);
+            stick_y = Math.round(gp.axes[1]);
         }
         
         var player = "<%= @username %>"
            
         if (block_input) {
+            console.log('input is blocked');
             if (block_frame == 10) {
                 block_input = false;
                 block_frame = 0;
@@ -435,12 +456,7 @@
             block_frame++;
         }
 
-        var stick_x = Math.round(gp.axes[0]);
-        var stick_y = Math.round(gp.axes[1]);
-
-        console.log(stick_x + ", " + stick_y);
-
-        if (!block_input && players[player]) {
+        if (!show_text_input && !block_input && players[player]) {
             if ((map[SPACE] && !players[player].charging_sword)  || (gp && gp.buttons[JOYPAD_B].pressed && !players[player].charging_sword )) {
                 players[player].charging_sword = true;
                 emit_sword_event();
@@ -468,6 +484,10 @@
             }
             else if (map[RIGHT] || (gp && (gp.buttons[JOYPAD_RIGHT].pressed || stick_x == 1))) {
                 move_link('right');
+            }
+            else if (map[ENTER]) {
+                console.log('you pressed the enter key');
+                show_text_input = true;
             }
             else if (!map[SPACE] && !(gp && gp.buttons[JOYPAD_B].pressed)) {
                 players[player].charging_sword = false;
@@ -607,8 +627,22 @@
             }
         })
     }
+
+    function render_messages() {
+        start_pos = {
+            x: 20,
+            y: 400
+        };
+
+        ctx.font = "14px Arial";
+
+        player_messages.forEach((message, index) => {
+            ctx.fillText(message, start_pos.x, start_pos.y+(index*14));
+        })
+    }
+
     function render() {
-        
+        var player = "<%= @username %>"
         now = Date.now();
         var delta = now - then;
         if (!player_dead) {
@@ -616,12 +650,53 @@
                 handleInput();
 
                 render_map();
-                if (players["<%= @username %>"]) {
+                if (players[player]) {
                     render_heart_sprites();
                     if (!map[SPACE] && !(gp && gp.buttons[JOYPAD_B].pressed)) {
                         players["<%= @username %>"].charging_sword = false;
                         socket.emit('stop-charging', "<%= @username %>"); 
                     }
+                }
+
+                if (show_text_input) {
+                    if (!input) {
+                        input = new CanvasInput({
+                            canvas: document.getElementById('link-map'),
+                            fontSize: 14,
+                            fontFamily: 'Arial',
+                            fontColor: 'black',
+                            width: 250,
+                            x: players[player].position.x,
+                            y: players[player].position.y-30,
+                            borderRadius: 90,
+                            onsubmit: function() {
+                                socket.emit('player-message', {
+                                    player: player,
+                                    message: input.value()
+                                });
+                                
+                                setTimeout(() => {
+                                    input.destroy();
+                                    show_text_input = false;
+                                    input = null;
+                                }, 200)
+                            }
+                        });
+                        input.focus();
+                    }
+                    else {
+                        input.render();
+                    }
+                }
+
+                if (show_player_messages) {
+                    if (input_frame == 60) {
+                        input_frame = 0;
+                        show_player_messages = false;
+                    }
+                    //render the messages
+                    render_messages();
+                    input_frame++;
                 }
 
                 
@@ -821,7 +896,9 @@
         map[e.keyCode] = e.type == 'keydown'
 
         //console.log(map);
-        e.preventDefault();
+        if (!show_text_input) {
+            e.preventDefault();
+        }
 
         var game_start = false;
 
