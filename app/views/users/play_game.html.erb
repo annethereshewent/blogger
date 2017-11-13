@@ -526,6 +526,7 @@
     }
 
     function show_death_animation() {
+        console.log('showing death animation');
 
         now = Date.now();
 
@@ -593,7 +594,9 @@
     }
 
     function render_map() {
-        console.log(map);
+        var tileHeight = map.tileheight;
+        var tileWidth = map.tilewidth;
+
         map.layers.forEach((layer, i) => {
             //parse each layer here
             for (var j = 0; j < layer.data.length; j++) {
@@ -606,43 +609,32 @@
 
                 var current_tile = tile-map.tilesets[tileset_index].firstgid;
 
-                var x_index = 0;
-                var y_index = 0;
+                var sprite_y = Math.floor(current_tile / map.tilesets[tileset_index].columns);
+                var sprite_x = current_tile - (sprite_y * map.tilesets[tileset_index].columns);
 
-                //now we need to get the coordinates in the tileset
-                while (current_tile >= map.tilesets[tileset_index].tiles_per_row) {
-                    current_tile -= map.tilesets[tileset_index].tiles_per_row;
-                    y_index++;
-                }
-                x_index = current_tile;
-
-                var canvas_x = j;
-                var canvas_y = 0; 
-
-                while (canvas_x >= map.width) {
-                    canvas_x -= map.width;
-                    canvas_y++;
-                }
+                var canvas_y = Math.floor(j / map.width);
+                var canvas_x = j - (canvas_y * map.width);
 
 
                 ctx.drawImage(document.getElementById(map.tilesets[tileset_index].id),
-                    x_index*8, y_index*8,
-                    map.tilewidth, map.tileheight,
-                    canvas_x*8, canvas_y*8,
-                    map.tilewidth, map.tileheight
+                    sprite_x*tileWidth, sprite_y*tileHeight,
+                    tileWidth, tileHeight,
+                    canvas_x*tileWidth, canvas_y*tileHeight,
+                    tileWidth, tileHeight
                 )
             }
         })
     }
     function render() {
+        
         now = Date.now();
         var delta = now - then;
         if (!player_dead) {
+            console.log('player not dead')
             if (delta > fps_interval) {
                 handleInput();
 
                 render_map();
-
 
                 if (players["<%= @username %>"]) {
                     render_heart_sprites();
