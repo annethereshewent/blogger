@@ -378,7 +378,7 @@
 
         socket.on('player-message', (data) => {
             
-            player_messages.push(data.message);
+            player_messages.push(data);
 
             if (player_messages.length > 6) {
                 player_messages.splice(0,1);
@@ -629,15 +629,16 @@
     }
 
     function render_messages() {
-        start_pos = {
-            x: 20,
-            y: 400
-        };
+        var x = 20;
+        var y = 400;
+           
+        ctx.font = "12px Courier";
 
-        ctx.font = "14px Arial";
-
-        player_messages.forEach((message, index) => {
-            ctx.fillText(message, start_pos.x, start_pos.y+(index*14));
+        player_messages.forEach((data, index) => {
+            ctx.fillStyle = 'red';
+            ctx.fillText(data.timestamp_str, x, y + (index*12));
+            ctx.fillStyle = 'white';
+            ctx.fillText(data.message, x+(data.timestamp_str.length*7.2), y+(index*12));
         })
     }
 
@@ -670,16 +671,19 @@
                             y: players[player].position.y-30,
                             borderRadius: 90,
                             onsubmit: function() {
-                                socket.emit('player-message', {
-                                    player: player,
-                                    message: input.value()
-                                });
+                                if (input.value().trim() != '') {
+                                    socket.emit('player-message', {
+                                        player: player,
+                                        message: input.value()
+                                    });
+                                }
                                 
                                 setTimeout(() => {
                                     input.destroy();
                                     show_text_input = false;
                                     input = null;
                                 }, 200)
+
                             }
                         });
                         input.focus();
