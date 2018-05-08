@@ -66,6 +66,8 @@ gem 'dropzonejs-rails'
 
 gem 'socket.io-rails'
 
+gem 'jwt'
+
 group :production do
 	gem 'rails_12factor'
 end

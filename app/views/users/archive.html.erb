@@ -66,6 +66,7 @@
 		.content a {
 			color: black;
 			text-decoration: none;
+			overflow: hidden;
 		}
 		.archive-year-select, .archive-month-select {
 			background: gold;
@@ -107,7 +108,9 @@
 
 
 		$(function() {
-			var select = <%= @select.html_safe %>
+			resize_elements();
+
+			var select = <%= @select.html_safe %>;
 			var items = [];
 			for (year in select) {
 				if (select.hasOwnProperty(year)) {
@@ -127,11 +130,11 @@
 						})
 					}
 
-					items.push(object)
+					items.push(object);
 				}
 			}
 
-			console.log(items)
+			console.log(items);
 			//now that the items have been built, create the select box
 			$('.archive-select').selectivity({
 				placeholder: 'Year',
@@ -146,28 +149,28 @@
 				})
 			})
 
-			$(".archive-year-select").change(function() {
-				var selected_year = $(".archive-year-select").val();
-				var html = '';
+			// $(".archive-year-select").change(function() {
+			// 	var selected_year = $(".archive-year-select").val();
+			// 	var html = '';
 
-				if (selected_year == <%= @first_post_date.year %>) {
-					for (var i = <%= @first_post_date.month-1 %>; i < months.length; i++) {
-						html += getOptionHtml(months[i]);
-					}
-				}
-				else if (selected_year == <%= @last_post_date.year %>) {
-					for (var i = 0; i < <%= @last_post_date.month %>; i++) {
-						html += getOptionHtml(months[i]);
-					}
-				}
-				else {
-					for (var i =0; i < months.length; i++) {
-						html += getOptionHtml(months[i]);
-					}
-				}
+			// 	if (selected_year == <%= @first_post_date.year %>) {
+			// 		for (var i = <%= @first_post_date.month-1 %>; i < months.length; i++) {
+			// 			html += getOptionHtml(months[i]);
+			// 		}
+			// 	}
+			// 	else if (selected_year == <%= @last_post_date.year %>) {
+			// 		for (var i = 0; i < <%= @last_post_date.month %>; i++) {
+			// 			html += getOptionHtml(months[i]);
+			// 		}
+			// 	}
+			// 	else {
+			// 		for (var i =0; i < months.length; i++) {
+			// 			html += getOptionHtml(months[i]);
+			// 		}
+			// 	}
 
-				$('.archive-month-select').html(html);
-			});
+			// 	$('.archive-month-select').html(html);
+			// });
 
 			$(".archive-select").on("change", function() {
 				console.log($('.archive-select').selectivity('val'));
@@ -182,6 +185,7 @@
 							$('.main').append(posts).masonry('appended', posts);
 
 							bind_hover();
+							resize_elements();
 						}
 
 					}
@@ -208,6 +212,15 @@
 			}, function() {
 				$(this).children(':first').children(':first').hide()
 			})
+		}
+
+		function resize_elements() {
+			$('iframe').each(function() {
+				$(this).css({
+					height: $(this).height()/1.7 + 'px',
+					width: $(this).width()/1.7 + 'px'
+				});
+			});
 		}
 
 		function getOptionHtml(option) {
