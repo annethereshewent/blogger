@@ -96,10 +96,7 @@
   
   def create
     @user = User.new(user_params)
-    test_user = User.find_by_email(@user.email)
 
-    puts "username with that email found" if test_user
-    
     if @user.save
       session[:username] = @user.email
       session[:userid]   = @user.id

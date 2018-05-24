@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   	# Include default devise modules. Others available are:
   	# :confirmable, :lockable, :timeoutable and :omniauthable
-  	devise :recoverable, :confirmable, :trackable
+  	devise :recoverable, :trackable
 	
 	validates :email, uniqueness: true, presence: true
 	validates :displayname, uniqueness:true
@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
 	validates_attachment :avatar,
   		:content_type => { :content_type => ["image/jpeg", "image/gif", "image/png"] }
 
-  	belongs_to :theme
+  	belongs_to :theme, optional: true
 
 	has_many :posts
 	has_many :comments
