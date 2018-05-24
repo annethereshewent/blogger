@@ -149,29 +149,6 @@
 				})
 			})
 
-			// $(".archive-year-select").change(function() {
-			// 	var selected_year = $(".archive-year-select").val();
-			// 	var html = '';
-
-			// 	if (selected_year == <%= @first_post_date.year %>) {
-			// 		for (var i = <%= @first_post_date.month-1 %>; i < months.length; i++) {
-			// 			html += getOptionHtml(months[i]);
-			// 		}
-			// 	}
-			// 	else if (selected_year == <%= @last_post_date.year %>) {
-			// 		for (var i = 0; i < <%= @last_post_date.month %>; i++) {
-			// 			html += getOptionHtml(months[i]);
-			// 		}
-			// 	}
-			// 	else {
-			// 		for (var i =0; i < months.length; i++) {
-			// 			html += getOptionHtml(months[i]);
-			// 		}
-			// 	}
-
-			// 	$('.archive-month-select').html(html);
-			// });
-
 			$(".archive-select").on("change", function() {
 				console.log($('.archive-select').selectivity('val'));
 				$.get(

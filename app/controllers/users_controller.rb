@@ -96,12 +96,16 @@
   
   def create
     @user = User.new(user_params)
+    test_user = User.find_by_email(@user.email)
+
+    puts "username with that email found" if test_user
+    
     if @user.save
       session[:username] = @user.email
       session[:userid]   = @user.id
       redirect_to user_dashboard_path
     else
-      redirect_to '/users', notice: "Username already exists"
+      redirect_to '/users', notice: "Unable to create user"
     end
   end
   
@@ -229,6 +233,8 @@
     first_year = @first_post_date.year
     last_year = @last_post_date.year
 
+
+
     (@first_post_date.year..@last_post_date.year).each do |year|
       @select[year] = []
       if year == @first_post_date.year
@@ -237,7 +243,11 @@
         last_index = @first_post_date.year == @last_post_date.year ? @last_post_date.month : months.length
 
         while i <  last_index
-          @select[year].push(months[i])
+          date = Date.parse("#{months[i]} #{year}")
+
+          if (@user.posts.where('created_at BETWEEN ? and ?', date.beginning_of_month.beginning_of_day, date.end_of_month.end_of_day).count > 0)
+            @select[year].push(months[i])
+          end
           i = i+1
         end
       elsif year == @last_post_date.year
@@ -245,11 +255,19 @@
           if index == @last_post_date.month
             break
           end
-
-          @select[year].push(month) 
+          date = Date.parse("#{month} #{year}")
+          if (@user.posts.where('created_at BETWEEN ? and ?', date.beginning_of_month.beginning_of_day, date.end_of_month.end_of_day).count > 0)
+            @select[year].push(month) 
+          end
         end
       else
-        @select[year] = months
+        months.each do |month|
+          date = Date.parse("#{month} #{year}")
+          if (@user.posts.where('created_at BETWEEN ? and ?', date.beginning_of_month.beginning_of_day, date.end_of_month.end_of_day).count > 0)
+            @select[year].push(month)
+          end
+        end
+        
       end
     end
     @select = @select.to_json
