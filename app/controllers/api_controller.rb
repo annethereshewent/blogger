@@ -55,7 +55,7 @@ class ApiController < ApplicationController
     end
     def create_post
         # first we need to verify that the user sending the request is authenticated (check their token)
-        unless (params[:token] && params[:user_id] && params[:post]) 
+        unless (params[:token]&& params[:post]) 
             render json: {
                 success: false
             }
@@ -63,7 +63,7 @@ class ApiController < ApplicationController
             # check the token
             decoded = decode(params[:token])
 
-            if (decoded[:user_id] && params[:user_id].to_i == decoded[:user_id].to_i) 
+            if (decoded[:user_id]) 
                 # the token is valid. create a post for this user.
                 @user = User.find(decoded[:user_id])
 

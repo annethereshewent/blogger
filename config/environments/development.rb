@@ -51,4 +51,3 @@ ActionMailer::Base.smtp_settings = {
 end
 
 ENV['CHAT_SERVER'] = "http://localhost:3001"
-ENV['GAME_SERVER'] = "http://localhost:3005";
