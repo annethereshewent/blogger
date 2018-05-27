@@ -29,20 +29,22 @@ class ApiController < ApplicationController
     end
 
     def fetch_posts
-        unless (params[:token] && params[:user_id]) 
+        unless (params[:token]) 
             render json: {
                 success: false
             }
         else
             decoded = decode(params[:token])
-            if (decoded[:user_id] && decoded[:user_id].to_i == params[:user_id].to_i)
+            if (decoded[:user_id])
                 # fetch the posts
                 user = User.find(decoded[:user_id])
                 formatted_posts = get_json_posts(user)
 
                 render json: {
                     success: true,
-                    posts: formatted_posts
+                    posts: formatted_posts,
+                    user_id: user.id,
+                    username: user.email
                 }
 
             else
