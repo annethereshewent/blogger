@@ -17,7 +17,6 @@ class ApiController < ApplicationController
                     token: encode(user_id: @user.id),
                     user_id: @user.id,
                     username: @user.email,
-                    friends: @friends,
                     posts: formatted_posts
                 }
             else
