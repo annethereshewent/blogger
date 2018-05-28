@@ -1,6 +1,26 @@
 class ApiController < ApplicationController
     protect_from_forgery with: :null_session
 
+    def register
+        user = User.new(user_params)
+
+        if (user.save) 
+            render json: {
+                success: true,
+                token: encode(user_id: user.id),
+                user_id: user.id,
+                username: user.email,
+                posts: []
+            }
+        else
+            render json: {
+                success: false,
+                status: "registration_failed"
+            }
+        end
+
+    end
+
     def login
         if (!params[:username] || !params[:password])
             render json: {
@@ -28,7 +48,7 @@ class ApiController < ApplicationController
     end
 
     def fetch_posts
-        unless (params[:token]) 
+        unless (params[:token] && params[:token].length > 0) 
             render json: {
                 success: false
             }
@@ -135,4 +155,9 @@ class ApiController < ApplicationController
     rescue
         nil
     end
+
+    private
+        def user_params
+            params.require(:user).permit(:email, :displayname, :password, :blog_title, :description, :avatar, :theme)
+        end
 end

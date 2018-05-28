@@ -36,6 +36,7 @@ Rails.application.routes.draw do
   post '/api/login' => 'api#login'
   post '/api/create_post' => 'api#create_post'
   get '/api/fetch_posts' => 'api#fetch_posts'
+  post '/api/register' => 'api#register'
 
   resources :users do
     resources :posts do
