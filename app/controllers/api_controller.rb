@@ -158,6 +158,6 @@ class ApiController < ApplicationController
 
     private
         def user_params
-            params.require(:user).permit(:email, :displayname, :password, :blog_title, :description, :avatar, :theme)
+            params.permit(:email, :displayname, :password, :blog_title, :description, :avatar, :theme)
         end
 end
