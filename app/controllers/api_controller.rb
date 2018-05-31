@@ -1,6 +1,7 @@
 class ApiController < ApplicationController
     protect_from_forgery with: :null_session
 
+
     def register
         user = User.new(user_params)
 
@@ -88,8 +89,9 @@ class ApiController < ApplicationController
                 @user = User.find(decoded[:user_id])
 
                 if @user
+                    
                     # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
-                    if Post.create(post: sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3), attributes: ['href']), user_id: decoded[:user_id])
+                    if Post.create(post: ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br), attributes: ['href', 'src']), user_id: decoded[:user_id])
                         render json: {
                             success: true
                         }
