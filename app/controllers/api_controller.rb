@@ -88,7 +88,8 @@ class ApiController < ApplicationController
                 @user = User.find(decoded[:user_id])
 
                 if @user
-                    if Post.create(post: params[:post], user_id: decoded[:user_id])
+                    # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
+                    if Post.create(post: sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3), attributes: ['href']), user_id: decoded[:user_id])
                         render json: {
                             success: true
                         }
