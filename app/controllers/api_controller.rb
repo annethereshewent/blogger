@@ -16,7 +16,7 @@ class ApiController < ApplicationController
         else
             render json: {
                 success: false,
-                status: "registration_failed"
+                message: "registration_failed"
             }
         end
 
@@ -25,7 +25,8 @@ class ApiController < ApplicationController
     def login
         if (!params[:username] || !params[:password])
             render json: {
-                success: false
+                success: false,
+                message: "bad_request"
             }
         else
             @user = User.find_by_email(params[:username])
@@ -42,7 +43,8 @@ class ApiController < ApplicationController
                 }
             else
                 render json: {
-                    success: false
+                    success: false,
+                    message: "login_failed"
                 }
             end
         end
@@ -51,11 +53,12 @@ class ApiController < ApplicationController
     def fetch_posts
         unless (params[:token] && params[:token].length > 0) 
             render json: {
-                success: false
+                success: false,
+                message: "bad_request"
             }
         else
             decoded = decode(params[:token])
-            if (decoded[:user_id])
+            if (decoded.is_a?(Hash) && decoded[:user_id])
                 # fetch the posts
                 user = User.find(decoded[:user_id])
                 formatted_posts = get_json_posts(user)
@@ -69,14 +72,15 @@ class ApiController < ApplicationController
 
             else
                 render json: {
-                    success: false
+                    success: false,
+                    message: "invalid_token"
                 }
             end
         end
     end
     def create_post
         # first we need to verify that the user sending the request is authenticated (check their token)
-        unless (params[:token]&& params[:post]) 
+        unless (params[:token] && params[:post]) 
             render json: {
                 success: false
             }
@@ -84,12 +88,11 @@ class ApiController < ApplicationController
             # check the token
             decoded = decode(params[:token])
 
-            if (decoded[:user_id]) 
+            if (decoded.is_a?(Hash) && decoded[:user_id]) 
                 # the token is valid. create a post for this user.
                 @user = User.find(decoded[:user_id])
 
                 if @user
-                    
                     # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
                     if Post.create(post: ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br), attributes: ['href', 'src']), user_id: decoded[:user_id])
                         render json: {
@@ -97,19 +100,22 @@ class ApiController < ApplicationController
                         }
                     else
                         render json: {
-                            success: false
+                            success: false,
+                            message: "post_create_failed"
                         }
                     end
                 else
                     render json: {
-                        success: false
+                        success: false,
+                        message: "invalid_user"
                     }
                 end
 
                 
             else
                 render json: {
-                    success: false
+                    success: false,
+                    message: "invalid_token"
                 }
             end
         end
