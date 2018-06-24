@@ -37,6 +37,8 @@ Rails.application.routes.draw do
   post '/api/create_post' => 'api#create_post'
   get '/api/fetch_posts' => 'api#fetch_posts'
   post '/api/register' => 'api#register'
+  get '/users/fetch_sidebar_posts' => 'users#fetch_sidebar_posts'
+  post '/users/save_sidebar_settings' => 'users#save_sidebar_settings'
 
   resources :users do
     resources :posts do

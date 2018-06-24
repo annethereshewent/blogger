@@ -1,0 +1,89 @@
+<style>
+    .sidebar-text {
+        color: <%= @user.text_color ? @user.text_color : '#ffffff'%>;
+    }
+    #sidebar {
+        background: <%= @user.background_color ? @user.background_color : '#e6b3ff'; %>;
+    }
+    .sidebar.avatar {
+        border: 4px solid <%= @user.background_color ? @user.background_color : '#e6b3ff'; %>;
+    }
+</style>
+<% if session[:userid] == @user.id %>
+    <button type="button" onclick="edit_sidebar_settings()" class="edit-sidebar btn confirm">Modify Theme</button>
+<% end %>
+<div class="sidebar-buttons">
+    <button type="button" onclick="save_sidebar_settings()" class="btn confirm">Save</button>
+    <button type="button" onclick="cancel_sidebar_settings('<%= @user.text_color %>','<%= @user.background_color %>')" class="btn cancel">Cancel</button>
+</div>
+<div class="banner">
+    <div class="edit-banner">
+
+    </div>
+    <img class="sidebar avatar" src="<%= @user.avatar.url(:small) %>">
+</div>
+<div class="sidebar-text sidebar-description-area">
+    <p class="sidebar-title"><%= @user.blog_title %></p>
+    <p class="sidebar-description"><%= @user.description %></p>
+</div>
+
+
+<div class="color-picker">
+    <div class="background-color-picker">
+        <label class="sidebar-label">Background Color:</label>
+        <input type="color" id="background-color">
+    </div>
+    <div class="text-color-picker">
+        <label class="sidebar-label">Font Color:</label>
+        <input type="color" id="text-color">
+    </div>
+</div>
+
+<div class="sidebar-main">
+    <% @posts.each do |post| %>
+        <% tags = post.tags.order('post_tags.created_at') %>
+        <div class="content">
+            <p style="font-size:small;"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>
+            <div class="post"> 
+                <% post.images.each do |image| %>
+                    <p><img src="<%= image.file.url(:medium) %>"></p>
+                <% end %>
+                <p><%= auto_link(post.post, sanitize: false).html_safe %></p>
+            </div>
+            <% if post.edited == 1 %>
+                <p style="font-size:small;"><i>(Edited on: <%= post.updated_at.strftime("%m-%d-%y %I:%M %P") %>)</i></p>
+            <% end %>
+            <% if post.tags.length > 0 %> 
+                <p class="print-tags"><i>Tags: <%= render partial: 'posts/tag', collection: tags %></i></p>
+            <% end %>
+            <div class="post-buttons" style="font-size:12px">
+                <a href="<%= user_post_comments_path(post.user_id, post) %>"><%= post.getCommentText %></a>
+                &nbsp;&nbsp;
+                <a href="#" onClick="openQuoteModal(<%= post.id %>);return false" style="margin-left:5px">Quote</a>
+                <% if post.user_id == session[:userid] %>
+                    <a class="delete" href="#" onclick="deletePost(<%= post.id %>);return false"><li class="fa fa-trash"></li></a>
+                <% end %>
+            </div>
+        </div>
+        <div class="content-divider"></div>
+    <% end %>
+</div>
+
+<script>
+    $(() => {
+        <% if @user.background_color != '' && @user.text_color != '' %>
+            $("#background-color").val('<%= @user.background_color %>')
+            $("#text-color").val('<%= @user.text_color %>')
+        <% end %>
+    })
+    $("#background-color").on('change', function() {
+        $("#sidebar").css({
+            background: $(this).val()
+        });
+    });
+    $("#text-color").on('change', function() {
+        $(".sidebar-text").css({
+            color: $(this).val()
+        });
+    });
+</script>

@@ -20,6 +20,40 @@
   	render plain: returnStr
   end
 
+  def fetch_sidebar_posts
+    if params[:user_id]
+      @user = User.find(params[:user_id])
+      @posts = @user.posts
+        .includes(:images)
+        .includes(:tags)
+        .order('posts.id desc')
+        .limit(15)
+
+      render partial: 'sidebar_posts'
+    else
+      render plain: "false"
+    end
+  end
+  
+  def save_sidebar_settings
+    unless session[:userid] && params[:text_color] && params[:background_color]
+      return render json: {
+        success: false
+      }
+    end
+
+    if User.update(session[:userid], text_color: params[:text_color], background_color: params[:background_color])
+      return render json: {
+        success: true
+      }
+    end
+
+    return render json: {
+      success: false
+    }
+
+  end
+
   def fetch_posts 
 
     @friends = User.where("id in (#{params[:friend_ids]})")

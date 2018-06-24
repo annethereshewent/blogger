@@ -172,16 +172,82 @@
 			margin-left:75px;
 		}
 		#sidebar {
-			display: none;
+			z-index: 1;
 			position: fixed;
 			top: 0;
 			right: 0;
+			width: 600px;
 			height: 100%;
+			display: none;
+			overflow-y: scroll;
+		}
+		.sidebar.avatar {
+			position: absolute;
+			top: 125px;
+			left: 250px;
+			width: 80px;
+			height: 80px;
+		}
+		.banner {
+			width: 100%;
+			height: 200px;
+		}
+		.sidebar-title {		
+			font-size: 24px;
+			margin-top: 10px;
+			margin-bottom: 0;
+		}
+		.sidebar-description {
+			font-size: 14px;
+			margin-top: 0;
+			margin-left: 10px;
+		}
+		.sidebar-description-area {
+			font-family: Gibson;
+			text-align: center;
+		}
+		#sidebar-loading {
+			display: none;
+			margin: auto;
+			position: absolute;
+			bottom: 0;
+			right: 250px;
+		}
+		.sidebar.content {
+			margin-left: 60px;
+		}
+		.edit-sidebar {
+			position: absolute;
+			right: 0;
+		}
+		.color-picker, .edit-banner {
+			display: none;
+		}
+		.text-color-picker, .background-color-picker {
+			position: absolute;
+		}
+		.text-color-picker {
+			left: 20px;
+			top: 100px;
+		}
+		.background-color-picker {
+			right: 20px;
+			top: 100px;
+		}
+		.sidebar-label {
+			color: white;
+			display: block;
+		}
+		.sidebar-buttons {
+			text-align: right;
+			display: none;
 		}
 	</style>
 </head>
 <body>
-	<div id="sidebar"></div>
+	<div id="sidebar">
+		<img id="sidebar-loading" src="/images/loading.gif">
+	</div>
 	<h1 class="logo"><a href="<%= user_dashboard_path %>"><span class="logo-bracket">[</span>blogger<span class="logo-bracket">].</span></a></h1>
 	<div class="search-row">
 		<i class="fa fa-search" style="margin-right:10px;"></i><input type="text" class="control-text" name="search" id="search">

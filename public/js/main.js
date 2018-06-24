@@ -9,9 +9,10 @@ var entityMap = {
 	'=': '&#x3D;'
 };
 
+var current_user = null;
+var sidebar_open = false;
+
 $(function(){
-
-
 	initEditor();
 	$('.tag-input').each(function() {
 		$(this).tagsInput({
@@ -40,6 +41,14 @@ $(function(){
 		$("#num-requests").css('display', 'inline');
 	}
 
+	$(document).click((event) => {
+		if (!$(event.target).closest("#sidebar").length && !$(event.target).closest(".avatar").length) {
+			if ($("#sidebar").is(":visible")) {
+				sidebar_open = false;
+				$("#sidebar").animate({width: "toggle"}, 350);	
+			}
+		}
+	});
 });
 
 function deletePost(pID) {
@@ -162,6 +171,67 @@ function openModal() {
 			remove_tags($("#tags"));
 		}
 	});
+}
+
+function open_sidebar(user_id) {
+	if (!sidebar_open || current_user == user_id) {
+		sidebar_open = sidebar_open ? false : true;
+		$("#sidebar").animate({width: "toggle"}, 350);
+		
+	}
+	
+	current_user = user_id;
+
+	$("#sidebar-loading").show();
+	$.get(
+		'/users/fetch_sidebar_posts?user_id=' + user_id,
+		function(data) {
+			$("#sidebar-loading").hide();
+			if (data != 'false') {
+				$("#sidebar").html(data);
+			}
+			else {
+				console.log("an error occurred");
+			}
+		}
+	);
+}
+function edit_sidebar_settings() {
+	$(".edit-sidebar").hide();
+	$(".sidebar-buttons").show();
+	$('.color-picker').show();
+	$('.edit-banner').show();
+
+}
+function cancel_sidebar_settings(text_color, background_color) {
+	$(".edit-sidebar").show();
+	$(".sidebar-buttons").hide();
+	$(".color-picker").hide();
+	$(".edit-banner").hide();
+
+	$("#sidebar").css('background', background_color);
+	$(".sidebar-text").css('color', text_color);
+}
+function save_sidebar_settings() {
+
+	$("#sidebar-loading").show();
+	$.post(
+		'/users/save_sidebar_settings',
+		{
+			text_color: $("#text-color").val(),
+			background_color: $("#background-color").val()
+		},
+		function(data) {
+			if (data.success) {
+				console.log("Success!");
+			}
+			else {
+				console.log("failure :(")
+			}
+			$("#sidebar-loading").hide();
+			cancel_sidebar_settings();
+		}
+	)
 }
 
 function escapeHtml(string) {

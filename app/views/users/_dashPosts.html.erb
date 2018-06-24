@@ -1,6 +1,6 @@
 <% @posts.each do |post| %>
 	<% tags = post.tags.order('post_tags.created_at') %>
-	<a href="<%= user_posts_page_path post.user_id, 1 %>">
+	<a href="javascript:void(0)" onclick="open_sidebar(<%= post.user.id %>)">
 		<div class="avatar-dash" id="avatar_<%= post.id %>">
 			<img class="avatar" src="<%= post.user.avatar.url(:small)%>">
 			<p style="font-size:12px;color:white"><b><%= post.user.displayname %></b></p>
