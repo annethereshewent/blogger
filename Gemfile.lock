@@ -75,6 +75,7 @@ GEM
       sassc (>= 1.11)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
+    htmlentities (4.3.4)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     jbuilder (2.7.0)
@@ -212,6 +213,7 @@ DEPENDENCIES
   devise
   dropzonejs-rails
   font-awesome-rails
+  htmlentities
   jbuilder
   jquery-rails
   jwt

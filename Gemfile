@@ -9,6 +9,8 @@ gem 'rails', '<= 5.1.5'
 #Froala wysiwyg editor 
 gem "wysiwyg-rails"
 
+# Use for sanitizing HTML input in API Controller
+gem 'htmlentities'
 # Use SCSS for stylesheets
 gem 'sass-rails'
 # Use Uglifier as compressor for JavaScript assets

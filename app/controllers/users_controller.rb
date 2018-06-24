@@ -20,15 +20,6 @@
   	render plain: returnStr
   end
 
-  def play_game 
-    unless (session[:userid])
-      return redirect_to '/users', notice: "Please log in to continue"
-    end
-
-    @username = User.find(session[:userid]).displayname
-
-  end
-
   def fetch_posts 
 
     @friends = User.where("id in (#{params[:friend_ids]})")

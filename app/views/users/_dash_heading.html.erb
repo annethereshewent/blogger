@@ -171,16 +171,17 @@
 		.message-label-from {
 			margin-left:75px;
 		}
-		.video-game {
-			opacity: 0;
-			width: 40px;
-			height: 40px;
-			float: right;
+		#sidebar {
+			display: none;
+			position: fixed;
+			top: 0;
+			right: 0;
+			height: 100%;
 		}
 	</style>
 </head>
 <body>
-
+	<div id="sidebar"></div>
 	<h1 class="logo"><a href="<%= user_dashboard_path %>"><span class="logo-bracket">[</span>blogger<span class="logo-bracket">].</span></a></h1>
 	<div class="search-row">
 		<i class="fa fa-search" style="margin-right:10px;"></i><input type="text" class="control-text" name="search" id="search">
