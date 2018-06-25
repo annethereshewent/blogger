@@ -58,9 +58,12 @@
     //note: most of sidebar code is in main.js because _dash_js was getting unwieldly.
     //we should get angular at some point???? it would be nice
     $(() => {
-        <% if @user.background_color != '' && @user.text_color != '' %>
+        <% if @user.background_color.present? && @user.text_color.present? %>
             $("#background-color").val('<%= @user.background_color %>')
             $("#text-color").val('<%= @user.text_color %>')
+        <% else %>
+            $("#background-color").val('#e6b3ff');
+            $("#text-color").val('#ffffff')
         <% end %>
 
         $("#avatar-upload").on('change', function() {
