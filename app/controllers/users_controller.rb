@@ -42,20 +42,7 @@
       }
     end
 
-    update_params = {
-      text_color: params[:text_color],
-      background_color: params[:background_color] 
-    }
-
-    if params[:avatar_file]
-      update_params[:avatar] = params[:avatar_file]
-    end
-
-    if params[:banner_file]
-      update_params[:banner] = params[:banner_file]
-    end
-
-    if User.update(session[:userid], update_params)
+    if User.update(session[:userid], sidebar_params)
       return render json: {
         success: true
       }
@@ -351,6 +338,10 @@
 
   private
   	def user_params
-  		params.require(:user).permit(:email, :displayname, :password, :blog_title, :description, :avatar, :theme, :banner)
+  		params.require(:user).permit(:email, :displayname, :password, :blog_title, :description, :avatar, :theme)
   	end
+
+    def sidebar_params
+      params.permit(:avatar, :banner, :background_color, :text_color)
+    end
 end

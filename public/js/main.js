@@ -203,6 +203,8 @@ function open_sidebar(user_id) {
 		$("#sidebar").animate({width: "toggle"}, 350);
 		
 	}
+
+	$("#sidebar").css('background', '');
 	
 	current_user = user_id;
 
@@ -258,10 +260,10 @@ function save_sidebar_settings() {
 	formData.append('background_color', $("#background-color").val());
 
 	if ($("#avatar-upload")[0].files[0]) {
-		formData.append('avatar_file', $("#avatar-upload")[0].files[0]);
+		formData.append('avatar', $("#avatar-upload")[0].files[0]);
 	}
 	if ($("#banner-upload")[0].files[0]) {
-		formData.append('banner_file', $("#banner-upload")[0].files[0]);
+		formData.append('banner', $("#banner-upload")[0].files[0]);
 	}
 
 	$("#sidebar-loading").show();
