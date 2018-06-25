@@ -5,7 +5,7 @@ class PostsController < ApplicationController
 		page = params[:page].present? ? params[:page].to_i : 1
 
 		@user = User.find(params[:user_id])
-		@posts = @user.posts.order('posts.id desc').includes(:tags).includes(:images).paginate(page: params[:page], per_page: 15)
+		@posts = @user.posts.order('posts.id desc').includes(:tags).includes(:images).paginate(page: page, per_page: 15)
 
 	end
 
@@ -57,7 +57,7 @@ class PostsController < ApplicationController
 	end
 
 	def fetch_sidebar_posts
-		@user = User.find(session[:userid])
+		@user = User.find(params[:user_id])
 
 		@posts = @user.posts.order('posts.id desc')
 			.includes(:tags)

@@ -337,7 +337,7 @@ function openNewModal(userID) {
 function load_sidebar_posts(page) {
 	$(".sidebar-loading").show();
 	$.get(
-		'/posts/' + page + '/fetch_sidebar_posts',
+		'/users/' + current_user + '/posts/' + page + '/fetch_sidebar_posts',
 		function(data) {
 			$(".sidebar-loading").hide();
 			$('.sidebar-main').append(data);
