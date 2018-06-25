@@ -51,33 +51,57 @@ $(function(){
 	});
 });
 
-function deletePost(pID) {
-		var r = confirm("Are you sure you want to delete this post?");
+function updateImage(selector) {
 
-		if (r) {
-			$.ajax({
-				url: "/posts/" + pID + "/delete/",			
-				type: "post",
-				success: function(data) {
-					//console.log(data);
-					if (data == "success") {
-						$("#post_" + pID).fadeOut(1000).slideUp(1000, function() {
-							//this is setting the deleted post's content divider height to 0. otherwise it looks bad
-							$("#post_"+ pID).next().hide();
-						});
+	var reader = new FileReader();
 
-						//if we are in the dashboard view, hide the avatar as well
-						if (location.href.indexOf('users') != -1) {
-							$("#avatar_" + pID).hide();
-						}
-					}
-					else {
-						alert("an error has occurred");
-					}
-				}
+	reader.onload = function (e) {
+		console.log('image read!!!!');
+		console.log(e.target.result);
+		if (selector == '#avatar-upload') {
+			console.log('hello?');
+        	$('.sidebar.avatar').attr('src', e.target.result);	
+		}
+		else {
+			console.log("changing banner....");
+			$(".banner").css({
+				"background-image": "url(" + e.target.result + ")"
 			});
 		}
+    }
+
+    console.log($(selector));
+
+	reader.readAsDataURL($(selector)[0].files[0])
+}
+
+function deletePost(pID) {
+	var r = confirm("Are you sure you want to delete this post?");
+
+	if (r) {
+		$.ajax({
+			url: "/posts/" + pID + "/delete/",			
+			type: "post",
+			success: function(data) {
+				//console.log(data);
+				if (data == "success") {
+					$("#post_" + pID).fadeOut(1000).slideUp(1000, function() {
+						//this is setting the deleted post's content divider height to 0. otherwise it looks bad
+						$("#post_"+ pID).next().hide();
+					});
+
+					//if we are in the dashboard view, hide the avatar as well
+					if (location.href.indexOf('users') != -1) {
+						$("#avatar_" + pID).hide();
+					}
+				}
+				else {
+					alert("an error has occurred");
+				}
+			}
+		});
 	}
+}
 
 function openRequests() {
 	num_requests = $("#num-requests").html() != '' ? $("#num-requests").html() : 0
@@ -196,32 +220,56 @@ function open_sidebar(user_id) {
 		}
 	);
 }
+
+function open_file_dialog(selector) {
+	$(selector).click();
+}
+
 function edit_sidebar_settings() {
 	$(".edit-sidebar").hide();
-	$(".sidebar-buttons").show();
+	$(".hidden-sidebar-button").show();
 	$('.color-picker').show();
 	$('.edit-banner').show();
+	$(".sidebar-edit").show();
 
 }
-function cancel_sidebar_settings(text_color, background_color) {
+
+function hide_sidebar_settings() {
 	$(".edit-sidebar").show();
-	$(".sidebar-buttons").hide();
+	$(".hidden-sidebar-button").hide();
 	$(".color-picker").hide();
 	$(".edit-banner").hide();
+	$(".sidebar-edit").hide();
+}
+
+
+
+function cancel_sidebar_settings(text_color, background_color) {
+	hide_sidebar_settings();
 
 	$("#sidebar").css('background', background_color);
 	$(".sidebar-text").css('color', text_color);
 }
 function save_sidebar_settings() {
 
+	var formData = new FormData();
+
+	formData.append('text_color', $("#text-color").val());
+	formData.append('background_color', $("#background-color").val());
+
+	if ($("#avatar-upload")[0].files[0]) {
+		formData.append('avatar_file', $("#avatar-upload")[0].files[0]);
+	}
+	if ($("#banner-upload")[0].files[0]) {
+		formData.append('banner_file', $("#banner-upload")[0].files[0]);
+	}
+
 	$("#sidebar-loading").show();
-	$.post(
-		'/users/save_sidebar_settings',
-		{
-			text_color: $("#text-color").val(),
-			background_color: $("#background-color").val()
-		},
-		function(data) {
+	$.ajax({
+		url: '/users/save_sidebar_settings',
+		type: 'POST',
+		data: formData,
+		success: function(data) {
 			if (data.success) {
 				console.log("Success!");
 			}
@@ -229,9 +277,12 @@ function save_sidebar_settings() {
 				console.log("failure :(")
 			}
 			$("#sidebar-loading").hide();
-			cancel_sidebar_settings();
-		}
-	)
+			hide_sidebar_settings();
+		},
+		cache: false,
+		contentType: false,
+		processData: false
+	})
 }
 
 function escapeHtml(string) {

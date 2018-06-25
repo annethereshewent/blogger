@@ -8,20 +8,29 @@
     .sidebar.avatar {
         border: 4px solid <%= @user.background_color ? @user.background_color : '#e6b3ff'; %>;
     }
+    .banner {
+        background-image: url(<%= @user.banner.url(:medium) %>);
+    }
 </style>
-<% if session[:userid] == @user.id %>
-    <button type="button" onclick="edit_sidebar_settings()" class="edit-sidebar btn confirm">Modify Theme</button>
-<% end %>
-<div class="sidebar-buttons">
-    <button type="button" onclick="save_sidebar_settings()" class="btn confirm">Save</button>
-    <button type="button" onclick="cancel_sidebar_settings('<%= @user.text_color %>','<%= @user.background_color %>')" class="btn cancel">Cancel</button>
-</div>
 <div class="banner">
-    <div class="edit-banner">
-
-    </div>
     <img class="sidebar avatar" src="<%= @user.avatar.url(:small) %>">
+    <a href="javascript:void(0)" onclick="open_file_dialog('#avatar-upload')"><img class="sidebar-edit" id="avatar-edit" src="/images/edit_icon.png"></a>
+    <a href="javascript:void(0)" onclick="open_file_dialog('#banner-upload')"><img class="sidebar-edit" id="banner-edit" src="/images/edit_icon.png"></a>
 </div>
+
+
+<div class="sidebar-buttons">
+    <% if session[:userid] == @user.id %>
+        <button type="button" onclick="edit_sidebar_settings()" class="edit-sidebar btn confirm">Modify Theme</button>
+    <% end %>
+    <button type="button" onclick="save_sidebar_settings()" class="btn confirm hidden-sidebar-button">Save</button>
+    <button type="button" onclick="cancel_sidebar_settings('<%= @user.text_color %>','<%= @user.background_color %>')" class="btn cancel hidden-sidebar-button">Cancel</button>
+</div>
+<input type="file" class="sidebar-files" id="avatar-upload">
+<input type="file" class="sidebar-files" id="banner-upload">
+
+
+
 <div class="sidebar-text sidebar-description-area">
     <p class="sidebar-title"><%= @user.blog_title %></p>
     <p class="sidebar-description"><%= @user.description %></p>
@@ -70,12 +79,23 @@
 </div>
 
 <script>
+    //note: most of sidebar code is in main.js because _dash_js was getting unwieldly.
+    //we should get angular at some point???? it would be nice
     $(() => {
         <% if @user.background_color != '' && @user.text_color != '' %>
             $("#background-color").val('<%= @user.background_color %>')
             $("#text-color").val('<%= @user.text_color %>')
         <% end %>
-    })
+
+        $("#avatar-upload").on('change', function() {
+            updateImage("#avatar-upload")
+        });
+
+        $("#banner-upload").on('change', function() {
+            updateImage("#banner-upload");
+        });
+    });
+
     $("#background-color").on('change', function() {
         $("#sidebar").css({
             background: $(this).val()

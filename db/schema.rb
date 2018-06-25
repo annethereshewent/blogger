@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180624041359) do
+ActiveRecord::Schema.define(version: 20180624234425) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,6 +108,10 @@ ActiveRecord::Schema.define(version: 20180624041359) do
     t.integer "theme_id"
     t.string "text_color"
     t.string "background_color"
+    t.string "banner_file_name"
+    t.string "banner_content_type"
+    t.integer "banner_file_size"
+    t.datetime "banner_updated_at"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["displayname"], name: "index_users_on_displayname", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true

@@ -13,6 +13,10 @@ class User < ActiveRecord::Base
 	validates_attachment :avatar,
   		:content_type => { :content_type => ["image/jpeg", "image/gif", "image/png"] }
 
+    has_attached_file :banner, styles: { medium: "600x200" }, default_url: "/images/default_banner.jpg"
+
+    validates_attachment :banner, content_type: { content_type: ["image/jpeg", 'image/gif', "image/png"]}
+
   	belongs_to :theme, optional: true
 
 	has_many :posts
