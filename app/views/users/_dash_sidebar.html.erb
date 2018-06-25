@@ -51,7 +51,7 @@
 <div class="sidebar-main">
     <%= render partial: 'sidebar_posts' %>
 </div>
-
+<img class="sidebar-loading" src="/images/loading.gif">
 <script>
     //since we've already loaded the first page, the current page will be 2
     var current_page = 2;
@@ -73,7 +73,8 @@
 
         $("#sidebar").on('scroll', function() {
             if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
-                load_sidebar_posts(<%= @user.id %>, current_page)
+                console.log(current_page);
+                load_sidebar_posts(current_page)
 
                 current_page++;
             }

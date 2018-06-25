@@ -205,11 +205,11 @@ function open_sidebar(user_id) {
 	
 	current_user = user_id;
 
-	$("#sidebar-loading").show();
+	$(".sidebar-loading").show();
 	$.get(
 		'/users/fetch_sidebar_posts?user_id=' + user_id,
 		function(data) {
-			$("#sidebar-loading").hide();
+			$(".sidebar-loading").hide();
 			if (data != 'false') {
 				$("#sidebar").html(data);
 			}
@@ -265,7 +265,7 @@ function save_sidebar_settings() {
 		formData.append('banner', $("#banner-upload")[0].files[0]);
 	}
 
-	$("#sidebar-loading").show();
+	$(".sidebar-loading").show();
 	$.ajax({
 		url: '/users/save_sidebar_settings',
 		type: 'POST',
@@ -277,7 +277,7 @@ function save_sidebar_settings() {
 			else {
 				console.log("failure :(")
 			}
-			$("#sidebar-loading").hide();
+			$(".sidebar-loading").hide();
 			hide_sidebar_settings();
 		},
 		cache: false,
@@ -335,11 +335,11 @@ function openNewModal(userID) {
 }
 
 function load_sidebar_posts(page) {
-	$("#sidebar-loading").show();
+	$(".sidebar-loading").show();
 	$.get(
 		'/posts/' + page + '/fetch_sidebar_posts',
 		function(data) {
-			$("#sidebar-loading").hide();
+			$(".sidebar-loading").hide();
 			$('.sidebar-main').append(data);
 		}
 	)
