@@ -29,7 +29,7 @@
         .order('posts.id desc')
         .limit(15)
 
-      render partial: 'sidebar_posts'
+      render partial: 'dash_sidebar'
     else
       render plain: "false"
     end

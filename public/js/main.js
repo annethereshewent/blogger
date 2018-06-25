@@ -56,10 +56,7 @@ function updateImage(selector) {
 	var reader = new FileReader();
 
 	reader.onload = function (e) {
-		console.log('image read!!!!');
-		console.log(e.target.result);
 		if (selector == '#avatar-upload') {
-			console.log('hello?');
         	$('.sidebar.avatar').attr('src', e.target.result);	
 		}
 		else {
@@ -246,11 +243,13 @@ function hide_sidebar_settings() {
 
 
 
-function cancel_sidebar_settings(text_color, background_color) {
+function cancel_sidebar_settings(text_color, background_color, avatar, banner) {
 	hide_sidebar_settings();
 
 	$("#sidebar").css('background', background_color);
 	$(".sidebar-text").css('color', text_color);
+	$(".sidebar.avatar").attr('src', avatar);
+	$(".banner").css('background-image', "url(" + banner + ")");
 }
 function save_sidebar_settings() {
 
@@ -333,6 +332,17 @@ function openNewModal(userID) {
 	$("#newPost").attr("action", "/users/" + userID + "/posts");
 	$("#blogSubmit").text("Post");
 	$("#postModal").next().html("New Post");
+}
+
+function load_sidebar_posts(page) {
+	$("#sidebar-loading").show();
+	$.get(
+		'/posts/' + page + '/fetch_sidebar_posts',
+		function(data) {
+			$("#sidebar-loading").hide();
+			$('.sidebar-main').append(data);
+		}
+	)
 }
 
 function getYoutubeVideo(id) {

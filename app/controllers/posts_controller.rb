@@ -56,24 +56,35 @@ class PostsController < ApplicationController
 		end
 	end
 
+	def fetch_sidebar_posts
+		@user = User.find(session[:userid])
+
+		@posts = @user.posts.order('posts.id desc')
+			.includes(:tags)
+			.includes(:images)
+			.paginate(page: params[:page], per_page: 15)
+
+		render partial: '/users/sidebar_posts'
+	end
+
 	def fetch 
 		@post = Post.find(params[:post_id])
 		user = @post.user
 		if @post
 			render json: {
-							status: true,
-							content: @post.post,
-							images: @post.images.map{ |image| image.file.url(:medium) },
-							user: {
-									displayname: user.displayname,
-									id: user.id
-						    },
-							tags: @post.tags.order('post_tags.created_at desc').map { |tag| tag.tag_name }
-				  		 }			
+				status: true,
+				content: @post.post,
+				images: @post.images.map{ |image| image.file.url(:medium) },
+				user: {
+						displayname: user.displayname,
+						id: user.id
+			    },
+				tags: @post.tags.order('post_tags.created_at desc').map { |tag| tag.tag_name }
+	  		}			
 		else
 			render json: {
-							status: false
-			  		  	 }
+				status: false
+	  	 	}
 		end
 	end
 
