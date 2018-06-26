@@ -1,11 +1,13 @@
 <% @posts.each do |post| %>
 	<% tags = post.tags.order('post_tags.created_at') %>
-	<a href="javascript:void(0)" onclick="open_sidebar(<%= post.user.id %>)">
-		<div class="avatar-dash" id="avatar_<%= post.id %>">
+	
+	<div class="avatar-dash" id="avatar_<%= post.id %>">
+		<a class="sidebar-link" href="javascript:void(0)" onclick="open_sidebar(<%= post.user.id %>)">
 			<img class="avatar" src="<%= post.user.avatar.url(:small)%>">
-			<p style="font-size:12px;color:white"><b><%= post.user.displayname %></b></p>
-		</div>
-	</a>
+		</a>
+		<p style="font-size:12px;color:white"><b><%= post.user.displayname %></b></p>
+	</div>
+	
 
 	<div class="dash content" id="post_<%= post.id %>">
 		<p style="font-size:small;"><i>Creation Date: <%= post.created_at.strftime("%m-%d-%y %I:%M %P") %></i></p>

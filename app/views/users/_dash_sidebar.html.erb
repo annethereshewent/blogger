@@ -12,6 +12,7 @@
         background-image: url(<%= @user.banner.url(:medium) %>);
     }
 </style>
+<link rel="stylesheet" href="/stylesheets/spectrum.css">
 <div class="banner">
     <a href="<%= user_posts_path @user.id %>"><img class="sidebar avatar" src="<%= @user.avatar.url(:small) %>"></a>
     <a href="javascript:void(0)" onclick="open_file_dialog('#avatar-upload')"><img class="sidebar-edit" id="avatar-edit" src="/images/edit_icon.png"></a>
@@ -40,11 +41,11 @@
 <div class="color-picker">
     <div class="background-color-picker">
         <label class="sidebar-label">Background Color:</label>
-        <input type="color" id="background-color">
+        <input type="color" name="background-color" id="background-color" value="<%= @user.background_color.present? ? @user.background_color : '#e6b3ff' %>" />
     </div>
     <div class="text-color-picker">
         <label class="sidebar-label">Font Color:</label>
-        <input type="color" id="text-color">
+        <input type="color" name="text-color" id="text-color" value="<%= @user.text_color.present? ? @user.text_color : '#ffffff' %>" />
     </div>
 </div>
 
@@ -52,20 +53,13 @@
     <%= render partial: 'sidebar_posts' %>
 </div>
 <img class="sidebar-loading" src="/images/loading.gif">
+<script src="/js/spectrum.js"></script>
 <script>
     //since we've already loaded the first page, the current page will be 2
     var current_page = 2;
     //note: most of sidebar code is in main.js because _dash_js was getting unwieldly.
     //we should get angular at some point???? it would be nice
     $(() => {
-        <% if @user.background_color.present? && @user.text_color.present? %>
-            $("#background-color").val('<%= @user.background_color %>')
-            $("#text-color").val('<%= @user.text_color %>')
-        <% else %>
-            $("#background-color").val('#e6b3ff');
-            $("#text-color").val('#ffffff')
-        <% end %>
-
         $("#avatar-upload").on('change', function() {
             updateImage("#avatar-upload")
         });
@@ -76,22 +70,66 @@
 
         $("#sidebar").on('scroll', function() {
             if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
-                console.log(current_page);
                 load_sidebar_posts(current_page)
 
                 current_page++;
             }
         });
     });
+    console.log(window.navigator.userAgent);
 
-    $("#background-color").on('change', function() {
-        $("#sidebar").css({
-            background: $(this).val()
+    //only chrome and firefox supports the color picker as of now
+    console.log(window.navigator.userAgent);
+    if (window.navigator.userAgent.indexOf('Chrome') != -1 || window.navigator.userAgent.indexOf('Firefox') != -1) {
+        $("#background-color").on('change', function() {
+            $("#sidebar").css({
+                background: $(this).val()
+            });
         });
-    });
-    $("#text-color").on('change', function() {
-        $(".sidebar-text").css({
-            color: $(this).val()
+        $("#text-color").on('change', function() {
+            $(".sidebar-text").css({
+                color: $(this).val()
+            });
         });
-    });
+    }
+    else {
+        var palette = [
+            ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)", /*"rgb(153, 153, 153)","rgb(183, 183, 183)",*/
+            "rgb(204, 204, 204)", "rgb(217, 217, 217)", /*"rgb(239, 239, 239)", "rgb(243, 243, 243)",*/ "rgb(255, 255, 255)"],
+            ["rgb(152, 0, 0)", "rgb(255, 0, 0)", "rgb(255, 153, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)",
+            "rgb(0, 255, 255)", "rgb(74, 134, 232)", "rgb(0, 0, 255)", "rgb(153, 0, 255)", "rgb(255, 0, 255)"],
+            ["rgb(230, 184, 175)", "rgb(244, 204, 204)", "rgb(252, 229, 205)", "rgb(255, 242, 204)", "rgb(217, 234, 211)",
+            "rgb(208, 224, 227)", "rgb(201, 218, 248)", "rgb(207, 226, 243)", "rgb(217, 210, 233)", "rgb(234, 209, 220)",
+            "rgb(221, 126, 107)", "rgb(234, 153, 153)", "rgb(249, 203, 156)", "rgb(255, 229, 153)", "rgb(182, 215, 168)",
+            "rgb(162, 196, 201)", "rgb(164, 194, 244)", "rgb(159, 197, 232)", "rgb(180, 167, 214)", "rgb(213, 166, 189)",
+            "rgb(204, 65, 37)", "rgb(224, 102, 102)", "rgb(246, 178, 107)", "rgb(255, 217, 102)", "rgb(147, 196, 125)",
+            "rgb(118, 165, 175)", "rgb(109, 158, 235)", "rgb(111, 168, 220)", "rgb(142, 124, 195)", "rgb(194, 123, 160)",
+            "rgb(166, 28, 0)", "rgb(204, 0, 0)", "rgb(230, 145, 56)", "rgb(241, 194, 50)", "rgb(106, 168, 79)",
+            "rgb(69, 129, 142)", "rgb(60, 120, 216)", "rgb(61, 133, 198)", "rgb(103, 78, 167)", "rgb(166, 77, 121)",
+            /*"rgb(133, 32, 12)", "rgb(153, 0, 0)", "rgb(180, 95, 6)", "rgb(191, 144, 0)", "rgb(56, 118, 29)",
+            "rgb(19, 79, 92)", "rgb(17, 85, 204)", "rgb(11, 83, 148)", "rgb(53, 28, 117)", "rgb(116, 27, 71)",*/
+            "rgb(91, 15, 0)", "rgb(102, 0, 0)", "rgb(120, 63, 4)", "rgb(127, 96, 0)", "rgb(39, 78, 19)",
+            "rgb(12, 52, 61)", "rgb(28, 69, 135)", "rgb(7, 55, 99)", "rgb(32, 18, 77)", "rgb(76, 17, 48)"]
+        ];
+
+        $("#background-color").spectrum({
+            showPalette: true,
+            showSelectionPalette: true,
+            maxSelectionSize: 10,
+            move: function(color) {
+                $("#sidebar").css('background', color.toHexString());
+            },
+            palette: palette
+        });
+        $("#text-color").spectrum({
+            showPalette: true,
+            showSelectionPalette: true,
+            maxSelectionSize: 10,
+            move: function(color) {
+                $(".sidebar-text").css('color', color.toHexString());
+            },
+            palette: palette
+        });
+    }
+    
 </script>

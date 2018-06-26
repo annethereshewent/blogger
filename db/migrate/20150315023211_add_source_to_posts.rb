@@ -1,4 +1,4 @@
-class AddSourceToPosts < ActiveRecord::Migration
+class AddSourceToPosts < ActiveRecord::Migration[5.1]
   def change
     add_column :posts, :source, :integer
   end
