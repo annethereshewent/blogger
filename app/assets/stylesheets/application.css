@@ -124,7 +124,7 @@ a.tlink {
     color:#FFFFFF;
 }
 .btn {
-    width:100px;
+    min-width:100px;
     height:25px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
