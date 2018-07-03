@@ -51,23 +51,13 @@ $(function(){
 	});
 });
 
-function updateImage(selector) {
+function updateImage(selector, callback) {
 
 	var reader = new FileReader();
 
-	reader.onload = function (e) {
-		if (selector == '#avatar-upload') {
-        	$('.sidebar.avatar').attr('src', e.target.result);	
-		}
-		else {
-			console.log("changing banner....");
-			$(".banner").css({
-				"background-image": "url(" + e.target.result + ")"
-			});
-		}
-    }
+	reader.onload = callback;
 
-    console.log($(selector));
+	console.log($(selector));
 
 	reader.readAsDataURL($(selector)[0].files[0])
 }

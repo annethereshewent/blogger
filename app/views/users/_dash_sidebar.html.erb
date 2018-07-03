@@ -61,17 +61,24 @@
     //we should get angular at some point???? it would be nice
     $(() => {
         $("#avatar-upload").on('change', function() {
-            updateImage("#avatar-upload")
+            updateImage("#avatar-upload", function(e) {
+                $('.sidebar.avatar').attr('src', e.target.result);  
+            });
         });
 
         $("#banner-upload").on('change', function() {
-            updateImage("#banner-upload");
+            updateImage("#banner-upload", function(e) {
+                console.log("changing banner....");
+                $(".banner").css({
+                    "background-image": "url(" + e.target.result + ")"
+                });
+            });
         });
 
         $("#sidebar").on('scroll', function() {
             if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
                 load_sidebar_posts(current_page)
-
+                //this somehow works.....
                 current_page++;
             }
         });

@@ -219,7 +219,7 @@
 
   def archive
     # params[:user_id] tells you who to get the archive for, initially load the posts for current month
-    unless params[:user_id]
+    unless session[:userid]
       return redirect_to '/users', notice: 'Please log in to continue'
     end
 
