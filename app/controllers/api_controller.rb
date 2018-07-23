@@ -172,7 +172,7 @@ class ApiController < ApplicationController
                 friends = user.friends.where('(sender = ?) or (friendships.accepted = true)', user.id)
 
                 render json: {
-                    success: true,
+                    success: true, 
                     friends: friends.map{ |friend|
                         {
                             user_id: friend.id
