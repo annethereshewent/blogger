@@ -158,6 +158,38 @@ class ApiController < ApplicationController
 
     end
 
+    def fetch_friends
+        unless params[:token]
+            render json: {
+                success: false
+            }
+        else
+            decoded = decode(params[:token])
+
+            if (decoded.is_a?(Hash) && decoded[:user_id])
+                # fetch friends
+                user = User.find(decoded[:user_id])
+                friends = user.friends.where('(sender = ?) or (friendships.accepted = true)', user.id)
+
+                render json: {
+                    success: true,
+                    friends: friends.map{ |friend|
+                        {
+                            user_id: friend.id
+                            username: friend.displayname,
+                            avatar: friend.avatar.url(:small)
+                        }
+                    }
+                } 
+            else
+                render json: {
+                    success: false
+                }
+            end
+
+        end
+    end
+
     def decode(token)
         body = JWT.decode(token, Rails.application.secrets.secret_key_base)[0]
         HashWithIndifferentAccess.new body
