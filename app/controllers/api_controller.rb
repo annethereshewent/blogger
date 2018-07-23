@@ -175,7 +175,7 @@ class ApiController < ApplicationController
                     success: true, 
                     friends: friends.map{ |friend|
                         {
-                            user_id: friend.id
+                            user_id: friend.id,
                             username: friend.displayname,
                             avatar: friend.avatar.url(:small)
                         }
