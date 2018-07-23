@@ -39,6 +39,7 @@ class ApiController < ApplicationController
                     token: encode(user_id: @user.id),
                     user_id: @user.id,
                     username: @user.email,
+                    avatar: @user.avatar.url(:small),
                     posts: formatted_posts
                 }
             else
@@ -67,7 +68,8 @@ class ApiController < ApplicationController
                     success: true,
                     posts: formatted_posts,
                     user_id: user.id,
-                    username: user.email
+                    username: user.email,
+                    avatar: user.avatar.url(:small)
                 }
 
             else
