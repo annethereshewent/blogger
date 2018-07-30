@@ -41,6 +41,7 @@ Rails.application.routes.draw do
   post '/users/save_sidebar_settings' => 'users#save_sidebar_settings'
   get '/users/:user_id/posts/:page/fetch_sidebar_posts' => 'posts#fetch_sidebar_posts'
   get '/api/fetch_friends' => 'api#fetch_friends'
+  get '/api/fetch_comments/:post_id' => 'api#fetch_comments'
 
   resources :users do
     resources :posts do

@@ -96,7 +96,7 @@ class ApiController < ApplicationController
 
                 if @user
                     # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
-                    if Post.create(post: ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br), attributes: ['href', 'src']), user_id: decoded[:user_id])
+                    if Post.create(post: ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src']), user_id: decoded[:user_id])
                         render json: {
                             success: true
                         }
@@ -142,6 +142,7 @@ class ApiController < ApplicationController
         formatted_posts = []
         posts.each_with_index do |post, index|
             formatted_posts[index] = {}
+            formatted_posts[index][:id] = post.id
             formatted_posts[index][:created_at] = post.created_at.strftime("%m-%d-%y %I:%M %P")
             formatted_posts[index][:updated_at] = post.updated_at.strftime("%m-%d-%y %I:%M %P")
             formatted_posts[index][:post] = post.post
@@ -190,6 +191,61 @@ class ApiController < ApplicationController
             end
 
         end
+    end
+
+    def fetch_comments
+        post = Post.find(params[:post_id])
+
+        comments = post.comments.order('comments.parent, comments.id').joins(:user).map{ |comment| 
+           {
+                id: comment.id,
+                comment: comment.comment,
+                parent: comment.parent,
+                username: comment.user.displayname,
+                avatar: comment.user.avatar.url(:small),
+            }
+        }
+
+        commentTree = {}
+
+        comments.each do |comment|
+            if commentTree[comment[:parent]].nil?
+                commentTree[comment[:parent]] = []
+            end
+            commentTree[comment[:parent]] << comment
+
+        end
+
+        # next we need to convert the comment tree into an array of comments, in the order to print them, with a new param: indentLevel, added to each comment
+        comments = searchCommentTree(commentTree, 0, 0)
+
+        render json: {
+            success: true,
+            comments: comments,
+            num_comments: comments.length
+        }
+    end
+
+    def searchCommentTree commentTree, root, indentLevel
+        if commentTree[root].nil?
+            return;
+        end
+
+        comments = []
+
+        commentTree[root].each do |comment|
+            next if comment.nil?
+
+            comment[:indentLevel] = indentLevel
+            comments << comment
+
+
+            newLevel = indentLevel + 1
+            comments.push(*searchCommentTree(commentTree, comment[:id], newLevel))
+        end
+
+        comments
+
     end
 
     def decode(token)
