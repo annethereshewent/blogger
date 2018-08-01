@@ -262,16 +262,20 @@ class ApiController < ApplicationController
         # next we need to convert the comment tree into an array of comments, in the order to print them, with a new param: indentLevel, added to each comment
         comments = searchCommentTree(commentTree, 0, 0)
 
+        if comments.nil? 
+            comments = []
+        end
+
         render json: {
             success: true,
             comments: comments,
-            num_comments: comments.nil? ? 0 : comments.length
+            num_comments: comments.length
         }
     end
 
     def searchCommentTree commentTree, root, indentLevel
         if commentTree[root].nil?
-            return nil;
+            return;
         end
 
         comments = []
