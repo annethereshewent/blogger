@@ -42,6 +42,7 @@ Rails.application.routes.draw do
   get '/users/:user_id/posts/:page/fetch_sidebar_posts' => 'posts#fetch_sidebar_posts'
   get '/api/fetch_friends' => 'api#fetch_friends'
   get '/api/fetch_comments/:post_id' => 'api#fetch_comments'
+  post '/api/post_comment' => 'api#post_comment'
 
   resources :users do
     resources :posts do

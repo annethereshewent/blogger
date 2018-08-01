@@ -61,11 +61,11 @@
 		</div>
 		<div class="content-divider"></div>
 		<div class="content comment-container" id="new-textbox-container">
-			<%= form_for :comment, method: :post, id: 'commentsubm', name: 'commentsubm' do |f| %>
+			<%= form_for :comment, method: :post, html: { id: 'commentsubm', name: 'commentsubm' } do |f| %>
 				<%= f.text_area :comment, class: 'comment-text', id: 'comment', name:'comment', placeholder:"Enter comment here..." %>
 				<input type="hidden" name="pid" value="<%= @post.id %>">
 				<div class="buttonarea" style="margin-top:10px;margin-left:10px">
-					<button type="submit" class="comment-submit btn primary">Post</button>&nbsp;&nbsp;<button type="button" onClick="$('#new-textbox-container').hide()" class="btn cancel">Cancel</button>
+					<button type="button" onclick="submitForm()" class="comment-submit btn primary">Post</button>&nbsp;&nbsp;<button type="button" onClick="$('#new-textbox-container').hide()" class="btn cancel">Cancel</button>
 				</div>
 				<input type="hidden" name="blog" value="<%= @user.id %>">
 			<% end %>
@@ -77,6 +77,7 @@
 			</div>
 		<% end %>
 	</div>
+		<script src="/js/main.js"></script>
 		<script type="text/javascript">
 		$(document).ready(function() {
 			$("#new-textbox-container").hide();
@@ -89,8 +90,16 @@
 		});
 		function submit_reply(comment_id) {
 			$("#authenticity_token_" + comment_id).val($('meta[name="csrf-token"]').attr('content'));
+			$("#comment_reply").val(escapeHtml($("#comment_reply").val()));
+			$("#comment_reply").val($("#comment_reply").val().replace(/\n/g, "<br>"));
 			$("#reply_form_" + comment_id).submit();
 		}
-		</script>
+
+		function submitForm() {
+			$("#comment").val(escapeHtml($("#comment").val()));
+			$("#comment").val($("#comment").val().replace(/\n/g, "<br>"));
+			$("#commentsubm").submit();
+		}
+ 		</script>
 </body>
 </html>

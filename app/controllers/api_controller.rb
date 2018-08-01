@@ -22,6 +22,49 @@ class ApiController < ApplicationController
 
     end
 
+    def post_comment
+        unless params[:token] && params[:comment] && params[:parent] && params[:indentLevel] && params[:pid]
+            render json: {
+                success: false,
+                message: "bad_request"
+            }
+        end
+
+        decoded = decode(params[:token])
+
+        if (decoded.is_a?(Hash) && decoded[:user_id]) 
+            post = Post.find(params[:pid])
+            post.num_comments += 1
+
+            if ((comment = Comment.create(comment: params[:comment], parent: params[:parent], user_id: decoded[:user_id], post_id: params[:pid])) && post.save)
+                comment = {
+                    id: comment.id,
+                    comment: comment.comment,
+                    parent: comment.parent,
+                    username: comment.user.displayname,
+                    avatar: comment.user.avatar.url(:small),
+                    indentLevel: params[:indentLevel].to_i
+                }
+
+                render json: {
+                    success: true,
+                    comment: comment 
+                }
+            else
+                render json: {
+                    success: false,
+                    message: "comment_creation_failed"
+                }
+            end
+        else
+            render json: {
+                success: false,
+                message: "invalid_token"
+            }
+
+        end
+    end
+
     def login
         if (!params[:username] || !params[:password])
             render json: {
