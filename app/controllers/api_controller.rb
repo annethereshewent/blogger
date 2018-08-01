@@ -265,13 +265,13 @@ class ApiController < ApplicationController
         render json: {
             success: true,
             comments: comments,
-            num_comments: comments.length
+            num_comments: comments.nil? ? 0 : comments.length
         }
     end
 
     def searchCommentTree commentTree, root, indentLevel
         if commentTree[root].nil?
-            return;
+            return nil;
         end
 
         comments = []
