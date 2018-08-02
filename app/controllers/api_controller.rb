@@ -105,7 +105,7 @@ class ApiController < ApplicationController
             if (decoded.is_a?(Hash) && decoded[:user_id])
                 # fetch the posts
                 user = User.find(decoded[:user_id])
-                formatted_posts = get_json_posts(user)
+                formatted_posts = params[:page].present? ? get_json_posts(user, nil, params[:page].to_i) : get_json_posts(user)
 
                 render json: {
                     success: true,
@@ -171,13 +171,13 @@ class ApiController < ApplicationController
         JWT.encode(payload, Rails.application.secrets.secret_key_base)
     end
 
-    def get_json_posts user, friends = nil
+    def get_json_posts user, friends = nil, page = 1
 
         friends = user.friends.where('(sender = ?) or (friendships.accepted = true)', user.id) unless friends
 
         posts = Post.where("user_id in (#{ friends.map{ |friend| friend.id }.push(user.id).join(',') })")
-            .limit(15)
             .order('id desc')
+            .paginate(page: page, per_page: 15)
             .includes(:tags)
             .includes(:images)
             .includes(:user)

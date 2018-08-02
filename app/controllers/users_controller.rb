@@ -58,7 +58,8 @@
 
     @friends = User.where("id in (#{params[:friend_ids]})")
     @user =  @friends[ @friends.index { |friend| friend.id == session[:userid] } ]
-    @posts = Post.where("posts.user_id in (#{params[:friend_ids]})").order('posts.id desc')
+    @posts = Post.where("posts.user_id in (#{params[:friend_ids]})")
+            .order('posts.id desc')
             .paginate(page: params[:page], per_page: 15)
             .includes(:tags)
             .includes(:images)
