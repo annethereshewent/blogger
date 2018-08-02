@@ -36,7 +36,10 @@ class ApiController < ApplicationController
             post = Post.find(params[:pid])
             post.num_comments += 1
 
-            if ((comment = Comment.create(comment: params[:comment], parent: params[:parent], user_id: decoded[:user_id], post_id: params[:pid])) && post.save)
+            comment = ActionController::Base.helpers.sanitize(params[:comment], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
+            comment = comment.gsub("\n", "<br>")
+
+            if ((comment = Comment.create(comment: comment, parent: params[:parent], user_id: decoded[:user_id], post_id: params[:pid])) && post.save)
                 comment = {
                     id: comment.id,
                     comment: comment.comment,
