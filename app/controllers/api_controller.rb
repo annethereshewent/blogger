@@ -145,7 +145,7 @@ class ApiController < ApplicationController
 
                 if @user
                     # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
-                    contents = params[:client] == "web" ? params[:post] : ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
+                    contents = params[:client] == "web" && request.headers["origin"] == ENV["ANGULAR_SERVER"] ? params[:post] : ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
                     if post = Post.create(post: contents, user_id: decoded[:user_id])
                         render json: {
                             success: true,
