@@ -117,6 +117,7 @@ GEM
       mimemagic (= 0.3.0)
     pg (1.0.0)
     rack (2.0.5)
+    rack-cors (1.0.2)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (5.1.5)
@@ -221,6 +222,7 @@ DEPENDENCIES
   nokogiri
   paperclip (< 5.0)
   pg
+  rack-cors
   rails (<= 5.1.5)
   rails_12factor
   rails_autolink

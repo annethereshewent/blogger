@@ -55,6 +55,10 @@
   end
 
   def fetch_posts 
+    unless session[:userid]
+      return render plain: "false"
+    end
+
 
     @friends = User.where("id in (#{params[:friend_ids]})")
     @user =  @friends[ @friends.index { |friend| friend.id == session[:userid] } ]
@@ -65,7 +69,8 @@
             .includes(:images)
             .includes(:user)
 
-    render partial: 'dashPosts'
+
+    return render partial: 'dashPosts'
   end
 
   def get_user_id 

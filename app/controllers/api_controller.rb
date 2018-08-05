@@ -23,14 +23,14 @@ class ApiController < ApplicationController
     end
 
     def post_comment
-        unless params[:token] && params[:comment] && params[:parent] && params[:indentLevel] && params[:pid]
+        unless request.headers["Authorization"] && params[:comment] && params[:parent] && params[:indentLevel] && params[:pid]
             render json: {
                 success: false,
                 message: "bad_request"
             }
         end
 
-        decoded = decode(params[:token])
+        decoded = decode(request.headers["Authorization"])
 
         if (decoded.is_a?(Hash) && decoded[:user_id]) 
             post = Post.find(params[:pid])
@@ -98,13 +98,15 @@ class ApiController < ApplicationController
     end
 
     def fetch_posts
-        unless (params[:token] && params[:token].length > 0) 
+        token = request.headers["Authorization"]
+
+        unless (token.present? && token.length > 0) 
             render json: {
                 success: false,
                 message: "bad_request"
             }
         else
-            decoded = decode(params[:token])
+            decoded = decode(request.headers["Authorization"])
             if (decoded.is_a?(Hash) && decoded[:user_id])
                 # fetch the posts
                 user = User.find(decoded[:user_id])
@@ -128,13 +130,14 @@ class ApiController < ApplicationController
     end
     def create_post
         # first we need to verify that the user sending the request is authenticated (check their token)
-        unless (params[:token] && params[:post]) 
+        unless (request.headers["Authorization"] && params[:post]) 
             render json: {
-                success: false
+                success: false,
+                message: "invalid_parameters"
             }
         else
             # check the token
-            decoded = decode(params[:token])
+            decoded = decode(request.headers["Authorization"])
 
             if (decoded.is_a?(Hash) && decoded[:user_id]) 
                 # the token is valid. create a post for this user.
@@ -142,9 +145,22 @@ class ApiController < ApplicationController
 
                 if @user
                     # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
-                    if Post.create(post: ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src']), user_id: decoded[:user_id])
+                    contents = params[:client] == "web" ? params[:post] : ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
+                    if post = Post.create(post: contents, user_id: decoded[:user_id])
                         render json: {
-                            success: true
+                            success: true,
+                            post: {                    
+                                id: post.id,
+                                created_at: post.created_at.strftime("%m-%d-%y %I:%M %P"),
+                                updated_at: post.updated_at.strftime("%m-%d-%y %I:%M %P"),
+                                post: post.post,
+                                edited: post.edited,
+                                num_comments: post.num_comments,
+                                avatar: post.user.avatar.url(:small),
+                                username: post.user.displayname,
+                                user_id: post.user.id,
+                                images: []
+                            }
                         }
                     else
                         render json: {
@@ -196,6 +212,7 @@ class ApiController < ApplicationController
             formatted_posts[index][:num_comments] = post.num_comments
             formatted_posts[index][:avatar] = post.user.avatar.url(:small)
             formatted_posts[index][:username] = post.user.displayname
+            formatted_posts[index][:user_id] = post.user.id
             formatted_posts[index][:images] = []
 
             post.images.each do |image|
@@ -276,6 +293,35 @@ class ApiController < ApplicationController
         }
     end
 
+    def find_user
+        user = User.where('displayname = ?', params[:username])
+
+        if user.count > 0
+            puts "duplicate found"
+            return render json: {
+                duplicate: true
+            }
+        end
+
+        return render json: {
+            duplicate: false
+        }
+    end
+
+    def find_email
+        user = User.find_by_email(params[:email])
+
+        if user
+            return render json: {
+                duplicate: true
+            }
+        end
+
+        return render json: {
+            duplicate: false
+        }
+    end
+
     def searchCommentTree commentTree, root, indentLevel
         if commentTree[root].nil?
             return;
@@ -307,6 +353,6 @@ class ApiController < ApplicationController
 
     private
         def user_params
-            params.permit(:email, :displayname, :password, :blog_title, :description, :avatar, :theme)
+            params.permit(:blog_title, :email, :displayname, :password, :description, :avatar, :theme)
         end
 end

@@ -44,6 +44,8 @@ Rails.application.routes.draw do
   get '/api/fetch_friends' => 'api#fetch_friends'
   get '/api/fetch_comments/:post_id' => 'api#fetch_comments'
   post '/api/post_comment' => 'api#post_comment'
+  post '/api/find_user' => 'api#find_user'
+  post '/api/find_email' => 'api#find_email'
 
   resources :users do
     resources :posts do

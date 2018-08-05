@@ -59,8 +59,8 @@ gem 'pg'
 
 # automatically add hyperlink to urls
 gem 'rails_autolink'
-
-# gem 'mysql2'
+# for cors related issues and new frontend
+gem 'rack-cors'
 
 
 # for dropzone js

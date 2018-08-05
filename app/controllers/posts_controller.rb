@@ -1,5 +1,5 @@
 class PostsController < ApplicationController	
-	protect_from_forgery :except => [:upload_image]
+	protect_from_forgery except: [:upload_image]
 
 	def index
 		page = params[:page].present? ? params[:page].to_i : 1
@@ -112,7 +112,7 @@ class PostsController < ApplicationController
 		})
 
 		render json: {
-			link: image.file.url
+			link: Rails.env.development? ? "http://localhost:3000" + image.file.url : image.file.url
 		}
 	end
 
