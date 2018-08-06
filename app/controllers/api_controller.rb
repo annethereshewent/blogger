@@ -128,6 +128,32 @@ class ApiController < ApplicationController
             end
         end
     end
+
+    def render_hash_post post
+        hash_post = {                    
+            id: post.id,
+            created_at: post.created_at.strftime("%m-%d-%y %I:%M %P"),
+            updated_at: post.updated_at.strftime("%m-%d-%y %I:%M %P"),
+            post: post.post,
+            edited: post.edited,
+            num_comments: post.num_comments,
+            avatar: post.user.avatar.url(:small),
+            username: post.user.displayname,
+            user_id: post.user.id,
+            images: []
+        }
+
+        post.images.each do |image|
+            hash_post[:images].push(image.file.url(:medium))
+        end
+
+        hash_post
+    end
+
+    def sanitize_post
+        params[:client] == "web" && request.headers["origin"] == ENV["ANGULAR_SERVER"] ? params[:post] : ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
+    end
+
     def create_post
         # first we need to verify that the user sending the request is authenticated (check their token)
         unless (request.headers["Authorization"] && params[:post]) 
@@ -145,22 +171,11 @@ class ApiController < ApplicationController
 
                 if @user
                     # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
-                    contents = params[:client] == "web" && request.headers["origin"] == ENV["ANGULAR_SERVER"] ? params[:post] : ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
+                    contents = sanitize_post
                     if post = Post.create(post: contents, user_id: decoded[:user_id])
                         render json: {
                             success: true,
-                            post: {                    
-                                id: post.id,
-                                created_at: post.created_at.strftime("%m-%d-%y %I:%M %P"),
-                                updated_at: post.updated_at.strftime("%m-%d-%y %I:%M %P"),
-                                post: post.post,
-                                edited: post.edited,
-                                num_comments: post.num_comments,
-                                avatar: post.user.avatar.url(:small),
-                                username: post.user.displayname,
-                                user_id: post.user.id,
-                                images: []
-                            }
+                            post: render_hash_post(post)
                         }
                     else
                         render json: {
@@ -182,6 +197,115 @@ class ApiController < ApplicationController
                     message: "invalid_token"
                 }
             end
+        end
+    end
+
+    def upload_image
+        unless request.headers["Authorization"]
+            return render json: {
+                success: false,
+                message: "unauthorized"
+            }
+        end
+
+        decoded = decode(request.headers["Authorization"])
+
+        if decoded.is_a?(Hash) && decoded[:user_id]
+            if post = Post.create(user_id: decoded[:user_id], post: '')
+                if post.images.create(file: params[:file])
+                    render json: {
+                        success: true,
+                        post: render_hash_post(post)
+                    }
+                else
+                    render json: {
+                        success: false,
+                        message: "image_creation_failed"
+                    }
+                end
+            else
+                render json: {
+                    success: false,
+                    message: "post_creation_failed"
+                }
+            end
+        else
+            render json: {
+                success: false,
+                message: "invalid_token"
+            }
+        end
+    end
+
+    def delete_post
+        unless request.headers["Authorization"]
+            return  render json: {
+                success: false,
+                message: "unauthorized"
+            }
+        end
+
+        decoded = decode(request.headers["Authorization"])
+
+
+
+        if decoded.is_a?(Hash) && decoded[:user_id]
+            if Post.destroy(params[:post_id])
+                render json: {
+                    success: true
+                }
+            else
+                render json: {
+                    success: false,
+                    message: "post_deletion_fail"
+                }
+            end
+        else
+            render json: {
+                success: false,
+                message: "invalid_token"
+            }
+        end
+
+    end
+
+    def edit_post
+        unless request.headers["Authorization"]
+            return render json: {
+                success: false,
+                message: "unauthorized"
+            }
+        end
+
+        decoded = decode(request.headers["Authorization"])
+
+        if decoded.is_a?(Hash) && decoded[:user_id]
+            unless params[:post] && params[:id]
+                return render json: {
+                    success: false,
+                    message: "invalid_params"
+                }
+            end
+
+            contents = sanitize_post
+
+            if post = Post.update(params[:id], post: contents, edited: 1)
+                render json: {
+                    success: true,
+                    post: render_hash_post(post)
+                }
+
+            else
+                render json: {
+                    success: false,
+                    message: "post_edit_fail"
+                }
+            end
+        else
+            render json: {
+                success: false,
+                message: "invalid_token"
+            }
         end
     end
 
@@ -225,12 +349,13 @@ class ApiController < ApplicationController
     end
 
     def fetch_friends
-        unless params[:token]
+        unless request.headers["Authorization"]
             render json: {
-                success: false
+                success: false,
+                message: "unauthorized"
             }
         else
-            decoded = decode(params[:token])
+            decoded = decode(request.headers["Authorization"])
 
             if (decoded.is_a?(Hash) && decoded[:user_id])
                 # fetch friends

@@ -49,6 +49,10 @@ class PostsController < ApplicationController
 	end
 	
 	def delete
+		unless session[:userid]
+			return render plain: "false"
+		end
+
 		if Post.destroy(params[:post_id])
 			render plain: "success"
 		else
@@ -106,10 +110,9 @@ class PostsController < ApplicationController
 	def upload_image
 		file = params[:file]
 
-
-		image = Image.create({
+		image = Image.create(
 			file: params[:file]
-		})
+		)
 
 		render json: {
 			link: Rails.env.development? ? "http://localhost:3000" + image.file.url : image.file.url

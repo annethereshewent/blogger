@@ -46,6 +46,9 @@ Rails.application.routes.draw do
   post '/api/post_comment' => 'api#post_comment'
   post '/api/find_user' => 'api#find_user'
   post '/api/find_email' => 'api#find_email'
+  post "/api/delete_post/:post_id" => 'api#delete_post'
+  post '/api/edit_post/:post_id' => 'api#edit_post' 
+  post '/api/upload_image/' => 'api#upload_image'
 
   resources :users do
     resources :posts do
