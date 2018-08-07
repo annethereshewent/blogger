@@ -1,4 +1,5 @@
 class ApiController < ApplicationController
+    include Common
     protect_from_forgery with: :null_session
 
 
@@ -23,23 +24,14 @@ class ApiController < ApplicationController
     end
 
     def post_comment
-        unless request.headers["Authorization"] && params[:comment] && params[:parent] && params[:indentLevel] && params[:pid]
-            render json: {
-                success: false,
-                message: "bad_request"
-            }
-        end
-
-        decoded = decode(request.headers["Authorization"])
-
-        if (decoded.is_a?(Hash) && decoded[:user_id]) 
+        if authorize?
             post = Post.find(params[:pid])
             post.num_comments += 1
 
             comment = ActionController::Base.helpers.sanitize(params[:comment], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
             comment = comment.gsub("\n", "<br>")
 
-            if ((comment = Comment.create(comment: comment, parent: params[:parent], user_id: decoded[:user_id], post_id: params[:pid])) && post.save)
+            if ((comment = Comment.create(comment: comment, parent: params[:parent], user_id: @decoded[:user_id], post_id: params[:pid])) && post.save)
                 comment = {
                     id: comment.id,
                     comment: comment.comment,
@@ -59,12 +51,6 @@ class ApiController < ApplicationController
                     message: "comment_creation_failed"
                 }
             end
-        else
-            render json: {
-                success: false,
-                message: "invalid_token"
-            }
-
         end
     end
 
@@ -98,34 +84,18 @@ class ApiController < ApplicationController
     end
 
     def fetch_posts
-        token = request.headers["Authorization"]
+        if authorize?
+            # fetch the posts
+            user = User.find(@decoded[:user_id])
+            formatted_posts = params[:page].present? ? get_json_posts(user, nil, params[:page].to_i) : get_json_posts(user)
 
-        unless (token.present? && token.length > 0) 
             render json: {
-                success: false,
-                message: "bad_request"
+                success: true,
+                posts: formatted_posts,
+                user_id: user.id,
+                username: user.displayname,
+                avatar: user.avatar.url(:thumb)
             }
-        else
-            decoded = decode(request.headers["Authorization"])
-            if (decoded.is_a?(Hash) && decoded[:user_id])
-                # fetch the posts
-                user = User.find(decoded[:user_id])
-                formatted_posts = params[:page].present? ? get_json_posts(user, nil, params[:page].to_i) : get_json_posts(user)
-
-                render json: {
-                    success: true,
-                    posts: formatted_posts,
-                    user_id: user.id,
-                    username: user.displayname,
-                    avatar: user.avatar.url(:thumb)
-                }
-
-            else
-                render json: {
-                    success: false,
-                    message: "invalid_token"
-                }
-            end
         end
     end
 
@@ -171,7 +141,6 @@ class ApiController < ApplicationController
                 success: "false",
                 message: "unauthorized"
             }
-
             return false
         end
 
