@@ -14,7 +14,7 @@ class PostsController < ApplicationController
 		content = params[:htmlContent].present? ? params[:htmlContent] : params[:youtube_content]
 
 		if @post = Post.create(post: content, user_id: params[:user_id])
-			parse_tags(params[:tags])
+			@post.parse_tags(params[:tags])
 			if params[:source] == 'dashboard' || params[:youtube_content].present?
 				redirect_to user_dashboard_path
 			else
@@ -29,22 +29,11 @@ class PostsController < ApplicationController
 
 	def update
 		if @post = Post.update(params[:id], post: params[:htmlContent], edited: 1)
-			parse_tags(params[:tags])
+			@post.parse_tags(params[:tags])
 			redirect_to user_posts_page_path(params[:user_id], 1)
 		else
 			flash[:notice] = "Unable to update post"
 			redirect_to user_posts_page_path(params[:user_id], 1)
-		end
-	end
-
-	def parse_tags(tags)
-		tags.split(',').each do |tag|
-			if (@tag = Tag.where('tag_name = ? ', tag)).present?
-				PostTag.create(tag_id: @tag[0].id, post_id: @post.id)
-			else
-				@tag = Tag.create(tag_name: tag)
-				PostTag.create(tag_id: @tag.id, post_id: @post.id)
-			end
 		end
 	end
 	
@@ -108,21 +97,23 @@ class PostsController < ApplicationController
 	end
 
 	def upload_image
-		file = params[:file]
+		if [ENV["ANGULAR_SERVER"], ENV["WEB_SERVER"]].include? request.headers["origin"]
+			file = params[:file]
 
-		image = Image.create(
-			file: params[:file]
-		)
+			image = Image.create(
+				file: params[:file]
+			)
 
-		render json: {
-			link: Rails.env.development? ? "http://localhost:3000" + image.file.url : image.file.url
-		}
+			render json: {
+				link: Rails.env.development? ? "http://localhost:3000" + image.file.url : image.file.url
+			}
+		end
 	end
 
 	def upload_images
 		if @post = Post.create(user_id: session[:userid], post: '')
 			if @post.images.create(post_params)
-				parse_tags(params[:tags])
+				@post.parse_tags(params[:tags])
 				if request.xhr?
 					render plain: 'success'
 				else
@@ -138,7 +129,7 @@ class PostsController < ApplicationController
 			end
 		else
 			flash[:notice] = "Unable to save image"
-			redirec_to user_dashboard_path session[:userid]
+			redirect_to user_dashboard_path session[:userid]
 		end
 	end
 

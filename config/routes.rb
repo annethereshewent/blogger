@@ -49,6 +49,7 @@ Rails.application.routes.draw do
   post "/api/delete_post/:post_id" => 'api#delete_post'
   post '/api/edit_post/:post_id' => 'api#edit_post' 
   post '/api/upload_image/' => 'api#upload_image'
+  get '/api/tag_search/:tag_name' => 'api#tag_search'
 
   resources :users do
     resources :posts do

@@ -61,3 +61,4 @@ end
 
 ENV['CHAT_SERVER'] = "http://localhost:3001"
 ENV["ANGULAR_SERVER"] = "http://localhost:4200"
+ENV["WEB_SERVER"] = "http://localhost:3000"

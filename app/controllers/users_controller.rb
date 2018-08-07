@@ -329,15 +329,7 @@
     params[:tag].gsub!('-', ' ')
 
     @user = User.find(session[:userid])
-    @posts = Post.order('posts.id desc')
-              .includes(:tags)
-              .includes(:images)
-              .where('posts.id in (
-                                    select post_tags.post_id
-                                    from post_tags, tags
-                                    where post_tags.tag_id = tags.id and tags.tag_name = ?
-                                  )
-              ', params[:tag])
+    @posts = Post.tagSearch(params[:tag])
 
     render 'dash_search'
   end

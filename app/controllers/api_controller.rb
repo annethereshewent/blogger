@@ -140,7 +140,10 @@ class ApiController < ApplicationController
             avatar: post.user.avatar.url(:small),
             username: post.user.displayname,
             user_id: post.user.id,
-            images: []
+            images: [],
+            tags: post.tags.map{ |tag| 
+                tag.tag_name
+            }
         }
 
         post.images.each do |image|
@@ -150,68 +153,84 @@ class ApiController < ApplicationController
         hash_post
     end
 
+    def tag_search 
+        if authorize? 
+            puts params[:tag]
+            posts = Post.tagSearch(params[:tag_name])
+
+            render json: {
+                success: true,
+                posts: posts.map{ |post| render_hash_post post}
+            }
+        end
+    end
+
+    def authorize? 
+        unless request.headers["Authorization"]
+            render json: {
+                success: "false",
+                message: "unauthorized"
+            }
+
+            return false
+        end
+
+        @decoded = decode(request.headers["Authorization"])
+
+        if @decoded.is_a?(Hash) && @decoded[:user_id]
+            return true
+        end
+        
+        render json: {
+            success: false,
+            message: "invalid token"
+        }
+
+        return false
+    end
+
+
     def sanitize_post
         params[:client] == "web" && request.headers["origin"] == ENV["ANGULAR_SERVER"] ? params[:post] : ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
     end
 
     def create_post
         # first we need to verify that the user sending the request is authenticated (check their token)
-        unless (request.headers["Authorization"] && params[:post]) 
-            render json: {
-                success: false,
-                message: "invalid_parameters"
-            }
-        else
-            # check the token
-            decoded = decode(request.headers["Authorization"])
+        if authorize?
+            # the token is valid. create a post for this user.
+            @user = User.find(@decoded[:user_id])
 
-            if (decoded.is_a?(Hash) && decoded[:user_id]) 
-                # the token is valid. create a post for this user.
-                @user = User.find(decoded[:user_id])
+            if @user
+                # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
+                contents = sanitize_post
 
-                if @user
-                    # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
-                    contents = sanitize_post
-                    if post = Post.create(post: contents, user_id: decoded[:user_id])
-                        render json: {
-                            success: true,
-                            post: render_hash_post(post)
-                        }
-                    else
-                        render json: {
-                            success: false,
-                            message: "post_create_failed"
-                        }
+                if post = Post.create(post: contents, user_id: @decoded[:user_id])
+                    if (params[:tags].present?)
+                        post.parse_tags(params[:tags])
                     end
+
+                    render json: {
+                        success: true,
+                        post: render_hash_post(post)
+                    }
                 else
                     render json: {
                         success: false,
-                        message: "invalid_user"
+                        message: "post_create_failed"
                     }
                 end
-
-                
             else
                 render json: {
                     success: false,
-                    message: "invalid_token"
+                    message: "invalid_user"
                 }
-            end
-        end
+            end 
+        end  
     end
 
     def upload_image
-        unless request.headers["Authorization"]
-            return render json: {
-                success: false,
-                message: "unauthorized"
-            }
-        end
-
-        decoded = decode(request.headers["Authorization"])
-
-        if decoded.is_a?(Hash) && decoded[:user_id]
-            if post = Post.create(user_id: decoded[:user_id], post: '')
+        if authorize?
+            if post = Post.create(user_id: @decoded[:user_id], post: '')
                 if post.images.create(file: params[:file])
                     render json: {
                         success: true,
@@ -229,27 +248,11 @@ class ApiController < ApplicationController
                     message: "post_creation_failed"
                 }
             end
-        else
-            render json: {
-                success: false,
-                message: "invalid_token"
-            }
         end
     end
 
     def delete_post
-        unless request.headers["Authorization"]
-            return  render json: {
-                success: false,
-                message: "unauthorized"
-            }
-        end
-
-        decoded = decode(request.headers["Authorization"])
-
-
-
-        if decoded.is_a?(Hash) && decoded[:user_id]
+        if authorize?
             if Post.destroy(params[:post_id])
                 render json: {
                     success: true
@@ -260,26 +263,11 @@ class ApiController < ApplicationController
                     message: "post_deletion_fail"
                 }
             end
-        else
-            render json: {
-                success: false,
-                message: "invalid_token"
-            }
         end
-
     end
 
     def edit_post
-        unless request.headers["Authorization"]
-            return render json: {
-                success: false,
-                message: "unauthorized"
-            }
-        end
-
-        decoded = decode(request.headers["Authorization"])
-
-        if decoded.is_a?(Hash) && decoded[:user_id]
+        if authorize?
             unless params[:post] && params[:id]
                 return render json: {
                     success: false,
@@ -301,11 +289,6 @@ class ApiController < ApplicationController
                     message: "post_edit_fail"
                 }
             end
-        else
-            render json: {
-                success: false,
-                message: "invalid_token"
-            }
         end
     end
 
@@ -338,6 +321,7 @@ class ApiController < ApplicationController
             formatted_posts[index][:username] = post.user.displayname
             formatted_posts[index][:user_id] = post.user.id
             formatted_posts[index][:images] = []
+            formatted_posts[index][:tags] = post.tags.map{ |tag| tag.tag_name }
 
             post.images.each do |image|
                 formatted_posts[index][:images].push(image.file.url(:medium))
@@ -349,36 +333,23 @@ class ApiController < ApplicationController
     end
 
     def fetch_friends
-        unless request.headers["Authorization"]
+        if authorize?
+            # fetch friends
+            user = User.find(@decoded[:user_id])
+            friends = user.friends.where('(sender = ?) or (friendships.accepted = true)', user.id)
+
             render json: {
-                success: false,
-                message: "unauthorized"
-            }
-        else
-            decoded = decode(request.headers["Authorization"])
-
-            if (decoded.is_a?(Hash) && decoded[:user_id])
-                # fetch friends
-                user = User.find(decoded[:user_id])
-                friends = user.friends.where('(sender = ?) or (friendships.accepted = true)', user.id)
-
-                render json: {
-                    success: true, 
-                    friends: friends.map{ |friend|
-                        {
-                            user_id: friend.id,
-                            username: friend.displayname,
-                            avatar: friend.avatar.url(:small)
-                        }
+                success: true, 
+                friends: friends.map{ |friend|
+                    {
+                        user_id: friend.id,
+                        username: friend.displayname,
+                        avatar: friend.avatar.url(:small)
                     }
-                } 
-            else
-                render json: {
-                    success: false
                 }
-            end
-
+            } 
         end
+
     end
 
     def fetch_comments

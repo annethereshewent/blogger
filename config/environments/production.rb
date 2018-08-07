@@ -105,3 +105,4 @@ end
 
 
 ENV['CHAT_SERVER'] = 'https://blogger243chat.herokuapp.com'
+ENV["WEB_SERVER"] = "https://blogger-243.herokuapp.com"
