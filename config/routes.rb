@@ -50,6 +50,7 @@ Rails.application.routes.draw do
   post '/api/edit_post/:post_id' => 'api#edit_post' 
   post '/api/upload_image/' => 'api#upload_image'
   get '/api/tag_search/:tag_name' => 'api#tag_search'
+  post '/api/verify' => 'api#verify'
 
   resources :users do
     resources :posts do

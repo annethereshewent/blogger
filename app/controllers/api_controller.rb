@@ -9,9 +9,7 @@ class ApiController < ApplicationController
         if (user.save) 
             render json: {
                 success: true,
-                token: encode(user_id: user.id),
-                user_id: user.id,
-                username: user.email,
+                user: render_hash_user(user),
                 posts: []
             }
         else
@@ -68,10 +66,7 @@ class ApiController < ApplicationController
 
                 render json: {
                     success: true,
-                    token: encode(user_id: @user.id),
-                    user_id: @user.id,
-                    username: @user.displayname,
-                    avatar: @user.avatar.url(:thumb),
+                    user: render_hash_user(@user),
                     posts: formatted_posts
                 }
             else
@@ -82,6 +77,35 @@ class ApiController < ApplicationController
             end
         end
     end
+    def verify
+        puts params[:id]
+        @user = User.select('password_digest').find(params[:id])
+        if @user.authenticate(params[:password])
+            render json: {
+                success: true
+            }
+        else
+            render json: {
+                success: false
+            }
+        end
+    end
+
+    def render_hash_user user
+         {
+            user_id: user.id,
+            username: user.displayname,
+            avatar: user.avatar.url(:medium),
+            avatar_small: user.avatar.url(:small),
+            token: encode(user_id: user.id),
+            avatar_thumb: user.avatar.url(:thumb),
+            blog_title: user.blog_title,
+            description: user.description,
+            email: user.email
+
+        }
+    end
+
 
     def fetch_posts
         if authorize?
@@ -92,15 +116,17 @@ class ApiController < ApplicationController
             render json: {
                 success: true,
                 posts: formatted_posts,
-                user_id: user.id,
-                username: user.displayname,
-                avatar: user.avatar.url(:thumb)
+                user: {
+                    user_id: user.id,
+                    username: user.displayname,
+                    avatar_thumb: user.avatar.url(:thumb)
+                }
             }
         end
     end
 
     def render_hash_post post
-        hash_post = {                    
+        {                    
             id: post.id,
             created_at: post.created_at.strftime("%m-%d-%y %I:%M %P"),
             updated_at: post.updated_at.strftime("%m-%d-%y %I:%M %P"),
@@ -110,17 +136,11 @@ class ApiController < ApplicationController
             avatar: post.user.avatar.url(:small),
             username: post.user.displayname,
             user_id: post.user.id,
-            images: [],
+            images: post.images.map { |image| image.file.url(:medium) } ,
             tags: post.tags.map{ |tag| 
                 tag.tag_name
             }
         }
-
-        post.images.each do |image|
-            hash_post[:images].push(image.file.url(:medium))
-        end
-
-        hash_post
     end
 
     def tag_search 
@@ -247,6 +267,12 @@ class ApiController < ApplicationController
             contents = sanitize_post
 
             if post = Post.update(params[:id], post: contents, edited: 1)
+                if params[:tags]
+                    post.parse_tags(params[:tags])
+                end
+
+                post = Post.find(params[:id])
+
                 render json: {
                     success: true,
                     post: render_hash_post(post)
@@ -318,7 +344,6 @@ class ApiController < ApplicationController
                 }
             } 
         end
-
     end
 
     def fetch_comments

@@ -107,6 +107,10 @@ class PostsController < ApplicationController
 			render json: {
 				link: Rails.env.development? ? "http://localhost:3000" + image.file.url : image.file.url
 			}
+		else 
+			render json: {
+				success: false
+			}
 		end
 	end
 
