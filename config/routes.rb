@@ -51,6 +51,7 @@ Rails.application.routes.draw do
   post '/api/upload_image/' => 'api#upload_image'
   get '/api/tag_search/:tag_name' => 'api#tag_search'
   post '/api/verify' => 'api#verify'
+  post '/api/update_user' => 'api#update_user'
 
   resources :users do
     resources :posts do

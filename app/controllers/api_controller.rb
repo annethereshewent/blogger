@@ -21,6 +21,22 @@ class ApiController < ApplicationController
 
     end
 
+    def update_user 
+        if authorize?
+            if user = User.update(params[:id], user_params)
+                render json: {
+                    success: true,
+                    user: render_hash_user(user)
+                }
+            else
+                render json: {
+                    success: false,
+                    message: "user_update_fail"
+                }
+            end
+        end
+    end
+
     def post_comment
         if authorize?
             post = Post.find(params[:pid])
@@ -158,7 +174,7 @@ class ApiController < ApplicationController
     def authorize? 
         unless request.headers["Authorization"]
             render json: {
-                success: "false",
+                success: false,
                 message: "unauthorized"
             }
             return false
