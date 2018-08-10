@@ -52,6 +52,7 @@ Rails.application.routes.draw do
   get '/api/tag_search/:tag_name' => 'api#tag_search'
   post '/api/verify' => 'api#verify'
   post '/api/update_user' => 'api#update_user'
+  post '/api/switch_theme' => 'api#switch_theme'
 
   resources :users do
     resources :posts do

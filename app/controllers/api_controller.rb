@@ -93,6 +93,31 @@ class ApiController < ApplicationController
             end
         end
     end
+
+    def switch_theme 
+        if authorize?
+            unless params[:theme_id]
+                return render json: {
+                    success: false,
+                    message: "bad_request"
+                }
+            end
+
+            if User.update(@decoded[:user_id], theme_id: params[:theme_id])
+                render json: {
+                    success: true
+                }
+            else
+                render json: {
+                    success: false,
+                    message: "theme_update_fail"
+                }
+            end
+
+        end
+
+    end
+
     def verify
         puts params[:id]
         @user = User.select('password_digest').find(params[:id])
@@ -117,7 +142,8 @@ class ApiController < ApplicationController
             avatar_thumb: user.avatar.url(:thumb),
             blog_title: user.blog_title,
             description: user.description,
-            email: user.email
+            email: user.email,
+            theme: user.theme.theme_name
 
         }
     end
@@ -188,7 +214,7 @@ class ApiController < ApplicationController
         
         render json: {
             success: false,
-            message: "invalid token"
+            message: "invalid_token"
         }
 
         return false
@@ -403,7 +429,6 @@ class ApiController < ApplicationController
         user = User.where('displayname = ?', params[:username])
 
         if user.count > 0
-            puts "duplicate found"
             return render json: {
                 duplicate: true
             }
