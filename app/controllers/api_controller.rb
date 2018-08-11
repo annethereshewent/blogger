@@ -197,6 +197,35 @@ class ApiController < ApplicationController
         end
     end
 
+    def fetch_blog_posts
+        unless params[:username]
+            return render json: {
+                success: false,
+                message: "bad_request"
+            }
+        end
+
+        page = params[:page].present? ? params[:page] : 1
+
+        user = User.where('displayname = ?', params[:username])[0]
+
+        if user
+            posts = user.fetch_blog_posts(page)
+
+            render json: {
+                success: true,
+                user: render_hash_user(user),
+                posts: posts.map{ |post| render_hash_post(post) }
+            }
+        else
+            render json: {
+                success: false,
+                message: "user_not_found"
+            }
+        end
+
+    end
+
     def authorize? 
         unless request.headers["Authorization"]
             render json: {

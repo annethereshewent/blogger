@@ -53,6 +53,8 @@ Rails.application.routes.draw do
   post '/api/verify' => 'api#verify'
   post '/api/update_user' => 'api#update_user'
   post '/api/switch_theme' => 'api#switch_theme'
+  get '/api/fetch_blog_posts/:username' => 'api#fetch_blog_posts'
+  get '/api/fetch_blog_posts/:username/:page' => 'api#fetch_blog_posts'
 
   resources :users do
     resources :posts do

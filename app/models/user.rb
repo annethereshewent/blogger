@@ -29,4 +29,7 @@ class User < ActiveRecord::Base
 		false
 	end
 
+    def fetch_blog_posts page
+        self.posts.order('posts.id desc').includes(:tags).includes(:images).paginate(page: page, per_page: 15)
+    end
 end
