@@ -39,6 +39,13 @@ class ApiController < ApplicationController
 
     def post_comment
         if authorize?
+            unless params[:indentLevel] && params[:comment] && params[:pid] && params[:parent]
+                return render json: {
+                    success: false,
+                    message: "bad_request"
+                }
+            end
+
             post = Post.find(params[:pid])
             post.num_comments += 1
 
@@ -46,18 +53,12 @@ class ApiController < ApplicationController
             comment = comment.gsub("\n", "<br>")
 
             if ((comment = Comment.create(comment: comment, parent: params[:parent], user_id: @decoded[:user_id], post_id: params[:pid])) && post.save)
-                comment = {
-                    id: comment.id,
-                    comment: comment.comment,
-                    parent: comment.parent,
-                    username: comment.user.displayname,
-                    avatar: comment.user.avatar.url(:small),
-                    indentLevel: params[:indentLevel].to_i
-                }
+                comment = render_hash_comment(comment)
+                comment[:indentLevel] = params[:indentLevel].to_i
 
                 render json: {
                     success: true,
-                    comment: comment 
+                    comment:  comment
                 }
             else
                 render json: {
@@ -185,6 +186,19 @@ class ApiController < ApplicationController
         }
     end
 
+    def render_hash_comment comment 
+        {
+            id: comment.id,
+            comment: comment.comment,
+            parent: comment.parent,
+            username: comment.user.displayname,
+            avatar: comment.user.avatar.url(:small),
+            avatar_thumb: comment.user.avatar.url(:thumb),
+            created_at: comment.created_at.strftime("%m-%d-%y %I:%M %P"),
+            updated_at: comment.updated_at.strftime("%m-%d-%y %I:%M %P")
+        }
+    end
+
     def tag_search 
         if authorize? 
             puts params[:tag]
@@ -212,11 +226,18 @@ class ApiController < ApplicationController
         if user
             posts = user.fetch_blog_posts(page)
 
-            render json: {
+            json_object = {
                 success: true,
+                posts: posts.map { |post| render_hash_post(post) },
                 user: render_hash_user(user),
-                posts: posts.map{ |post| render_hash_post(post) }
+                pagination: {
+                    next_page: posts.next_page,
+                    page: page,
+                    prev_page: posts.previous_page
+                }
             }
+
+            render json: json_object
         else
             render json: {
                 success: false,
@@ -421,13 +442,7 @@ class ApiController < ApplicationController
         post = Post.find(params[:post_id])
 
         comments = post.comments.order('comments.parent, comments.id').joins(:user).map{ |comment| 
-           {
-                id: comment.id,
-                comment: comment.comment,
-                parent: comment.parent,
-                username: comment.user.displayname,
-                avatar: comment.user.avatar.url(:small),
-            }
+           render_hash_comment(comment)
         }
 
         commentTree = {}
@@ -447,11 +462,19 @@ class ApiController < ApplicationController
             comments = []
         end
 
-        render json: {
+        response = {
             success: true,
+            post: render_hash_post(post),
             comments: comments,
             num_comments: comments.length
         }
+
+        if params[:username].present?
+            user = User.where('displayname = ?', params[:username])[0]
+            response[:user] = render_hash_user(user)
+        end
+
+        render json: response
     end
 
     def find_user
