@@ -143,7 +143,7 @@ class ApiController < ApplicationController
             blog_title: user.blog_title,
             description: user.description,
             email: user.email,
-            theme: user.theme.theme_name
+            theme: user.theme.present? ? user.theme.theme_name : 'default'
 
         }
     end
