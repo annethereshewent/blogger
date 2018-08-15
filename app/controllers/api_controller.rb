@@ -21,6 +21,33 @@ class ApiController < ApplicationController
 
     end
 
+    def is_friends
+        if authorize?
+            user = User.find(@decoded[:user_id])
+            puts @decoded[:user_id]
+            if user.present?
+                friends = user.friends.where('friendships.accepted = true and users.displayname = ?', params[:friend])
+
+                if friends.present?
+                    render json: {
+                        success: true,
+                        is_friend: true
+                    }
+                else
+                    render json: {
+                        success: true,
+                        is_friend: false
+                    }
+                end
+            else
+                render json: {
+                    success: false,
+                    message: "user_not_found"
+                }
+            end
+        end
+    end
+
     def update_user 
         if authorize?
             if user = User.update(params[:id], user_params)

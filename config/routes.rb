@@ -55,6 +55,7 @@ Rails.application.routes.draw do
   post '/api/switch_theme' => 'api#switch_theme'
   get '/api/fetch_blog_posts/:username' => 'api#fetch_blog_posts'
   get '/api/fetch_blog_posts/:username/:page' => 'api#fetch_blog_posts'
+  get '/api/is_friends/:friend' => 'api#is_friends'
 
   resources :users do
     resources :posts do

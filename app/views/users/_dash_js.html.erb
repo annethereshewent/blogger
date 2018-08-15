@@ -256,7 +256,8 @@
 	function sendUserInfo() {
 		socket.emit('user-list', {
 			username: "<%= @user.displayname %>",
-			avatar: "<%= @user.avatar.url(:thumb) %>"
+			avatar: "<%= @user.avatar.url(:thumb) %>",
+			user_id: <%= @user.id %>
 		});
 	}
 	function logIn() {
@@ -294,15 +295,24 @@
 		//send request for chat logs
 		console.log("sending request for logs...");
 
-		get_user_id(username, function(to_id) {
-			console.log('sending history request. toid = ' + to_id)
-			socket.emit('history_request', {
-				to: username,
-				toid: to_id,
-				from: '<%= @user.displayname %>',
-				fromid: <%= @user.id %>,
-			})
+		var user = users[userIndex(username)];
 
+		// get_user_id(username, function(to_id) {
+		// 	console.log('sending history request. toid = ' + to_id)
+		// 	socket.emit('history_request', {
+		// 		to: username,
+		// 		toid: to_id,
+		// 		from: '<%= @user.displayname %>',
+		// 		fromid: <%= @user.id %>,
+		// 	})
+
+		// })
+
+		socket.emit('history_request', {
+			to: user.username,
+			toid: user.user_id,
+			from: '<%= @user.displayname %>',
+			fromid: <%= @user.id %>
 		})
 		
 		//if the box exists already do nothing
@@ -355,17 +365,33 @@
 				extension = extension[extension.length-1];
 
 
-				get_user_id(username, function(to_id) {
+				// get_user_id(username, function(to_id) {
+				// 	socket.emit('message', {
+				// 		from: "<%= @user.displayname %>",
+				// 		fromid: <%= @user.id %>,
+				// 		to: username,
+				// 		toid: parseInt(to_id),
+				// 		content: e.target.result,
+				// 		type: 'image',
+				// 		extension: extension
+				// 	});
+				// })
+
+				var user = users[userIndex(username)];
+
+				if (user) {
 					socket.emit('message', {
 						from: "<%= @user.displayname %>",
 						fromid: <%= @user.id %>,
-						to: username,
-						toid: parseInt(to_id),
+						to: user.username,
+						toid: user.user_id,
 						content: e.target.result,
 						type: 'image',
 						extension: extension
-					});
-				})
+					});	
+				}
+
+				
 				
 			};
 
@@ -420,31 +446,40 @@
 				audio.play();
 
 				console.log($("#chat-text-" + username).val());
-				get_user_id(username, function(to_id) {
+				// get_user_id(username, function(to_id) {
+				// 	socket.emit('message', {
+				// 		from: "<%= @user.displayname %>",
+				// 		fromid: <%= @user.id %>,
+				// 		to: username,
+				// 		toid: parseInt(to_id),
+				// 		content: contents,
+				// 		type: 'text'
+				// 	});
+				// 	//console.log($("#pm-" + username)[0].scrollHeight);
+
+					
+					
+						
+				// });
+				var user = users[userIndex(username)];
+
+				if (user) {
 					socket.emit('message', {
 						from: "<%= @user.displayname %>",
 						fromid: <%= @user.id %>,
-						to: username,
-						toid: parseInt(to_id),
+						to: user.username,
+						toid: user.user_id,
 						content: contents,
 						type: 'text'
 					});
-					//console.log($("#pm-" + username)[0].scrollHeight);
 
-					
 					$("#pm-" + username).append('<label class="message-label-self"><%= @user.displayname %></label><li class="message-self">' + contents + "</li>" );
 					$("#chat-text-" + username).val("");
 
 					console.log('passing ' + username + ' to scroll_to_bottom');
-					chat_scroll_to_bottom(username);
-						
-				});
-
-				
+					chat_scroll_to_bottom(username);	
+				}				
 			}
-
-
-
 		});
 	}
 
