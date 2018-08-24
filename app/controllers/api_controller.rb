@@ -532,6 +532,18 @@ class ApiController < ApplicationController
         }
     end
 
+    def search
+        if authorize?
+            post_search(params[:search_term])
+
+            render json: {
+                success: true,
+                posts: @posts.map{ |post| render_hash_post(post) }
+            }
+
+        end
+    end
+
     def searchCommentTree commentTree, root, indentLevel
         if commentTree[root].nil?
             return;

@@ -1,4 +1,6 @@
  class UsersController < ApplicationController
+  include Common
+  
   def login
     if session[:userid]
       redirect_to user_dashboard_path 
@@ -111,16 +113,7 @@
   def search
     @user = User.find(session[:userid])
 
-    search_params = params[:search].split(' ').map{ |token| "%#{token}%" }.join('')
-
-
-
-    @posts = Post.where('post LIKE ? or id in (
-        select post_tags.post_id
-        from post_tags, tags
-        where post_tags.tag_id = tags.id and tags.tag_name LIKE ? 
-      )', 
-      search_params, search_params).order('id desc')
+    post_search(params[:search])
 
     render 'dash_search'
   end
