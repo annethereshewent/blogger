@@ -263,7 +263,8 @@
 	function logIn() {
 		socket.emit('login', {
 			username: "<%= @user.displayname %>",
-			avatar: "<%= @user.avatar.url(:thumb) %>"
+			avatar: "<%= @user.avatar.url(:thumb) %>",
+			user_id: <%= @user.id %>
 		});
 	}
 
