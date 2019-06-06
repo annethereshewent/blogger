@@ -2,70 +2,59 @@ class ApiController < ApplicationController
     include Common
     protect_from_forgery with: :null_session
 
+    before_action :doorkeeper_authorize!, :current_resource_owner
 
-    def register
-        user = User.new(user_params)
+    def is_friends
+        if @user.present?
+            friends = @user.friends.where('friendships.accepted = true and users.displayname = ?', params[:friend])
 
-        if (user.save) 
-            render json: {
-                success: true,
-                user: render_hash_user(user),
-                posts: []
-            }
-        else
-            render json: {
-                success: false,
-                message: "registration_failed"
-            }
+            if friends.present?
+                render json: {
+                    success: true,
+                    is_friend: true
+                }
+            else
+                render json: {
+                    success: true,
+                    is_friend: false
+                }
+            end
         end
 
     end
 
-    def is_friends
-        if authorize?
-            user = User.find(@decoded[:user_id])
-            puts @decoded[:user_id]
-            if user.present?
-                friends = user.friends.where('friendships.accepted = true and users.displayname = ?', params[:friend])
-
-                if friends.present?
-                    render json: {
-                        success: true,
-                        is_friend: true
-                    }
-                else
-                    render json: {
-                        success: true,
-                        is_friend: false
-                    }
-                end
-            else
-                render json: {
-                    success: false,
-                    message: "user_not_found"
-                }
-            end
+    def current_resource_owner
+        if doorkeeper_token
+            @user = User.find(doorkeeper_token.resource_owner_id) 
+        else
+            render json: {
+                success: false,
+                message: "user not found"
+            }
         end
     end
 
     def update_user 
-        if authorize?
-            if user = User.update(params[:id], user_params)
-                render json: {
-                    success: true,
-                    user: render_hash_user(user)
-                }
-            else
-                render json: {
-                    success: false,
-                    message: "user_update_fail"
-                }
-            end
+        if @user.present? and @user.update(user_params)
+            render json: {
+                success: true,
+                user: render_hash_user(@user)
+            }
+        else
+            render json: {
+                success: false,
+                message: "user_update_fail"
+            }
         end
+
     end
 
     def post_comment
-        if authorize?
+        if @user.present?
+            return render json: {
+                success: true
+            }
+
             unless params[:indentLevel] && params[:comment] && params[:pid] && params[:parent]
                 return render json: {
                     success: false,
@@ -79,7 +68,7 @@ class ApiController < ApplicationController
             comment = ActionController::Base.helpers.sanitize(params[:comment], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
             comment = comment.gsub("\n", "<br>")
 
-            if ((comment = Comment.create(comment: comment, parent: params[:parent], user_id: @decoded[:user_id], post_id: params[:pid])) && post.save)
+            if ((comment = Comment.create(comment: comment, parent: params[:parent], user_id: @user.id, post_id: params[:pid])) && post.save)
                 comment = render_hash_comment(comment)
                 comment[:indentLevel] = params[:indentLevel].to_i
 
@@ -96,34 +85,21 @@ class ApiController < ApplicationController
         end
     end
 
-    def login
-        if (!params[:username] || !params[:password])
-            render json: {
-                success: false,
-                message: "bad_request"
-            }
-        else
-            @user = User.find_by_email(params[:username])
-            if @user and @user.authenticate(params[:password])
-                @friends = @user.friends.where('(sender = ?) or (friendships.accepted = true)', @user.id) 
-                formatted_posts = get_json_posts(@user, @friends)
+    def fetch_user 
+        if @user.present?
+            friends = @user.friends.where('(sender = ?) or (friendships.accepted = true)', @user.id)
+            formatted_posts = get_json_posts(@user, friends)
 
-                render json: {
-                    success: true,
-                    user: render_hash_user(@user),
-                    posts: formatted_posts
-                }
-            else
-                render json: {
-                    success: false,
-                    message: "login_failed"
-                }
-            end
+            render json: {
+                success: true,
+                user: render_hash_user(@user),
+                posts: formatted_posts
+            }
         end
     end
 
     def switch_theme 
-        if authorize?
+        if @user.present?
             unless params[:theme_id]
                 return render json: {
                     success: false,
@@ -143,13 +119,12 @@ class ApiController < ApplicationController
             end
 
         end
-
     end
 
+    # leave this for now but we can remove it later and use the oauth route instead
     def verify
-        puts params[:id]
-        @user = User.select('password_digest').find(params[:id])
-        if @user.authenticate(params[:password])
+        user = User.select('password_digest').find(params[:id])
+        if user.authenticate(params[:password])
             render json: {
                 success: true
             }
@@ -166,7 +141,6 @@ class ApiController < ApplicationController
             username: user.displayname,
             avatar: user.avatar.url(:medium),
             avatar_small: user.avatar.url(:small),
-            token: encode(user_id: user.id),
             avatar_thumb: user.avatar.url(:thumb),
             blog_title: user.blog_title,
             description: user.description,
@@ -178,18 +152,16 @@ class ApiController < ApplicationController
 
 
     def fetch_posts
-        if authorize?
-            # fetch the posts
-            user = User.find(@decoded[:user_id])
-            formatted_posts = params[:page].present? ? get_json_posts(user, nil, params[:page].to_i) : get_json_posts(user)
+        if @user.present?
+            formatted_posts = params[:page].present? ? get_json_posts(@user, nil, params[:page].to_i) : get_json_posts(@user)
 
             render json: {
                 success: true,
                 posts: formatted_posts,
                 user: {
-                    user_id: user.id,
-                    username: user.displayname,
-                    avatar_thumb: user.avatar.url(:thumb)
+                    user_id: @user.id,
+                    username: @user.displayname,
+                    avatar_thumb: @user.avatar.url(:thumb)
                 }
             }
         end
@@ -227,8 +199,7 @@ class ApiController < ApplicationController
     end
 
     def tag_search 
-        if authorize? 
-            puts params[:tag]
+        if @user.present? 
             posts = Post.tagSearch(params[:tag_name])
 
             render json: {
@@ -274,71 +245,39 @@ class ApiController < ApplicationController
 
     end
 
-    def authorize? 
-        unless request.headers["Authorization"]
-            render json: {
-                success: false,
-                message: "unauthorized"
-            }
-            return false
-        end
-
-        @decoded = decode(request.headers["Authorization"])
-
-        if @decoded.is_a?(Hash) && @decoded[:user_id]
-            return true
-        end
-        
-        render json: {
-            success: false,
-            message: "invalid_token"
-        }
-
-        return false
-    end
-
-
     def sanitize_post
         params[:client] == "web" && request.headers["origin"] == ENV["ANGULAR_SERVER"] ? params[:post] : ActionController::Base.helpers.sanitize(params[:post], tags:  %w(b a i ol ul img li h1 h2 h3, br p), attributes: ['href', 'src'])
     end
 
     def create_post
         # first we need to verify that the user sending the request is authenticated (check their token)
-        if authorize?
+        if @user.present?
             # the token is valid. create a post for this user.
-            @user = User.find(@decoded[:user_id])
+            # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
+            contents = sanitize_post
 
-            if @user
-                # we need to sanitize the html first since this is coming from a mobile app, not from the rails app
-                contents = sanitize_post
-
-                if post = Post.create(post: contents, user_id: @decoded[:user_id])
-                    if (params[:tags].present?)
-                        post.parse_tags(params[:tags])
-                    end
-
-                    render json: {
-                        success: true,
-                        post: render_hash_post(post)
-                    }
-                else
-                    render json: {
-                        success: false,
-                        message: "post_create_failed"
-                    }
+            if post = @user.posts.create(post: contents)
+                if (params[:tags].present?)
+                    post.parse_tags(params[:tags])
                 end
+
+                render json: {
+                    success: true,
+                    post: render_hash_post(post)
+                }
             else
                 render json: {
                     success: false,
-                    message: "invalid_user"
+                    message: "post_create_failed"
                 }
-            end 
+            end
+
         end  
     end
 
     def upload_image
-        if authorize?
-            if post = Post.create(user_id: @decoded[:user_id], post: '')
+        if @user.present?
+            if post = @user.posts.create(post: '')
                 if post.images.create(file: params[:file])
                     render json: {
                         success: true,
@@ -360,7 +299,7 @@ class ApiController < ApplicationController
     end
 
     def delete_post
-        if authorize?
+        if @user.present?
             if Post.destroy(params[:post_id])
                 render json: {
                     success: true
@@ -375,7 +314,7 @@ class ApiController < ApplicationController
     end
 
     def edit_post
-        if authorize?
+        if @user.present?
             unless params[:post] && params[:id]
                 return render json: {
                     success: false,
@@ -406,10 +345,10 @@ class ApiController < ApplicationController
         end
     end
 
-    def encode(payload, exp = 24.hours.from_now)
-        payload[:exp] = exp.to_i
-        JWT.encode(payload, Rails.application.secrets.secret_key_base)
-    end
+    # def encode(payload, exp = 24.hours.from_now)
+    #     payload[:exp] = exp.to_i
+    #     JWT.encode(payload, Rails.application.secrets.secret_key_base)
+    # end
 
     def get_json_posts user, friends = nil, page = 1
 
@@ -447,10 +386,9 @@ class ApiController < ApplicationController
     end
 
     def fetch_friends
-        if authorize?
+        if @user.present?
             # fetch friends
-            user = User.find(@decoded[:user_id])
-            friends = user.friends.where('(sender = ?) or (friendships.accepted = true)', user.id)
+            friends = @user.friends.where('(sender = ?) or (friendships.accepted = true)', @user.id)
 
             render json: {
                 success: true, 
@@ -533,7 +471,7 @@ class ApiController < ApplicationController
     end
 
     def search
-        if authorize?
+        if @user.present?
             post_search(params[:search_term])
 
             render json: {
@@ -566,12 +504,12 @@ class ApiController < ApplicationController
 
     end
 
-    def decode(token)
-        body = JWT.decode(token, Rails.application.secrets.secret_key_base)[0]
-        HashWithIndifferentAccess.new body
-    rescue
-        nil
-    end
+    # def decode(token)
+    #     body = JWT.decode(token, Rails.application.secrets.secret_key_base)[0]
+    #     HashWithIndifferentAccess.new body
+    # rescue
+    #     nil
+    # end
 
     private
         def user_params

@@ -1,8 +1,14 @@
 Rails.application.routes.draw do
 
+  use_doorkeeper do 
+    skip_controllers :application, :comments, :posts, :users
+  end
+  
   devise_for :users, controllers: {
     confirmations: 'users/confirmations'
   }
+
+
 
   get '/users/checkLogin'
   get '/users' => 'users#login'
@@ -37,7 +43,7 @@ Rails.application.routes.draw do
   post '/api/create_post' => 'api#create_post'
   get '/api/fetch_posts' => 'api#fetch_posts'
   get '/api/fetch_posts/:page' => 'api#fetch_posts'
-  post '/api/register' => 'api#register'
+  post '/api/register' => 'api_registration#register'
   get '/users/fetch_sidebar_posts' => 'users#fetch_sidebar_posts'
   post '/users/save_sidebar_settings' => 'users#save_sidebar_settings'
   get '/users/:user_id/posts/:page/fetch_sidebar_posts' => 'posts#fetch_sidebar_posts'
@@ -57,6 +63,7 @@ Rails.application.routes.draw do
   get '/api/fetch_blog_posts/:username/:page' => 'api#fetch_blog_posts'
   get '/api/is_friends/:friend' => 'api#is_friends'
   get '/api/search/:search_term' => 'api#search'
+  get '/api/fetch_user' => 'api#fetch_user'
 
   resources :users do
     resources :posts do
