@@ -89,6 +89,15 @@ Rails.application.configure do
     }
   }
 
+Rails.application.config.middleware.insert_before 0, Rack::Cors do
+  allow do
+    origins 'blogger-frontend.herokuapp.com'
+    resource '*',
+      headers: :any,
+      methods: %i(get post put patch delete options head)
+  end
+end
+
   # Configure the mailer
   config.action_mailer.default_url_options = { host: 'blogger-243.heroku.com' }
 
