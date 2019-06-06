@@ -21,7 +21,7 @@ class Post < ActiveRecord::Base
       tags = tags.split(',')
     end
 
-    puts tags
+    self.tags.destroy_all
 
     tags.each do |tag|
       if (@tag = Tag.where('tag_name = ? ', tag)).present?
@@ -38,10 +38,10 @@ class Post < ActiveRecord::Base
       .includes(:tags)
       .includes(:images)
       .where('posts.id in (
-                            select post_tags.post_id
-                            from post_tags, tags
-                            where post_tags.tag_id = tags.id and tags.tag_name = ?
-                          )
+          select post_tags.post_id
+          from post_tags, tags
+          where post_tags.tag_id = tags.id and tags.tag_name = ?
+        )
       ', tag)
 
     posts
