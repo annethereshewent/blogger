@@ -51,10 +51,6 @@ class ApiController < ApplicationController
 
     def post_comment
         if @user.present?
-            return render json: {
-                success: true
-            }
-
             unless params[:indentLevel] && params[:comment] && params[:pid] && params[:parent]
                 return render json: {
                     success: false,
