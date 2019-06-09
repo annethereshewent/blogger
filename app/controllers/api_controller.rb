@@ -1,5 +1,6 @@
 class ApiController < ApplicationController
     include Common
+    # yes, this is normally used in views but this is an api controller and i need it to linkify posts
     include ActionView::Helpers::TextHelper
 
     protect_from_forgery with: :null_session
@@ -184,7 +185,7 @@ class ApiController < ApplicationController
                 }
             end
 
-            if User.update(@decoded[:user_id], theme_id: params[:theme_id])
+            if @user.update(theme_id: params[:theme_id])
                 render json: {
                     success: true
                 }
