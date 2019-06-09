@@ -64,6 +64,8 @@ Rails.application.routes.draw do
   get '/api/is_friends/:friend' => 'api#is_friends'
   get '/api/search/:search_term' => 'api#search'
   get '/api/fetch_user' => 'api#fetch_user'
+  get '/api/archive/:username' => 'api#archive'
+  post '/api/fetch_archive_posts/:username' => 'api#fetch_archive_posts'
 
   resources :users do
     resources :posts do

@@ -209,9 +209,7 @@
 
     date = Date.parse(params[:date])
 
-    @posts = @user.posts.where('created_at between ? and ?', date.beginning_of_month.beginning_of_day, date.end_of_month.end_of_day)
-      .order('id desc')
-      .includes(:images)
+    @posts = @user.fetch_archive_posts_by_date date
 
     render partial: 'archive_posts'
   end
@@ -223,11 +221,6 @@
     end
 
     @user = User.find(params[:user_id])
-
-    @first_post_date = Date.parse(@user.posts.limit(1).order('id')[0].created_at.to_s)
-   
-    @last_post_date = Date.parse(@user.posts.limit(1).order('id desc')[0].created_at.to_s)
-
 
     months = [
       'January',
@@ -243,10 +236,8 @@
       'November',
       'December'
     ]
-    
-    @posts = @user.posts.where('created_at BETWEEN ? and ?', @last_post_date.beginning_of_month.beginning_of_day, @last_post_date.end_of_month.end_of_day)
-      .order('id desc')
-      .includes(:images)
+
+    @posts, @first_post_date, @last_post_date = @user.get_archive_posts()
 
 
     @select = {}

@@ -1,5 +1,7 @@
 class ApiController < ApplicationController
     include Common
+    include ActionView::Helpers::TextHelper
+
     protect_from_forgery with: :null_session
 
     before_action :doorkeeper_authorize!, :current_resource_owner
@@ -30,6 +32,98 @@ class ApiController < ApplicationController
             render json: {
                 success: false,
                 message: "user not found"
+            }
+        end
+    end
+
+    def archive
+        if @user
+            user = User.where('displayname = ?', params[:username]).first
+
+            posts, first_post_date, last_post_date = user.get_archive_posts()
+
+            months = [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December'
+            ]
+
+            select_array = []
+
+            (first_post_date.year..last_post_date.year).each do |year|
+                if year == first_post_date.year
+                    i = first_post_date.month-1
+
+                    last_index = first_post_date.year == last_post_date.year ? last_post_date.month : months.length
+
+                    while i <  last_index
+                        date = Date.parse("#{months[i]} #{year}")
+
+                        if (user.posts.where('created_at BETWEEN ? and ?', date.beginning_of_month.beginning_of_day, date.end_of_month.end_of_day).count > 0)
+                            select_array.push({
+                                label: months[i],
+                                year: year,
+                                value: "#{months[i]} #{year}"
+                            })
+                        end
+                        i = i+1
+                    end
+                elsif year == last_post_date.year
+                    months.each_with_index do |month, index|
+                        if index == last_post_date.month
+                            break
+                        end
+                        date = Date.parse("#{month} #{year}")
+                        if (user.posts.where('created_at BETWEEN ? and ?', date.beginning_of_month.beginning_of_day, date.end_of_month.end_of_day).count > 0)
+                            select_array.push({
+                                label: month,
+                                year: year,
+                                value: "#{month} #{year}"
+                            }) 
+                        end
+                    end
+                else
+                    months.each do |month|
+                        date = Date.parse("#{month} #{year}")
+                        if (user.posts.where('created_at BETWEEN ? and ?', date.beginning_of_month.beginning_of_day, date.end_of_month.end_of_day).count > 0)
+                            select_array.push({
+                                label: month,
+                                year: year,
+                                value: "#{month} #{year}"
+                            })
+                        end
+                    end
+                end
+            end
+
+            render json: {
+                options: select_array.reverse,
+                success: true,
+                posts: posts.map{ |post| render_hash_post post, true },
+            }
+        end
+    end
+
+    def fetch_archive_posts
+        if @user
+            user = User.where('displayname = ?', params[:username]).first
+
+            date = Date.parse(params[:date])
+
+            posts = user.fetch_archive_posts_by_date date
+
+            render json: {
+                success: true,
+                posts: posts.map { |post| render_hash_post post, true }
             }
         end
     end
@@ -135,12 +229,12 @@ class ApiController < ApplicationController
         end
     end
 
-    def render_hash_post post
+    def render_hash_post post, is_archive = false
         {                    
             id: post.id,
-            created_at: post.created_at.strftime("%m-%d-%y %I:%M %P"),
+            created_at: !is_archive ? post.created_at.strftime("%m-%d-%y %I:%M %P") : post.created_at.strftime("%B %e, %Y"),
             updated_at: post.updated_at.strftime("%m-%d-%y %I:%M %P"),
-            post: post.post,
+            post: auto_link(post.post, sanitize: false),
             edited: post.edited,
             num_comments: post.num_comments,
             avatar: post.user.avatar.url(:small),
