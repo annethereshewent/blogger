@@ -66,6 +66,7 @@ Rails.application.routes.draw do
   get '/api/fetch_user' => 'api#fetch_user'
   get '/api/archive/:username' => 'api#archive'
   post '/api/fetch_archive_posts/:username' => 'api#fetch_archive_posts'
+  post '/api/save_sidebar_settings' => 'api#save_sidebar_settings'
 
   resources :users do
     resources :posts do
