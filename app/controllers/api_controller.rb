@@ -38,7 +38,7 @@ class ApiController < ApplicationController
         if @user.present? and @user.update(user_params)
             render json: {
                 success: true,
-                user: render_hash_user(@user)
+                user: @user.render_hash_user()
             }
         else
             render json: {
@@ -81,19 +81,6 @@ class ApiController < ApplicationController
         end
     end
 
-    def fetch_user 
-        if @user.present?
-            friends = @user.friends.where('(sender = ?) or (friendships.accepted = true)', @user.id)
-            formatted_posts = get_json_posts(@user, friends)
-
-            render json: {
-                success: true,
-                user: render_hash_user(@user),
-                posts: formatted_posts
-            }
-        end
-    end
-
     def switch_theme 
         if @user.present?
             unless params[:theme_id]
@@ -131,25 +118,10 @@ class ApiController < ApplicationController
         end
     end
 
-    def render_hash_user user
-         {
-            user_id: user.id,
-            username: user.displayname,
-            avatar: user.avatar.url(:medium),
-            avatar_small: user.avatar.url(:small),
-            avatar_thumb: user.avatar.url(:thumb),
-            blog_title: user.blog_title,
-            description: user.description,
-            email: user.email,
-            theme: user.theme.present? ? user.theme.theme_name : 'default'
-
-        }
-    end
-
 
     def fetch_posts
         if @user.present?
-            formatted_posts = params[:page].present? ? get_json_posts(@user, nil, params[:page].to_i) : get_json_posts(@user)
+            formatted_posts = params[:page].present? ? @user.get_json_posts(nil, params[:page].to_i) : @user.get_json_posts()
 
             render json: {
                 success: true,
@@ -223,7 +195,7 @@ class ApiController < ApplicationController
             json_object = {
                 success: true,
                 posts: posts.map { |post| render_hash_post(post) },
-                user: render_hash_user(user),
+                user: user.render_hash_user(),
                 pagination: {
                     next_page: posts.next_page,
                     page: page,
@@ -346,41 +318,6 @@ class ApiController < ApplicationController
     #     JWT.encode(payload, Rails.application.secrets.secret_key_base)
     # end
 
-    def get_json_posts user, friends = nil, page = 1
-
-        friends = user.friends.where('(sender = ?) or (friendships.accepted = true)', user.id) unless friends
-
-        posts = Post.where("user_id in (#{ friends.map{ |friend| friend.id }.push(user.id).join(',') })")
-            .order('id desc')
-            .paginate(page: page, per_page: 15)
-            .includes(:tags)
-            .includes(:images)
-            .includes(:user)
-
-        formatted_posts = []
-        posts.each_with_index do |post, index|
-            formatted_posts[index] = {}
-            formatted_posts[index][:id] = post.id
-            formatted_posts[index][:created_at] = post.created_at.strftime("%m-%d-%y %I:%M %P")
-            formatted_posts[index][:updated_at] = post.updated_at.strftime("%m-%d-%y %I:%M %P")
-            formatted_posts[index][:post] = post.post
-            formatted_posts[index][:edited] = post.edited
-            formatted_posts[index][:num_comments] = post.num_comments
-            formatted_posts[index][:avatar] = post.user.avatar.url(:small)
-            formatted_posts[index][:username] = post.user.displayname
-            formatted_posts[index][:user_id] = post.user.id
-            formatted_posts[index][:images] = []
-            formatted_posts[index][:tags] = post.tags.map{ |tag| tag.tag_name }
-
-            post.images.each do |image|
-                formatted_posts[index][:images].push(image.file.url(:medium))
-            end
-        end
-
-        formatted_posts
-
-    end
-
     def fetch_friends
         if @user.present?
             # fetch friends
@@ -432,7 +369,7 @@ class ApiController < ApplicationController
 
         if params[:username].present?
             user = User.where('displayname = ?', params[:username])[0]
-            response[:user] = render_hash_user(user)
+            response[:user] = user.render_hash_user()
         end
 
         render json: response
