@@ -249,6 +249,21 @@ class ApiController < ApplicationController
         }
     end
 
+    def save_sidebar_settings
+        if @user
+            if @user.update(sidebar_params)
+                render json: {
+                    success: true
+                }
+            else
+                render json: {
+                    success: false,
+                    message: 'unable to save user'
+                }
+            end
+        end
+    end
+
     def render_hash_comment comment 
         {
             id: comment.id,
@@ -543,5 +558,9 @@ class ApiController < ApplicationController
     private
         def user_params
             params.permit(:blog_title, :email, :displayname, :password, :description, :avatar, :theme)
+        end
+
+        def sidebar_params
+            params.permit(:avatar, :banner, :background_color, :text_color)
         end
 end
