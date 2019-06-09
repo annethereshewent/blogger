@@ -20,10 +20,6 @@ class ApiRegistrationController < ApplicationController
 
     end
 
-    def authorize_public
-        doorkeeper_authorize!
-    end
-
     private
         def user_params
             params.permit(:blog_title, :email, :displayname, :password, :description, :avatar, :theme)
