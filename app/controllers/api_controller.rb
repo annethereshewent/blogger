@@ -244,7 +244,8 @@ class ApiController < ApplicationController
             images: post.images.map { |image| image.file.url(:medium) } ,
             tags: post.tags.map{ |tag| 
                 tag.tag_name
-            }
+            },
+            user: post.user.render_hash_user
         }
     end
 

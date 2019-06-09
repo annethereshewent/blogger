@@ -58,6 +58,7 @@ class User < ActiveRecord::Base
             formatted_posts[index][:user_id] = post.user.id
             formatted_posts[index][:images] = []
             formatted_posts[index][:tags] = post.tags.map{ |tag| tag.tag_name }
+            formatted_posts[index][:user] = post.user.render_hash_user
 
             post.images.each do |image|
                 formatted_posts[index][:images].push(image.file.url(:medium))
@@ -78,8 +79,10 @@ class User < ActiveRecord::Base
             blog_title: self.blog_title,
             description: self.description,
             email: self.email,
-            theme: self.theme.present? ? self.theme.theme_name : 'default'
-
+            theme: self.theme.present? ? self.theme.theme_name : 'default',
+            text_color: self.text_color,
+            background_color: self.background_color,
+            banner:  self.banner.url(:medium)
         }
     end
 
