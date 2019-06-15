@@ -5,7 +5,7 @@ class ApiController < ApplicationController
 
     protect_from_forgery with: :null_session
 
-    before_action :doorkeeper_authorize!, :current_resource_owner
+    before_action :doorkeeper_authorize!, :current_resource_owner, except: [:fetch_blog_posts, :fetch_comments]
 
     def is_friends
         if @user.present?
