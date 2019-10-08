@@ -338,6 +338,7 @@ class ApiController < ApplicationController
             if post = @user.posts.create(post: contents)
                 if (params[:tags].present?)
                     post.parse_tags(params[:tags])
+                    post.tags.reload
                 end
 
                 render json: {
