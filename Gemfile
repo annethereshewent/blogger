@@ -40,7 +40,7 @@ gem 'bcrypt'
 gem 'font-awesome-rails'
 
 # for handling attachments
-gem 'paperclip', "< 5.0"
+gem 'paperclip', "< 5.2.0"
 
 # used with aws-sdk, something about xml
 gem 'nokogiri'

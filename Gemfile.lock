@@ -125,11 +125,12 @@ GEM
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     orm_adapter (0.5.0)
-    paperclip (4.2.4)
-      activemodel (>= 3.2.0)
-      activesupport (>= 3.2.0)
+    paperclip (5.1.0)
+      activemodel (>= 4.2.0)
+      activesupport (>= 4.2.0)
       cocaine (~> 0.5.5)
       mime-types
+      mimemagic (~> 0.3.0)
     pg (1.2.3)
     rack (2.2.3)
     rack-cors (1.1.1)
@@ -241,7 +242,7 @@ DEPENDENCIES
   jwt
   listen
   nokogiri
-  paperclip (< 5.0)
+  paperclip (< 5.2.0)
   pg
   rack-cors
   rails (<= 6.0.3.3)

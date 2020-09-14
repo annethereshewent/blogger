@@ -557,7 +557,7 @@ class ApiController < ApplicationController
 
     private
         def user_params
-            params.permit(:blog_title, :description, :avatar, :theme, :email, :password)
+            params.permit(:blog_title, :description, :avatar, :theme, :email, :displayname, :password)
         end
 
         def sidebar_params
