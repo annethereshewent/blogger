@@ -130,10 +130,9 @@ class ApiController < ApplicationController
     end
 
     def update_user 
-        if @user.present? and @user.update(user_params)
+        if @user.present? && @user.update(user_params)
             render json: {
-                success: true,
-                user: @user.render_hash_user()
+                success: true
             }
         else
             render json: {
@@ -558,7 +557,7 @@ class ApiController < ApplicationController
 
     private
         def user_params
-            params.permit(:blog_title, :email, :displayname, :password, :description, :avatar, :theme)
+            params.permit(:blog_title, :description, :avatar, :theme, :email, :password)
         end
 
         def sidebar_params

@@ -1,8 +1,10 @@
 source 'http://rubygems.org'
 ruby "2.6.3"
 
+gem "webpacker"
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '<= 5.1.5'
+gem 'rails', '<= 6.0.3.3'
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 
@@ -71,7 +73,7 @@ gem 'socket.io-rails'
 gem 'jwt'
 
 #OAUTH 2.0!
-gem 'doorkeeper', '<= 4.3'
+gem 'doorkeeper'
 
 group :production do
 	gem 'rails_12factor'
