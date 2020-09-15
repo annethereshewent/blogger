@@ -79,7 +79,7 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    doorkeeper (5.4.0)
+    doorkeeper (5.3.3)
       railties (>= 5)
     dropzonejs-rails (0.8.5)
       rails (> 3.1)
@@ -233,7 +233,7 @@ DEPENDENCIES
   bcrypt
   coffee-rails
   devise
-  doorkeeper
+  doorkeeper (<= 5.3.3)
   dropzonejs-rails
   font-awesome-rails
   htmlentities

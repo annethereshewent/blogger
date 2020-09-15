@@ -73,7 +73,7 @@ gem 'socket.io-rails'
 gem 'jwt'
 
 #OAUTH 2.0!
-gem 'doorkeeper'
+gem 'doorkeeper', '<= 5.3.3'
 
 group :production do
 	gem 'rails_12factor'
