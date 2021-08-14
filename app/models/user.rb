@@ -2,13 +2,13 @@ class User < ActiveRecord::Base
   	# Include default devise modules. Others available are:
   	# :confirmable, :lockable, :timeoutable and :omniauthable
   	devise :recoverable, :trackable
-	
+
 	validates :email, uniqueness: true, presence: true
 	validates :displayname, uniqueness:true
-	
+
 	has_secure_password
 	validates_confirmation_of :password
-	
+
 	has_attached_file :avatar, :styles => { medium: "120x120#", thumb: '50x50#', small: '80x80#' }, :default_url => '/images/user_icon.png'
 	validates_attachment :avatar,
   		:content_type => { :content_type => ["image/jpeg", "image/gif", "image/png"] }
@@ -66,7 +66,6 @@ class User < ActiveRecord::Base
         end
 
         formatted_posts
-
     end
 
     def render_hash_user
@@ -86,11 +85,11 @@ class User < ActiveRecord::Base
         }
     end
 
-    def get_archive_posts 
+    def get_archive_posts
         first_post_date = Date.parse(self.posts.limit(1).order('id')[0].created_at.to_s)
-   
+
         last_post_date = Date.parse(self.posts.limit(1).order('id desc')[0].created_at.to_s)
-        
+
         posts = self.posts.where('created_at BETWEEN ? and ?', last_post_date.beginning_of_month.beginning_of_day, last_post_date.end_of_month.end_of_day)
           .order('id desc')
           .includes(:images)
